@@ -6,19 +6,36 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.8",
+    "@apollo/experimental-nextjs-app-support": "^0.11.2",
+    "@shopify/polaris": "^13.7.0",
+    "@shopify/polaris-icons": "^9.2.0",
     "cookies-next": "^4.2.1",
+    "firebase": "^10.12.4",
     "moment": "^2.30.1",
     "next": "14.2.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-simple-typewriter": "^5.0.1"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/client-preset": "^4.3.2",
+    "@graphql-codegen/near-operation-file-preset": "^3.0.0",
+    "@graphql-codegen/typed-document-node": "^5.0.9",
+    "@graphql-codegen/typescript": "^4.0.9",
+    "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
+    "@graphql-codegen/typescript-react-query": "^6.1.0",
+    "@types/graphql": "^14.5.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "apollo": "^2.34.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",

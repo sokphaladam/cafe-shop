@@ -1,0 +1,11 @@
+overwrite: true
+schema: "http://localhost:4000/"
+require:
+  - ts-node/register
+documents: "src/gql/**/*.gql"
+generates:
+  src/gql/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"

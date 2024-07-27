@@ -1,7 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 import { Telegram } from '@/api/telegram';
 import { useOrderContext } from '@/context/OrderContext';
 import React, { useCallback, useState } from 'react';
 import { useCustomToast } from './custom/CustomToast';
+import { Icon } from '@shopify/polaris';
+import { CartFilledIcon, CartIcon } from '@shopify/polaris-icons';
 
 export function CartPop() {
   const { setToasts, toasts } = useCustomToast();
@@ -37,10 +40,22 @@ export function CartPop() {
 
   }, [count, items, setItems, setToasts, toasts])
 
+  const handleRemove = useCallback((i: number) => {
+    const dummy = (items || []).filter((_, index) => index !== i);
+    setItems && setItems(dummy)
+    if (dummy.length === 0) {
+      setShow(false)
+    }
+  }, [items, setItems])
+
   return (
     <React.Fragment>
-      <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative' onClick={() => setShow(!show)}>
-        <img src="shopping.svg" alt="" />
+      <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative' onClick={() => {
+        if ((items || []).length > 0) {
+          setShow(!show)
+        }
+      }}>
+        <Icon source={CartFilledIcon} tone='base' />
         {
           items && items.length > 0 && (
             <span
@@ -94,9 +109,7 @@ export function CartPop() {
                     <div className='flex flex-row align-middle self-center w-[25%] justify-end'>
                       <div
                         className='bg-red-500 p-1 rounded-md text-red-200'
-                        onClick={() => {
-                          setItems && setItems(items.filter((_, index) => index !== i))
-                        }}
+                        onClick={() => handleRemove(i)}
                       >Remove</div>
                     </div>
                   </div>

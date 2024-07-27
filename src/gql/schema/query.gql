@@ -1,0 +1,68 @@
+query me {
+  me {
+    id
+    display
+    contact
+    gender
+    role {
+      id
+      name
+    }
+    createdDate
+  }
+}
+
+query ProductList(
+  $offset: Int
+  $limit: Int
+  $code: String
+  $filter: FilterProduct
+) {
+  productList(offset: $offset, limit: $limit, code: $code, filter: $filter) {
+    id
+    title
+    description
+    type
+    category {
+      id
+      name
+      root
+    }
+    sku {
+      id
+      name
+      price
+      discount
+      unit
+    }
+    code
+    images
+  }
+}
+
+query product($productId: Int!) {
+  product(id: $productId) {
+    id
+    title
+    description
+    type
+    category {
+      id
+      name
+      root
+    }
+    sku {
+      id
+      name
+      price
+      discount
+      unit
+    }
+    code
+    images
+  }
+}
+
+query categoryList {
+  categoryList
+}

@@ -1,0 +1,23 @@
+mutation Login($username: String!, $password: String!) {
+  login(username: $username, password: $password)
+}
+
+mutation createProduct($data: ProductInput) {
+  createProduct(data: $data)
+}
+
+mutation updateProduct($updateProductId: Int!, $data: ProductInput) {
+  updateProduct(id: $updateProductId, data: $data)
+}
+
+mutation updateCategory(
+  $updateCategoryId: Int!
+  $data: CategoryInput
+  $isActive: Boolean
+) {
+  updateCategory(id: $updateCategoryId, data: $data, isActive: $isActive)
+}
+
+mutation createCategory {
+  createCategory
+}
