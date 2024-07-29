@@ -50,11 +50,13 @@ export function CartPop() {
 
   return (
     <React.Fragment>
-      <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative' onClick={() => {
-        if ((items || []).length > 0) {
-          setShow(!show)
-        }
-      }}>
+      <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative'
+      // onClick={() => {
+      //   if ((items || []).length > 0) {
+      //     setShow(!show)
+      //   }
+      // }}
+      >
         <Icon source={CartFilledIcon} tone='base' />
         {
           items && items.length > 0 && (

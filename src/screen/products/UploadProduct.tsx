@@ -8,6 +8,7 @@ import { PolarisUpload } from "@/components/polaris/PolarisUpload";
 import { UploadProductSku } from "./components/upload/UploadProductSku";
 import { ProductInput, Sku } from "@/gql/graphql";
 import { PolarisCategory } from "@/components/polaris/PolarisCategory";
+import { UploadProductAddon } from "./components/upload/UploadProductAddon";
 
 interface Props {
   value: ProductInput;
@@ -31,7 +32,9 @@ export function UploadProduct({ value, setValue, onSubmit, loading, }: Props) {
       sku: value.sku?.map(x => {
         return {
           ...x,
-          unit
+          unit,
+          price: Number(x?.price),
+          discount: Number(x?.discount)
         }
       })
     }
@@ -121,13 +124,19 @@ export function UploadProduct({ value, setValue, onSubmit, loading, }: Props) {
               <TextField disabled={loading || uploading} requiredIndicator autoComplete="off" label="Unit" placeholder="Enter the product sku unit" value={unit} onChange={v => setUnit(v)} />
               <br />
               {!uploading && <UploadProductSku value={value} setValue={setValue} />}
+              <br />
+              <Divider />
+              <br />
+              <Text as="h3" variant="headingMd">3. Product Addons</Text>
+              <br />
+              <UploadProductAddon value={value} setValue={setValue} />
             </Box>
           </Card>
         </Layout.Section>
         <Layout.Section variant="oneThird">
           <Card>
             <Box>
-              <Text as="h3" variant="headingMd">3. Product Organization*</Text>
+              <Text as="h3" variant="headingMd">4. Product Organization*</Text>
               <br />
               <PolarisUpload url={value.images + ''} setUrl={url => {
                 setValue({

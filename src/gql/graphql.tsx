@@ -19,6 +19,21 @@ export type Scalars = {
   JSONObject: { input: any; output: any; }
 };
 
+export type AddonInput = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+  isRequired?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AddonProduct = {
+  __typename?: 'AddonProduct';
+  id?: Maybe<Scalars['Int']['output']>;
+  isRequired?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
 export type Book = {
   __typename?: 'Book';
   author?: Maybe<Scalars['String']['output']>;
@@ -35,6 +50,14 @@ export type Brand = {
 export type BrandInput = {
   logo?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CartItemInput = {
+  discount?: InputMaybe<Scalars['Float']['input']>;
+  price?: InputMaybe<Scalars['Float']['input']>;
+  productId?: InputMaybe<Scalars['Int']['input']>;
+  qty?: InputMaybe<Scalars['Int']['input']>;
+  skuId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Category = {
@@ -63,6 +86,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createBrand?: Maybe<Scalars['Boolean']['output']>;
   createCategory?: Maybe<Scalars['Boolean']['output']>;
+  createOrder?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<Scalars['String']['output']>;
   updateBrand?: Maybe<Scalars['Boolean']['output']>;
@@ -78,6 +102,11 @@ export type MutationCreateBrandArgs = {
 
 export type MutationCreateCategoryArgs = {
   data?: InputMaybe<CategoryInput>;
+};
+
+
+export type MutationCreateOrderArgs = {
+  data?: InputMaybe<OrderInput>;
 };
 
 
@@ -111,8 +140,38 @@ export type MutationUpdateProductArgs = {
   id: Scalars['Int']['input'];
 };
 
+export type Order = {
+  __typename?: 'Order';
+  address?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  items?: Maybe<Array<Maybe<OrderItem>>>;
+  name?: Maybe<Scalars['String']['output']>;
+  paid?: Maybe<Scalars['String']['output']>;
+  set?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  total?: Maybe<Scalars['String']['output']>;
+  uuid?: Maybe<Scalars['String']['output']>;
+};
+
+export type OrderInput = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  carts?: InputMaybe<Array<InputMaybe<CartItemInput>>>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  set?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OrderItem = {
+  __typename?: 'OrderItem';
+  discount?: Maybe<Scalars['Float']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  price?: Maybe<Scalars['Float']['output']>;
+  qty?: Maybe<Scalars['Int']['output']>;
+  sku?: Maybe<Sku>;
+};
+
 export type Product = {
   __typename?: 'Product';
+  addons?: Maybe<Array<Maybe<AddonProduct>>>;
   category?: Maybe<Category>;
   code?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -124,6 +183,7 @@ export type Product = {
 };
 
 export type ProductInput = {
+  addons?: InputMaybe<Array<InputMaybe<AddonInput>>>;
   category?: InputMaybe<Scalars['Int']['input']>;
   code?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -141,6 +201,7 @@ export type Query = {
   category?: Maybe<Category>;
   categoryList?: Maybe<Scalars['JSON']['output']>;
   me?: Maybe<User>;
+  orderList?: Maybe<Array<Maybe<Order>>>;
   product?: Maybe<Product>;
   productList?: Maybe<Array<Maybe<Product>>>;
   user?: Maybe<User>;
@@ -161,6 +222,12 @@ export type QueryBrandListArgs = {
 
 export type QueryCategoryArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type QueryOrderListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -281,14 +348,14 @@ export type ProductListQueryVariables = Exact<{
 }>;
 
 
-export type ProductListQuery = { __typename?: 'Query', productList?: Array<{ __typename?: 'Product', id?: number | null, title?: string | null, description?: string | null, type?: Array<Type_Product | null> | null, code?: string | null, images?: string | null, category?: { __typename?: 'Category', id?: number | null, name?: string | null, root?: number | null } | null, sku?: Array<{ __typename?: 'SKU', id?: number | null, name?: string | null, price?: number | null, discount?: number | null, unit?: string | null } | null> | null } | null> | null };
+export type ProductListQuery = { __typename?: 'Query', productList?: Array<{ __typename?: 'Product', id?: number | null, title?: string | null, description?: string | null, type?: Array<Type_Product | null> | null, code?: string | null, images?: string | null, category?: { __typename?: 'Category', id?: number | null, name?: string | null, root?: number | null } | null, sku?: Array<{ __typename?: 'SKU', id?: number | null, name?: string | null, price?: number | null, discount?: number | null, unit?: string | null } | null> | null, addons?: Array<{ __typename?: 'AddonProduct', value?: string | null, name?: string | null, isRequired?: boolean | null, id?: number | null } | null> | null } | null> | null };
 
 export type ProductQueryVariables = Exact<{
   productId: Scalars['Int']['input'];
 }>;
 
 
-export type ProductQuery = { __typename?: 'Query', product?: { __typename?: 'Product', id?: number | null, title?: string | null, description?: string | null, type?: Array<Type_Product | null> | null, code?: string | null, images?: string | null, category?: { __typename?: 'Category', id?: number | null, name?: string | null, root?: number | null } | null, sku?: Array<{ __typename?: 'SKU', id?: number | null, name?: string | null, price?: number | null, discount?: number | null, unit?: string | null } | null> | null } | null };
+export type ProductQuery = { __typename?: 'Query', product?: { __typename?: 'Product', id?: number | null, title?: string | null, description?: string | null, type?: Array<Type_Product | null> | null, code?: string | null, images?: string | null, category?: { __typename?: 'Category', id?: number | null, name?: string | null, root?: number | null } | null, sku?: Array<{ __typename?: 'SKU', id?: number | null, name?: string | null, price?: number | null, discount?: number | null, unit?: string | null } | null> | null, addons?: Array<{ __typename?: 'AddonProduct', value?: string | null, name?: string | null, isRequired?: boolean | null, id?: number | null } | null> | null } | null };
 
 export type CategoryListQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -522,6 +589,12 @@ export const ProductListDocument = gql`
     }
     code
     images
+    addons {
+      value
+      name
+      isRequired
+      id
+    }
   }
 }
     `;
@@ -582,6 +655,12 @@ export const ProductDocument = gql`
     }
     code
     images
+    addons {
+      value
+      name
+      isRequired
+      id
+    }
   }
 }
     `;

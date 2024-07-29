@@ -37,6 +37,12 @@ query ProductList(
     }
     code
     images
+    addons {
+      value
+      name
+      isRequired
+      id
+    }
   }
 }
 
@@ -60,6 +66,12 @@ query product($productId: Int!) {
     }
     code
     images
+    addons {
+      value
+      name
+      isRequired
+      id
+    }
   }
 }
 

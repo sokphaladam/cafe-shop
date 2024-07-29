@@ -37,7 +37,7 @@ export function UpdateProductScreen() {
         category: x?.category?.id || 0,
         description: x?.description,
         images: x?.images,
-        sku: x?.sku?.map(s => {
+        sku: (x?.sku || []).length > 0 ? x?.sku?.map(s => {
           return {
             id: s?.id,
             name: s?.name,
@@ -45,8 +45,21 @@ export function UpdateProductScreen() {
             discount: s?.discount,
             price: s?.price
           }
-        }),
-        type: x?.type
+        }) : [{
+          name: '',
+          discount: 0,
+          price: 0,
+          unit: ''
+        }],
+        type: x?.type,
+        addons: x?.addons?.map(a => {
+          return {
+            id: a?.id,
+            name: a?.name,
+            value: a?.value,
+            isRequired: a?.isRequired
+          }
+        })
       });
       setTimeout(() => {
         setSleep(false)
