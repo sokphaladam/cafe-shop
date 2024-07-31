@@ -1,5 +1,6 @@
 import { Telegram } from '@/api/telegram';
 import { useOrderContext } from '@/context/OrderContext';
+import { useWindowSize } from '@/hook/useWindowSize';
 import { Button, ButtonGroup, Divider, Modal, TextField, Thumbnail } from '@shopify/polaris';
 import React, { useCallback, useState } from 'react';
 
@@ -7,6 +8,7 @@ export function LayoutCart() {
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState('');
   const { items, setItems } = useOrderContext();
+  const { width } = useWindowSize();
 
   const handleCheckout = useCallback(() => {
     const telegram = new Telegram();
@@ -36,11 +38,14 @@ export function LayoutCart() {
       setPhone('');
       setOpen(!open);
     }).catch(err => console.log(err));
-
   }, [items, open, phone, setItems])
 
+  if ((width || 0) <= 640) {
+    return <div></div>
+  }
+
   return (
-    <div className="w-[30%] bg-white rounded-lg sticky top-0">
+    <div className="w-[30%] bg-white rounded-lg sticky top-[11%] max-h-[500px]">
       <Modal title="Confirmation" open={open} onClose={() => setOpen(!open)} primaryAction={{
         content: 'Confirm',
         onAction: handleCheckout

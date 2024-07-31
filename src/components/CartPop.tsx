@@ -3,14 +3,16 @@ import { Telegram } from '@/api/telegram';
 import { useOrderContext } from '@/context/OrderContext';
 import React, { useCallback, useState } from 'react';
 import { useCustomToast } from './custom/CustomToast';
-import { Icon } from '@shopify/polaris';
+import { Button, ButtonGroup, Divider, Icon, Modal, Thumbnail } from '@shopify/polaris';
 import { CartFilledIcon, CartIcon } from '@shopify/polaris-icons';
+import { useWindowSize } from '@/hook/useWindowSize';
 
 export function CartPop() {
   const { setToasts, toasts } = useCustomToast();
   const { items, setItems } = useOrderContext();
   const [show, setShow] = useState(false);
   const [count, setCount] = useState(1);
+  const { width } = useWindowSize();
 
   const handleCheckout = useCallback(() => {
     const telegram = new Telegram();
@@ -50,12 +52,61 @@ export function CartPop() {
 
   return (
     <React.Fragment>
+      <Modal open={show} onClose={() => setShow(!show)} title="Checkout">
+        <Modal.Section>
+          {
+            items?.map((x, i) => {
+              const sku = x.sku.find((s: any) => s.id === x.sku_id);
+              return (
+                <div key={i} className='p-4'>
+                  <div className='flex flex-row justify-between items-center'>
+                    <div className='flex flex-row'>
+                      <Thumbnail source={x.images || ''} alt='' size='medium' />
+                      <div className='ml-2'>
+                        <b>{x.title}</b>
+                        <br />
+                        <b>${sku ? sku.price : ''} ({sku.name})</b>
+                        <br />
+                        {x.addon_value.join(',')}
+                      </div>
+                    </div>
+                    <div>
+                      <ButtonGroup variant='segmented'>
+                        <Button size='micro' onClick={() => {
+                          const dummy = [...items];
+                          if (dummy[i].qty === 1) {
+                            setItems && setItems(items.filter((_, index) => index !== i))
+                            return;
+                          }
+                          dummy[i].qty = dummy[i].qty - 1;
+                          setItems && setItems(dummy)
+                        }}>-</Button>
+                        <Button disabled size='micro'>{x.qty}</Button>
+                        <Button size='micro' onClick={() => {
+                          const dummy = [...items];
+                          dummy[i].qty = dummy[i].qty + 1;
+                          setItems && setItems(dummy)
+                        }}>+</Button>
+                      </ButtonGroup>
+                    </div>
+                  </div>
+                  <br />
+                  <div>
+                    Special Request: {x.remark}
+                  </div>
+                  <Divider />
+                </div>
+              )
+            })
+          }
+        </Modal.Section>
+      </Modal>
       <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative'
-      // onClick={() => {
-      //   if ((items || []).length > 0) {
-      //     setShow(!show)
-      //   }
-      // }}
+        onClick={() => {
+          if ((items || []).length > 0 && (width || 0) <= 640) {
+            setShow(!show)
+          }
+        }}
       >
         <Icon source={CartFilledIcon} tone='base' />
         {
@@ -66,7 +117,7 @@ export function CartPop() {
           )
         }
       </div>
-      {
+      {/* {
         show === true && <div className='fixed bottom-0 w-full left-0 right-0'>
           <div className='relative w-[512px] mx-auto bg-white rounded-md p-4 shadow-md max-md:w-[512/2] max-sm:w-full'>
             <div className='p-1 font-bold'>
@@ -126,7 +177,7 @@ export function CartPop() {
             </div>
           </div>
         </div>
-      }
+      } */}
     </React.Fragment>
   )
 }

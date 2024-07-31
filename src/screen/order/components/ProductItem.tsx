@@ -45,7 +45,8 @@ export function ProductItem(props: Props) {
         status: 'info'
       }
     ])
-  }, [addons, items, props.product, remark, setItems, setToasts, sku, toasts])
+    setOpen(!open)
+  }, [addons, items, open, props.product, remark, setItems, setToasts, sku, toasts])
 
   return (
     <React.Fragment>
@@ -105,7 +106,7 @@ export function ProductItem(props: Props) {
         </Modal.Section>
       </Modal>
       <div onClick={() => setOpen(!open)} className="bg-white rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer hover:scale-105 hover:bg-gray-50 transition-all">
-        <div className="max-w-[250px]">
+        <div className="max-w-[250px] max-sm:w-[210px] max-lg:w-[180px]">
           <b className="text-lg">{props.product.title}</b>
           <div className="text-red-500 font-bold my-2">${(props.product.sku || [])[0]?.price}</div>
           <div className="max-h-[30px] truncate">{props.product.description}</div>
