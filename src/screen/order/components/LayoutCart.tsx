@@ -1,14 +1,58 @@
 import { Telegram } from '@/api/telegram';
+import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
+import { OrderInput, useCreateOrderMutation } from '@/gql/graphql';
 import { useWindowSize } from '@/hook/useWindowSize';
-import { Button, ButtonGroup, Divider, Modal, TextField, Thumbnail } from '@shopify/polaris';
+import { Button, ButtonGroup, Divider, Icon, Modal, TextField, Thumbnail } from '@shopify/polaris';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 
 export function LayoutCart() {
+  const params = useSearchParams();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState('');
   const { items, setItems } = useOrderContext();
+  const { toasts, setToasts } = useCustomToast();
   const { width } = useWindowSize();
+  const [createOrder] = useCreateOrderMutation();
+
+  const [info] = useState({
+    set: params.get('set') || 1,
+    name: params.get('token') || new Date().getTime() + "" + (params.get('set') || 1)
+  })
+
+  const handleCreateOrder = useCallback(() => {
+    const input: OrderInput = {
+      set: info.set + "",
+      name: info.name,
+      address: '',
+      carts: items?.map(item => {
+        const sku = item.sku.find((s: any) => s.id === item.sku_id);
+        return {
+          skuId: item.sku_id,
+          qty: item.qty,
+          addons: item.addon_value.join(','),
+          discount: sku.discount,
+          price: sku.price,
+          productId: item.id,
+          remark: item.remark
+        }
+      })
+    }
+
+    createOrder({
+      variables: {
+        data: input
+      }
+    }).then(res => {
+      if (res.data?.createOrder) {
+        process.browser && localStorage.removeItem(info.name);
+        setItems && setItems([]);
+        setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }])
+      }
+    })
+  }, [createOrder, info.name, info.set, items, setItems, setToasts, toasts])
 
   const handleCheckout = useCallback(() => {
     const telegram = new Telegram();
@@ -45,7 +89,7 @@ export function LayoutCart() {
   }
 
   return (
-    <div className="w-[30%] bg-white rounded-lg sticky top-[11%] max-h-[500px]">
+    <div className={`w-[30%] bg-white rounded-lg sticky top-[11%]`} style={{ height: window.innerHeight / 1.2 }}>
       <Modal title="Confirmation" open={open} onClose={() => setOpen(!open)} primaryAction={{
         content: 'Confirm',
         onAction: handleCheckout
@@ -54,7 +98,12 @@ export function LayoutCart() {
           <TextField value={phone} label="Phone number" onChange={setPhone} autoComplete='off' type='number' />
         </Modal.Section>
       </Modal>
-      <div>
+      <div className='h-[50px] border-collapse border-gray-200 border-b-[0.5px] p-3'>
+        <h3 className='font-bold text-lg'>Checkout</h3>
+      </div>
+      <div className='h-[400px] overflow-auto' style={{ height: (window.innerHeight / 1.2) - 100 }}>
+        {items?.length === 0 && <div className='flex flex-col items-center justify-center' style={{ height: (window.innerHeight / 1.2) - 100 }}>
+          <div>Order anything you want</div></div>}
         {
           items?.map((x, i) => {
             const sku = x.sku.find((s: any) => s.id === x.sku_id);
@@ -101,8 +150,9 @@ export function LayoutCart() {
           })
         }
       </div>
-      <div className='p-4 absolute bottom-0 left-0 right-0'>
-        <Button variant='primary' tone='critical' fullWidth onClick={() => setOpen(!open)}>Checkout</Button>
+      <div className='absolute bottom-0 left-0 right-0 h-[50px] border-collapse border-gray-200 border-t-[0.5px] flex flex-row justify-center items-center p-4'>
+        {/* <Button variant='primary' tone='critical' fullWidth onClick={() => setOpen(!open)}>Checkout</Button> */}
+        <div className={`p-2 w-full text-center ${items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => items?.length === 0 ? {} : handleCreateOrder()}>Checkout</div>
       </div>
     </div>
   )

@@ -6,6 +6,7 @@ import React, { useCallback, useState } from 'react';
 
 interface Props {
   product: Product
+  keyItem: string;
 }
 
 export function ProductItem(props: Props) {
@@ -36,8 +37,8 @@ export function ProductItem(props: Props) {
         qty: 1,
       })
     }
-    console.log(data)
     setItems && setItems(data);
+    process.browser && localStorage.setItem(props.keyItem, JSON.stringify(data));
     setToasts([
       ...toasts,
       {
@@ -46,7 +47,7 @@ export function ProductItem(props: Props) {
       }
     ])
     setOpen(!open)
-  }, [addons, items, open, props.product, remark, setItems, setToasts, sku, toasts])
+  }, [addons, items, open, props.keyItem, props.product, remark, setItems, setToasts, sku, toasts])
 
   return (
     <React.Fragment>

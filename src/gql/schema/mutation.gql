@@ -21,3 +21,7 @@ mutation updateCategory(
 mutation createCategory {
   createCategory
 }
+
+mutation createOrder($data: OrderInput) {
+  createOrder(data: $data)
+}

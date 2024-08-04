@@ -53,10 +53,12 @@ export type BrandInput = {
 };
 
 export type CartItemInput = {
+  addons?: InputMaybe<Scalars['String']['input']>;
   discount?: InputMaybe<Scalars['Float']['input']>;
   price?: InputMaybe<Scalars['Float']['input']>;
   productId?: InputMaybe<Scalars['Int']['input']>;
   qty?: InputMaybe<Scalars['Int']['input']>;
+  remark?: InputMaybe<Scalars['String']['input']>;
   skuId?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -72,8 +74,16 @@ export type CategoryInput = {
   root?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type ChangeOrderInput = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+  itemStatus?: InputMaybe<StatusOrderItem>;
+  orderId: Scalars['Int']['input'];
+  status?: InputMaybe<StatusOrder>;
+};
+
 export type FilterProduct = {
   category?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  type?: InputMaybe<Array<InputMaybe<Type_Product>>>;
 };
 
 export enum Gender {
@@ -84,14 +94,22 @@ export enum Gender {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  changeOrderStatus?: Maybe<Scalars['Boolean']['output']>;
   createBrand?: Maybe<Scalars['Boolean']['output']>;
   createCategory?: Maybe<Scalars['Boolean']['output']>;
   createOrder?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
+  createProductStock?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<Scalars['String']['output']>;
   updateBrand?: Maybe<Scalars['Boolean']['output']>;
   updateCategory?: Maybe<Scalars['Boolean']['output']>;
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
+  updateProductStock?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type MutationChangeOrderStatusArgs = {
+  data?: InputMaybe<ChangeOrderInput>;
 };
 
 
@@ -112,6 +130,11 @@ export type MutationCreateOrderArgs = {
 
 export type MutationCreateProductArgs = {
   data?: InputMaybe<ProductInput>;
+};
+
+
+export type MutationCreateProductStockArgs = {
+  data?: InputMaybe<ProductStockInput>;
 };
 
 
@@ -140,6 +163,12 @@ export type MutationUpdateProductArgs = {
   id: Scalars['Int']['input'];
 };
 
+
+export type MutationUpdateProductStockArgs = {
+  data?: InputMaybe<ProductStockInput>;
+  id: Scalars['Int']['input'];
+};
+
 export type Order = {
   __typename?: 'Order';
   address?: Maybe<Scalars['String']['output']>;
@@ -148,7 +177,7 @@ export type Order = {
   name?: Maybe<Scalars['String']['output']>;
   paid?: Maybe<Scalars['String']['output']>;
   set?: Maybe<Scalars['String']['output']>;
-  status?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<StatusOrder>;
   total?: Maybe<Scalars['String']['output']>;
   uuid?: Maybe<Scalars['String']['output']>;
 };
@@ -167,6 +196,7 @@ export type OrderItem = {
   price?: Maybe<Scalars['Float']['output']>;
   qty?: Maybe<Scalars['Int']['output']>;
   sku?: Maybe<Sku>;
+  status?: Maybe<StatusOrderItem>;
 };
 
 export type Product = {
@@ -193,6 +223,20 @@ export type ProductInput = {
   type?: InputMaybe<Array<InputMaybe<Type_Product>>>;
 };
 
+export type ProductStock = {
+  __typename?: 'ProductStock';
+  id?: Maybe<Scalars['Int']['output']>;
+  location?: Maybe<Scalars['String']['output']>;
+  product?: Maybe<Product>;
+  qty?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ProductStockInput = {
+  location?: InputMaybe<Scalars['String']['input']>;
+  productId?: InputMaybe<Scalars['Int']['input']>;
+  qty?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   books?: Maybe<Array<Maybe<Book>>>;
@@ -204,6 +248,8 @@ export type Query = {
   orderList?: Maybe<Array<Maybe<Order>>>;
   product?: Maybe<Product>;
   productList?: Maybe<Array<Maybe<Product>>>;
+  productStock?: Maybe<ProductStock>;
+  productStockList?: Maybe<Array<Maybe<ProductStock>>>;
   user?: Maybe<User>;
   userList?: Maybe<Array<Maybe<User>>>;
 };
@@ -244,6 +290,17 @@ export type QueryProductListArgs = {
 };
 
 
+export type QueryProductStockArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryProductStockListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryUserArgs = {
   id: Scalars['Int']['input'];
 };
@@ -277,6 +334,21 @@ export type SkuInput = {
   price?: InputMaybe<Scalars['Float']['input']>;
   unit?: InputMaybe<Scalars['String']['input']>;
 };
+
+export enum StatusOrder {
+  Checkout = 'CHECKOUT',
+  Delivery = 'DELIVERY',
+  Pending = 'PENDING',
+  Verify = 'VERIFY'
+}
+
+export enum StatusOrderItem {
+  Completed = 'COMPLETED',
+  Making = 'MAKING',
+  OutOfStock = 'OUT_OF_STOCK',
+  Pending = 'PENDING',
+  RequestChange = 'REQUEST_CHANGE'
+}
 
 export enum Type_Product {
   Addon = 'ADDON',
@@ -334,6 +406,13 @@ export type CreateCategoryMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory?: boolean | null };
+
+export type CreateOrderMutationVariables = Exact<{
+  data?: InputMaybe<OrderInput>;
+}>;
+
+
+export type CreateOrderMutation = { __typename?: 'Mutation', createOrder?: boolean | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -521,6 +600,37 @@ export function useCreateCategoryMutation(baseOptions?: Apollo.MutationHookOptio
 export type CreateCategoryMutationHookResult = ReturnType<typeof useCreateCategoryMutation>;
 export type CreateCategoryMutationResult = Apollo.MutationResult<CreateCategoryMutation>;
 export type CreateCategoryMutationOptions = Apollo.BaseMutationOptions<CreateCategoryMutation, CreateCategoryMutationVariables>;
+export const CreateOrderDocument = gql`
+    mutation createOrder($data: OrderInput) {
+  createOrder(data: $data)
+}
+    `;
+export type CreateOrderMutationFn = Apollo.MutationFunction<CreateOrderMutation, CreateOrderMutationVariables>;
+
+/**
+ * __useCreateOrderMutation__
+ *
+ * To run a mutation, you first call `useCreateOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createOrderMutation, { data, loading, error }] = useCreateOrderMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateOrderMutation(baseOptions?: Apollo.MutationHookOptions<CreateOrderMutation, CreateOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateOrderMutation, CreateOrderMutationVariables>(CreateOrderDocument, options);
+      }
+export type CreateOrderMutationHookResult = ReturnType<typeof useCreateOrderMutation>;
+export type CreateOrderMutationResult = Apollo.MutationResult<CreateOrderMutation>;
+export type CreateOrderMutationOptions = Apollo.BaseMutationOptions<CreateOrderMutation, CreateOrderMutationVariables>;
 export const MeDocument = gql`
     query me {
   me {
