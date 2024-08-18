@@ -52,7 +52,7 @@ export function CustomerOrderScreen() {
       <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 max-sm:p-4">
         <div className="w-[70%] flex flex-col gap-4 max-sm:w-full">
           {
-            Object.keys(groups).map(g => {
+            groups && Object.keys(groups).map(g => {
               return (
                 <div key={g}>
                   <div className="text-xl my-2 font-semibold">{g}</div>

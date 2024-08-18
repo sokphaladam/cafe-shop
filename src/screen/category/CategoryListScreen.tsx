@@ -1,11 +1,12 @@
 'use client'
 import { PolarisLayout } from '@/components/polaris/PolarisLayout';
+import { FormCategory } from '@/components/polaris/form/FormCategory';
 import { useCategoryListQuery } from '@/gql/graphql';
 import { ActionList, Box, Card, Icon, Layout, Popover, Spinner } from '@shopify/polaris';
 import { FolderDownIcon, FolderIcon, MenuVerticalIcon } from '@shopify/polaris-icons';
 import React, { useCallback, useState } from 'react';
 
-function PopoverControl(props: { id: number }) {
+function PopoverControl(props: { id: number, onEdit: any }) {
   const [open, setOpen] = useState(false);
 
   const toggelOpen = useCallback(() => setOpen(!open), [open])
@@ -20,7 +21,7 @@ function PopoverControl(props: { id: number }) {
     <Popover preferredPosition='mostSpace' activator={activator} active={open} onClose={toggelOpen}>
       <ActionList
         items={[
-          { content: 'Edit', url: `/category/edit/${props.id}` }
+          { content: 'Edit', onAction: ()=> props.onEdit(props.id) }
         ]}
       />
     </Popover>
@@ -30,6 +31,8 @@ function PopoverControl(props: { id: number }) {
 export function CategoryListScreen() {
   const { data, loading } = useCategoryListQuery();
   const [open, setOpen] = useState(0);
+  const [active, setActive] = useState(false);
+  const [categoryId, setCategoryId] = useState(0);
 
   const loadChidren = (childs: any[], i: number = 2) => {
     const number = i
@@ -41,7 +44,10 @@ export function CategoryListScreen() {
             <div><Icon source={ch.id === open ? FolderDownIcon : FolderIcon} /></div>
             <div className='ml-2'>{ch.name}</div>
           </div>
-          <PopoverControl id={ch.id} />
+          <PopoverControl id={ch.id}  onEdit={(v: any)=> {
+            setCategoryId(v);
+            setActive(true);
+          }}/>
         </div>
         {loadChidren(ch.children, i + 2)}
       </div>
@@ -51,8 +57,12 @@ export function CategoryListScreen() {
   return (
     <Layout>
       <Layout.Section variant='oneThird'>
-        <PolarisLayout title='Category List' fullWidth primaryAction={{ content: 'Create', url: '/category/create' }}>
+        <PolarisLayout title='Category List' fullWidth primaryAction={{ content: 'Create', onAction: ()=>setActive(true) }}>
           {loading && <Spinner />}
+          <FormCategory title={`Categories ${categoryId > 0 ? '#'+categoryId: ''}`} active={active} setActive={v => {
+            setActive(v);
+            setCategoryId(0);
+          }} id={categoryId} />
           <Card>
             <Box>
               {
@@ -64,7 +74,10 @@ export function CategoryListScreen() {
                           <div><Icon source={x.id === open ? FolderDownIcon : FolderIcon} /></div>
                           <div className='ml-2'>{x.name}</div>
                         </div>
-                        <PopoverControl id={x.id} />
+                        <PopoverControl id={x.id} onEdit={(v: any) => {
+                          setCategoryId(v);
+                          setActive(true);
+                        }} />
                       </div>
                       {loadChidren(x.children)}
                     </div>

@@ -18,8 +18,8 @@ mutation updateCategory(
   updateCategory(id: $updateCategoryId, data: $data, isActive: $isActive)
 }
 
-mutation createCategory {
-  createCategory
+mutation createCategory($data: CategoryInput) {
+  createCategory(data: $data)
 }
 
 mutation createOrder($data: OrderInput) {

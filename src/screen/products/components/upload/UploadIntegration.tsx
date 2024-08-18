@@ -1,9 +1,14 @@
-import { Type_Product, useProductListQuery } from '@/gql/graphql';
+import { ProductInput, Type_Product, useProductListQuery } from '@/gql/graphql';
 import { Autocomplete, Icon, LegacyStack, Tag, TextField, Thumbnail } from '@shopify/polaris';
 import { PlusIcon } from '@shopify/polaris-icons';
 import React, { useCallback, useState } from 'react';
 
-export function UploadIntegration() {
+interface Props {
+  value: ProductInput;
+  setValue: (v: ProductInput) => void
+}
+
+export function UploadIntegration(props: Props) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
   const [inputValue, setInputValue] = useState('');
   const { data, loading } = useProductListQuery({

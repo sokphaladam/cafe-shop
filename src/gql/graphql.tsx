@@ -83,6 +83,7 @@ export type ChangeOrderInput = {
 
 export type FilterProduct = {
   category?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  isLowStock?: InputMaybe<Scalars['Boolean']['input']>;
   type?: InputMaybe<Array<InputMaybe<Type_Product>>>;
 };
 
@@ -91,6 +92,21 @@ export enum Gender {
   Male = 'MALE',
   Other = 'OTHER'
 }
+
+export type Integrate = {
+  __typename?: 'Integrate';
+  id?: Maybe<Scalars['Int']['output']>;
+  integrate?: Maybe<Product>;
+  product?: Maybe<Product>;
+  qty?: Maybe<Scalars['String']['output']>;
+};
+
+export type IntegrateInput = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+  integrateId?: InputMaybe<Scalars['Int']['input']>;
+  productId?: InputMaybe<Scalars['Int']['input']>;
+  qty?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -187,6 +203,7 @@ export type OrderInput = {
   carts?: InputMaybe<Array<InputMaybe<CartItemInput>>>;
   name?: InputMaybe<Scalars['String']['input']>;
   set?: InputMaybe<Scalars['String']['input']>;
+  uuid?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type OrderItem = {
@@ -207,7 +224,9 @@ export type Product = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   images?: Maybe<Scalars['String']['output']>;
+  integrates?: Maybe<Array<Maybe<Integrate>>>;
   sku?: Maybe<Array<Maybe<Sku>>>;
+  stockAlter?: Maybe<Scalars['Float']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Array<Maybe<Type_Product>>>;
 };
@@ -218,7 +237,9 @@ export type ProductInput = {
   code?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   images?: InputMaybe<Scalars['String']['input']>;
+  integrate?: InputMaybe<Array<InputMaybe<IntegrateInput>>>;
   sku?: InputMaybe<Array<InputMaybe<SkuInput>>>;
+  stockAlter?: InputMaybe<Scalars['Float']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Array<InputMaybe<Type_Product>>>;
 };
@@ -245,6 +266,7 @@ export type Query = {
   category?: Maybe<Category>;
   categoryList?: Maybe<Scalars['JSON']['output']>;
   me?: Maybe<User>;
+  order?: Maybe<Order>;
   orderList?: Maybe<Array<Maybe<Order>>>;
   product?: Maybe<Product>;
   productList?: Maybe<Array<Maybe<Product>>>;
@@ -268,6 +290,12 @@ export type QueryBrandListArgs = {
 
 export type QueryCategoryArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type QueryOrderArgs = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+  token?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -402,7 +430,9 @@ export type UpdateCategoryMutationVariables = Exact<{
 
 export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory?: boolean | null };
 
-export type CreateCategoryMutationVariables = Exact<{ [key: string]: never; }>;
+export type CreateCategoryMutationVariables = Exact<{
+  data?: InputMaybe<CategoryInput>;
+}>;
 
 
 export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory?: boolean | null };
@@ -440,6 +470,13 @@ export type CategoryListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CategoryListQuery = { __typename?: 'Query', categoryList?: any | null };
+
+export type CategoryQueryVariables = Exact<{
+  categoryId: Scalars['Int']['input'];
+}>;
+
+
+export type CategoryQuery = { __typename?: 'Query', category?: { __typename?: 'Category', id?: number | null, name?: string | null, root?: number | null } | null };
 
 
 export const LoginDocument = gql`
@@ -571,8 +608,8 @@ export type UpdateCategoryMutationHookResult = ReturnType<typeof useUpdateCatego
 export type UpdateCategoryMutationResult = Apollo.MutationResult<UpdateCategoryMutation>;
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
 export const CreateCategoryDocument = gql`
-    mutation createCategory {
-  createCategory
+    mutation createCategory($data: CategoryInput) {
+  createCategory(data: $data)
 }
     `;
 export type CreateCategoryMutationFn = Apollo.MutationFunction<CreateCategoryMutation, CreateCategoryMutationVariables>;
@@ -590,6 +627,7 @@ export type CreateCategoryMutationFn = Apollo.MutationFunction<CreateCategoryMut
  * @example
  * const [createCategoryMutation, { data, loading, error }] = useCreateCategoryMutation({
  *   variables: {
+ *      data: // value for 'data'
  *   },
  * });
  */
@@ -844,3 +882,45 @@ export type CategoryListQueryHookResult = ReturnType<typeof useCategoryListQuery
 export type CategoryListLazyQueryHookResult = ReturnType<typeof useCategoryListLazyQuery>;
 export type CategoryListSuspenseQueryHookResult = ReturnType<typeof useCategoryListSuspenseQuery>;
 export type CategoryListQueryResult = Apollo.QueryResult<CategoryListQuery, CategoryListQueryVariables>;
+export const CategoryDocument = gql`
+    query category($categoryId: Int!) {
+  category(id: $categoryId) {
+    id
+    name
+    root
+  }
+}
+    `;
+
+/**
+ * __useCategoryQuery__
+ *
+ * To run a query within a React component, call `useCategoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCategoryQuery({
+ *   variables: {
+ *      categoryId: // value for 'categoryId'
+ *   },
+ * });
+ */
+export function useCategoryQuery(baseOptions: Apollo.QueryHookOptions<CategoryQuery, CategoryQueryVariables> & ({ variables: CategoryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CategoryQuery, CategoryQueryVariables>(CategoryDocument, options);
+      }
+export function useCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CategoryQuery, CategoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CategoryQuery, CategoryQueryVariables>(CategoryDocument, options);
+        }
+export function useCategorySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CategoryQuery, CategoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CategoryQuery, CategoryQueryVariables>(CategoryDocument, options);
+        }
+export type CategoryQueryHookResult = ReturnType<typeof useCategoryQuery>;
+export type CategoryLazyQueryHookResult = ReturnType<typeof useCategoryLazyQuery>;
+export type CategorySuspenseQueryHookResult = ReturnType<typeof useCategorySuspenseQuery>;
+export type CategoryQueryResult = Apollo.QueryResult<CategoryQuery, CategoryQueryVariables>;

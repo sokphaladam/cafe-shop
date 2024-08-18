@@ -108,7 +108,7 @@ export function UploadProduct({ value, setValue, onSubmit, loading, }: Props) {
                 placeholder="Enter the product title"
                 value={value.title || ''}
                 onChange={v => {
-                  setValue({ ...value, title: v, code: prefix(v) })
+                  setValue({ ...value, title: v, code: v === ''?"": prefix(v) })
                 }}
                 requiredIndicator
               />
@@ -144,7 +144,7 @@ export function UploadProduct({ value, setValue, onSubmit, loading, }: Props) {
                 <Box>
                   <Text as="h3" variant="headingMd">5. Product Ingredients*</Text>
                   <br />
-                  <UploadIntegration />
+                  <UploadIntegration  value={value} setValue={setValue}/>
                 </Box>
               </Card></>
           }
@@ -171,7 +171,12 @@ export function UploadProduct({ value, setValue, onSubmit, loading, }: Props) {
                 !uploading && <PolarisCategory value={value} onChange={setValue} />
               }
               <br />
-              <TextField disabled={loading || uploading} autoComplete="off" label="Quantity Alert" placeholder="How many is minimum quantity for alter?" type="number" />
+              <TextField value={value.stockAlter+''} onChange={v => {
+                setValue({
+                  ...value,
+                  stockAlter: Number(v)
+                })
+              }}   disabled={loading || uploading} autoComplete="off" label="Quantity Alert" placeholder="How many is minimum quantity for alter?" type="number" />
             </Box>
           </Card>
         </Layout.Section>
