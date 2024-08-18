@@ -59,6 +59,15 @@ export function UpdateProductScreen() {
             value: a?.value,
             isRequired: a?.isRequired
           }
+        }),
+        stockAlter: x?.stockAlter,
+        integrate: x?.integrates?.map(x => {
+          return {
+            id: x?.id,
+            integrateId: x?.integrate?.id,
+            productId: x?.product?.id,
+            qty: x?.qty
+          }
         })
       });
       setTimeout(() => {

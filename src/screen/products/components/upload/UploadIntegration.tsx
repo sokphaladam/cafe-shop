@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function UploadIntegration(props: Props) {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+  // const [selectedOptions, setSelectedOptions] = useState<string[]>([])
   const [inputValue, setInputValue] = useState('');
   const { data, loading } = useProductListQuery({
     variables: {
@@ -23,23 +23,26 @@ export function UploadIntegration(props: Props) {
 
   const removeTag = useCallback(
     (tag: string) => () => {
-      const options = [...selectedOptions];
-      options.splice(options.indexOf(tag), 1);
-      setSelectedOptions(options);
+      const options = [...(props.value.integrate || [])];
+      options.splice(options.map(x => x?.integrateId + '').indexOf(tag), 1);
+      props.setValue({
+        ...props.value,
+        integrate: options
+      })
     },
-    [selectedOptions],
+    [props],
   );
 
   const verticalContentMarkup =
-    selectedOptions.length > 0 ? (
+    (props.value.integrate || [])?.length > 0 ? (
       <LegacyStack spacing="extraTight" alignment="center">
-        {selectedOptions.map((option) => {
-          const find = data?.productList?.find((f: any) => Number(f.id) === Number(option))
+        {(props.value.integrate || []).map((option) => {
+          const find = data?.productList?.find((f: any) => Number(f.id) === Number(option?.integrateId))
           let tagLabel = '';
-          tagLabel = find ? find.title?.replace('_', ' ') + '' : option.replace('_', ' ');
+          tagLabel = find ? find.title?.replace('_', ' ') + '' : option?.integrateId + '';
           tagLabel = titleCase(tagLabel);
           return (
-            <Tag key={`option${option}`} onRemove={removeTag(option)}>
+            <Tag key={`option${option}`} onRemove={removeTag(option?.integrateId + '')}>
               {tagLabel}
             </Tag>
           );
@@ -70,24 +73,51 @@ export function UploadIntegration(props: Props) {
             }
           }) || [] : []
         }
-        selected={selectedOptions}
-        onSelect={setSelectedOptions}
+        selected={props.value.integrate?.map(x => x?.integrateId + '') || []}
+        onSelect={v => {
+          const dummy = [...(props.value.integrate || [])]
+          for (const i of v) {
+            const find = dummy.findIndex(f => Number(f?.integrateId) === Number(i));
+
+            if (find < 0) {
+              dummy.push({
+                integrateId: Number(i),
+                qty: '0'
+              })
+            }
+          }
+
+          props.setValue({
+            ...props.value,
+            integrate: dummy
+          })
+        }}
         listTitle='Ingredients'
         textField={textField}
         loading={loading}
       />
       {
-        selectedOptions.map(opt => {
-          const find = data?.productList?.find((f: any) => Number(f.id) === Number(opt))
+        (props.value.integrate || []).map((opt, i) => {
+          const find = data?.productList?.find((f: any) => Number(f.id) === Number(opt?.integrateId + ''))
           const unit = find ? (find?.sku as any[])[0]?.unit : '';
           return (
-            <div className='p-2 flex flex-row gap-2 justify-between items-center' key={opt}>
+            <div className='p-2 flex flex-row gap-2 justify-between items-center' key={i}>
               <div><Thumbnail alt='' source={find?.images + ''} size='small' /></div>
               <div>
-                <TextField disabled autoComplete='off' label labelHidden value={find ? find.title + "" : opt} />
+                <TextField disabled autoComplete='off' label labelHidden value={find ? find.title + "" : opt?.integrateId + ''} />
               </div>
               <div className='w-[350px]'>
-                <TextField autoComplete='off' label labelHidden placeholder={``} suffix={unit} type='integer' />
+                <TextField autoComplete='off' value={opt?.qty + ""} label labelHidden placeholder={``} suffix={unit} onChange={v => {
+                  const dummy = [...(props.value.integrate || [])]
+                  if (dummy[i]) {
+                    dummy[i].qty = String(v);
+                  }
+                  console.log(dummy[i])
+                  props.setValue({
+                    ...props.value,
+                    integrate: dummy
+                  })
+                }} />
               </div>
             </div>
           )

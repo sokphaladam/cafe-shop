@@ -23,7 +23,9 @@ export function CreateProductScreen() {
       price: 0,
       unit: ''
     }],
-    type: []
+    type: [],
+    integrate: [],
+    stockAlter: 0
   });
 
   const handleSubmit = useCallback((v: ProductInput) => {
