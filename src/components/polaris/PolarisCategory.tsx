@@ -58,17 +58,15 @@ export function PolarisCategory(props: Props) {
     (value: string) => {
       if (value.length >= 2) {
         const filterRegex = new RegExp(value, "i");
-        const filter = data?.categoryList?.filter((x: any) => x?.name.match(filterRegex));
+        const filter = data ? data?.categoryList?.raw.filter((x: any) => x?.name.match(filterRegex)) : '';
 
         if ((filter || []).length > 0) {
           const builds = filter
-          setCategory(builds);
-          console.log(builds);
-          setTreeNode(
-            Object.keys(builds.hash)
-              .filter((x) => x !== "0")
-              .map((x: any) => builds.hash[x]),
-          );
+          const ids = builds.map((b: any) => Number(b.id));
+          const tree = Object.keys(data?.categoryList.hash)
+            .filter((x) => x !== "0").filter(x => ids.includes(Number(x))).map((x: any) => data?.categoryList.hash[x])
+          setCategory(data?.categoryList);
+          setTreeNode(tree)
         }
       }
     },

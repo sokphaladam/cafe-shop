@@ -1,12 +1,15 @@
 import { User } from "@/gql/graphql";
+import { useScriptLanguage } from "@/service/LanguageProvider";
 import { AppsIcon, ArchiveIcon, CartFilledIcon, MagicIcon } from "@shopify/polaris-icons";
 
 export function MenuItems(user: User | null) {
+  const lng = useScriptLanguage();
+
   const defaultValue: any[] = [{
-    title: "Dashboard",
+    title: lng.menu_dashboard,
     items: [
       {
-        label: "Dashboard",
+        label: lng.menu_dashboard,
         icon: AppsIcon,
         url: "/",
         items: [],
@@ -17,12 +20,12 @@ export function MenuItems(user: User | null) {
     title: 'Inventory',
     items: [
       {
-        label: "Products",
+        label: lng.menu_product,
         icon: ArchiveIcon,
         url: '/products',
       },
       {
-        label: "Categories",
+        label: lng.menu_category,
         icon: MagicIcon,
         url: '/category'
       }
@@ -32,12 +35,23 @@ export function MenuItems(user: User | null) {
     title: 'Orders',
     items: [
       {
-        label: "Point of sales",
+        label: "Customer Order",
         icon: CartFilledIcon,
-        url: '/pos'
+        url: '/orders/list'
       }
     ]
-  }];
+  }
+    // {
+    //   title: 'Orders',
+    //   items: [
+    //     {
+    //       label: "Point of sales",
+    //       icon: CartFilledIcon,
+    //       url: '/pos'
+    //     }
+    //   ]
+    // }
+  ];
 
   let MenuItem: any[] = [];
 

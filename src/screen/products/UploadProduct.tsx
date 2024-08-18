@@ -9,6 +9,7 @@ import { UploadProductSku } from "./components/upload/UploadProductSku";
 import { ProductInput, Sku } from "@/gql/graphql";
 import { PolarisCategory } from "@/components/polaris/PolarisCategory";
 import { UploadProductAddon } from "./components/upload/UploadProductAddon";
+import { UploadIntegration } from "./components/upload/UploadIntegration";
 
 interface Props {
   value: ProductInput;
@@ -115,23 +116,38 @@ export function UploadProduct({ value, setValue, onSubmit, loading, }: Props) {
               <TextField disabled={loading || uploading} autoComplete="off" label="Description" placeholder="Enter the details of the product" multiline={5} value={value.description || ''} onChange={v => {
                 setValue({ ...value, description: v })
               }} />
-              <br />
-              <Divider />
-              <br />
+            </Box>
+          </Card>
+          <br />
+          <Card>
+            <Box>
               <Text as="h3" variant="headingMd">2. Product SKU*</Text>
               <small className="text-red-500">{error.find((f: any) => f.type === 'sku')?.message}</small>
               <br />
               <TextField disabled={loading || uploading} requiredIndicator autoComplete="off" label="Unit" placeholder="Enter the product sku unit" value={unit} onChange={v => setUnit(v)} />
               <br />
               {!uploading && <UploadProductSku value={value} setValue={setValue} />}
-              <br />
-              <Divider />
-              <br />
+            </Box>
+          </Card>
+          <br />
+          <Card>
+            <Box>
               <Text as="h3" variant="headingMd">3. Product Addons</Text>
               <br />
               <UploadProductAddon value={value} setValue={setValue} />
             </Box>
           </Card>
+          {
+            (value.type as any)?.includes('PRODUCTION') && <>
+              <br />
+              <Card>
+                <Box>
+                  <Text as="h3" variant="headingMd">5. Product Ingredients*</Text>
+                  <br />
+                  <UploadIntegration />
+                </Box>
+              </Card></>
+          }
         </Layout.Section>
         <Layout.Section variant="oneThird">
           <Card>
@@ -154,6 +170,8 @@ export function UploadProduct({ value, setValue, onSubmit, loading, }: Props) {
               {
                 !uploading && <PolarisCategory value={value} onChange={setValue} />
               }
+              <br />
+              <TextField disabled={loading || uploading} autoComplete="off" label="Quantity Alert" placeholder="How many is minimum quantity for alter?" type="number" />
             </Box>
           </Card>
         </Layout.Section>
