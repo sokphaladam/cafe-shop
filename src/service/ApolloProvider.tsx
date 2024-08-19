@@ -12,14 +12,14 @@ import {
 import { getCookie } from "cookies-next";
 
 function makeClient(initialize_token?: string | null) {
-  const token = initialize_token
-    ? initialize_token
-    : getCookie("tk_token");
+  const token = initialize_token ? initialize_token : getCookie("tk_token");
   const httpLink = new HttpLink({
-    uri: config_app.public.assets.url,
-    headers: token ? {
-      'Authorization': "Bearer " + token
-    } : {}
+    uri: config_app.public.assets.url + "?token=" + token,
+    headers: token
+      ? {
+          Authorization: "Bearer " + token,
+        }
+      : {},
   });
 
   return new NextSSRApolloClient({
@@ -27,18 +27,18 @@ function makeClient(initialize_token?: string | null) {
     link:
       typeof window === "undefined"
         ? ApolloLink.from([
-          new SSRMultipartLink({
-            stripDefer: true,
-          }),
-          httpLink,
-        ])
+            new SSRMultipartLink({
+              stripDefer: true,
+            }),
+            httpLink,
+          ])
         : httpLink,
     defaultOptions: {
       query: {
-        fetchPolicy: 'network-only',
+        fetchPolicy: "network-only",
       },
       watchQuery: {
-        fetchPolicy: 'network-only',
+        fetchPolicy: "network-only",
       },
     },
   });
@@ -46,7 +46,9 @@ function makeClient(initialize_token?: string | null) {
 
 export function ApolloWrapper({ children }: React.PropsWithChildren) {
   return (
-    <ApolloNextAppProvider makeClient={() => makeClient(getCookie("lf_affiliate_token"))}>
+    <ApolloNextAppProvider
+      makeClient={() => makeClient(getCookie("lf_affiliate_token"))}
+    >
       {children}
     </ApolloNextAppProvider>
   );

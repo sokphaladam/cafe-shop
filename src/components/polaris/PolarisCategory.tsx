@@ -1,7 +1,19 @@
-import { Button, Collapsible, Icon, Listbox, Popover, TextField } from "@shopify/polaris";
+import {
+  Button,
+  Collapsible,
+  Icon,
+  Listbox,
+  Popover,
+  TextField,
+} from "@shopify/polaris";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { ProductInput, useCategoryListQuery } from "@/gql/graphql";
-import { SearchIcon, ChevronLeftIcon, ChevronRightIcon, CheckIcon } from '@shopify/polaris-icons';
+import {
+  SearchIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CheckIcon,
+} from "@shopify/polaris-icons";
 
 const CategoryCallbackContext = React.createContext<{
   value?: number;
@@ -29,6 +41,7 @@ interface PropsSuggest {
 interface Props {
   value: ProductInput;
   onChange: (v: ProductInput) => void;
+  created?: boolean;
 }
 
 export function PolarisCategory(props: Props) {
@@ -58,19 +71,25 @@ export function PolarisCategory(props: Props) {
     (value: string) => {
       if (value.length >= 2) {
         const filterRegex = new RegExp(value, "i");
-        const filter = data ? data?.categoryList?.raw.filter((x: any) => x?.name.match(filterRegex)) : '';
+        const filter = data
+          ? data?.categoryList?.raw.filter((x: any) =>
+              x?.name.match(filterRegex)
+            )
+          : "";
 
         if ((filter || []).length > 0) {
-          const builds = filter
+          const builds = filter;
           const ids = builds.map((b: any) => Number(b.id));
           const tree = Object.keys(data?.categoryList.hash)
-            .filter((x) => x !== "0").filter(x => ids.includes(Number(x))).map((x: any) => data?.categoryList.hash[x])
+            .filter((x) => x !== "0")
+            .filter((x) => ids.includes(Number(x)))
+            .map((x: any) => data?.categoryList.hash[x]);
           setCategory(data?.categoryList);
-          setTreeNode(tree)
+          setTreeNode(tree);
         }
       }
     },
-    [setCategory, setTreeNode, data],
+    [setCategory, setTreeNode, data]
   );
 
   const handleQuery = useCallback(
@@ -86,7 +105,7 @@ export function PolarisCategory(props: Props) {
       }
       await setTimeout(() => filterSearch(value), 500);
     },
-    [filterSearch, data, setCategory, setTreeNode],
+    [filterSearch, data, setCategory, setTreeNode]
   );
 
   const handleSelectChildTree = useCallback(
@@ -97,7 +116,14 @@ export function PolarisCategory(props: Props) {
       setPreviousTreeId([...previousTreeId, tree.id]);
       setShowAll(false);
     },
-    [category, setTreeNode, setSelectTree, setPreviousTreeId, previousTreeId, setShowAll],
+    [
+      category,
+      setTreeNode,
+      setSelectTree,
+      setPreviousTreeId,
+      previousTreeId,
+      setShowAll,
+    ]
   );
 
   const handlePreviousSelectChildTree = useCallback(() => {
@@ -108,12 +134,21 @@ export function PolarisCategory(props: Props) {
     setTreeNode(tree.children);
     setPreviousTreeId(newArr);
     setShowAll(false);
-  }, [category, setTreeNode, setSelectTree, setPreviousTreeId, previousTreeId, setShowAll]);
+  }, [
+    category,
+    setTreeNode,
+    setSelectTree,
+    setPreviousTreeId,
+    previousTreeId,
+    setShowAll,
+  ]);
 
-  const cat =
-    data
-      ? (category.hash as any)[String(props.value.category || 0)] || { path: "", name: "" }
-      : { path: "", name: "" };
+  const cat = data
+    ? (category.hash as any)[String(props.value.category || 0)] || {
+        path: "",
+        name: "",
+      }
+    : { path: "", name: "" };
 
   return (
     <div>
@@ -122,15 +157,22 @@ export function PolarisCategory(props: Props) {
           activator={
             <TextField
               prefix={<Icon source={SearchIcon as any} tone="base" />}
-              label={`Category${(props.value.category || 0) > 0 ? `: ${cat.path || ""}${cat.name || ""}` : ""}`}
+              label={`Category${
+                (props.value.category || 0) > 0
+                  ? `: ${cat.path || ""}${cat.name || ""}`
+                  : ""
+              }`}
               autoComplete="off"
               placeholder="Search"
               onFocus={() => setActive(true)}
               value={keyword}
               onChange={handleQuery}
-            // error={
-            //   context.error?.name === "category_id" && "Please search category or select category from suggestion."
-            // }
+              labelAction={{
+                content: "Add New",
+              }}
+              // error={
+              //   context.error?.name === "category_id" && "Please search category or select category from suggestion."
+              // }
             />
           }
           active={active}
@@ -152,31 +194,62 @@ export function PolarisCategory(props: Props) {
               }}
             >
               {selectTree !== null && previousTreeId.length > 1 && !keyword && (
-                <div className='flex flex-row justify-between my-[0.04125rem]'>
-                  <div onClick={handlePreviousSelectChildTree} className="hover:bg-gray-400 hover: rounded-full mr-3">
+                <div className="flex flex-row justify-between my-[0.04125rem]">
+                  <div
+                    onClick={handlePreviousSelectChildTree}
+                    className="hover:bg-gray-400 hover: rounded-full mr-3"
+                  >
                     <Icon source={ChevronLeftIcon} tone="base" />
                   </div>
                   <div
-                    className={props.value.category === selectTree.id ? 'bg-gray-200 flex flex-row items-center' : ""}
-                    onClick={() => props.onChange({ ...props.value, category: selectTree.id })}
+                    className={
+                      props.value.category === selectTree.id
+                        ? "bg-gray-200 flex flex-row items-center"
+                        : ""
+                    }
+                    onClick={() =>
+                      props.onChange({
+                        ...props.value,
+                        category: selectTree.id,
+                      })
+                    }
                   >
-                    <div className={'p-0 w-[90px] mr-3'}>{selectTree.name}</div>
-                    {props.value.category === selectTree.id && <Icon source={CheckIcon} tone="base" />}
+                    <div className={"p-0 w-[90px] mr-3"}>{selectTree.name}</div>
+                    {props.value.category === selectTree.id && (
+                      <Icon source={CheckIcon} tone="base" />
+                    )}
                   </div>
                 </div>
               )}
-              {(treeNode.length > 6 && showAll === false ? treeNode.slice(0, 6) : treeNode).map((tree) => {
+              {(treeNode.length > 6 && showAll === false
+                ? treeNode.slice(0, 6)
+                : treeNode
+              ).map((tree) => {
                 return (
-                  <div key={tree.id} className={'flex flex-row justify-between my-[0.04125rem]'}>
+                  <div
+                    key={tree.id}
+                    className={"flex flex-row justify-between my-[0.04125rem]"}
+                  >
                     <div
-                      className={props.value.category === tree.id ? 'bg-gray-200 flex flex-row items-center' : ""}
-                      onClick={() => props.onChange({ ...props.value, category: tree.id })}
+                      className={
+                        props.value.category === tree.id
+                          ? "bg-gray-200 flex flex-row items-center"
+                          : ""
+                      }
+                      onClick={() =>
+                        props.onChange({ ...props.value, category: tree.id })
+                      }
                     >
-                      {props.value.category === tree.id && <Icon source={CheckIcon} tone="base" />}
-                      <div className={'p-0 w-[90px] ml-3'}>{tree.name}</div>
+                      {props.value.category === tree.id && (
+                        <Icon source={CheckIcon} tone="base" />
+                      )}
+                      <div className={"p-0 w-[90px] ml-3"}>{tree.name}</div>
                     </div>
                     {tree.children.length > 0 && !keyword ? (
-                      <div onClick={() => handleSelectChildTree(tree.id)} className="hover:bg-gray-400 hover: rounded-full ml-3">
+                      <div
+                        onClick={() => handleSelectChildTree(tree.id)}
+                        className="hover:bg-gray-400 hover: rounded-full ml-3"
+                      >
                         <Icon source={ChevronRightIcon} tone="base" />
                       </div>
                     ) : (
@@ -186,8 +259,10 @@ export function PolarisCategory(props: Props) {
                 );
               })}
               {treeNode.length > 6 && showAll === false && (
-                <div onClick={() => setShowAll(true)} >
-                  <div className="p-2 rounded-lg whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer text-blue-700 hover:bg-gray-200">Show all {treeNode.length}</div>
+                <div onClick={() => setShowAll(true)}>
+                  <div className="p-2 rounded-lg whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer text-blue-700 hover:bg-gray-200">
+                    Show all {treeNode.length}
+                  </div>
                 </div>
               )}
             </CategoryCallbackContext.Provider>
