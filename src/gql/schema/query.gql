@@ -101,3 +101,70 @@ query category($categoryId: Int!) {
     root
   }
 }
+
+query orderList($offset: Int, $limit: Int) {
+  orderList(offset: $offset, limit: $limit) {
+    uuid
+    total
+    status
+    set
+    paid
+    name
+    items {
+      id
+      qty
+      price
+      sku {
+        id
+        name
+        discount
+        price
+        unit
+      }
+      status
+      discount
+    }
+    id
+    address
+  }
+}
+
+query order($token: String, $orderId: Int) {
+  order(token: $token, id: $orderId) {
+    uuid
+    total
+    status
+    set
+    paid
+    name
+    items {
+      id
+      qty
+      sku {
+        price
+        discount
+        id
+        unit
+        name
+      }
+      product {
+        title
+        images
+        code
+        description
+        id
+      }
+      price
+      discount
+      status
+      addons
+      remark
+    }
+    id
+    address
+  }
+}
+
+query generateTokenOrder($set: Int!) {
+  generateTokenOrder(set: $set)
+}

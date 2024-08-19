@@ -25,3 +25,26 @@ mutation createCategory($data: CategoryInput) {
 mutation createOrder($data: OrderInput) {
   createOrder(data: $data)
 }
+
+mutation addOrderItem($orderId: Int!, $data: CartItemInput) {
+  addOrderItem(orderId: $orderId, data: $data)
+}
+
+mutation markOrderItemStatus(
+  $markOrderItemStatusId: Int!
+  $status: StatusOrderItem
+) {
+  markOrderItemStatus(id: $markOrderItemStatusId, status: $status)
+}
+
+mutation increaseOrderItem($increaseOrderItemId: Int!) {
+  increaseOrderItem(id: $increaseOrderItemId)
+}
+
+mutation decreaseOrderItem($decreaseOrderItemId: Int!) {
+  decreaseOrderItem(id: $decreaseOrderItemId)
+}
+
+mutation changeOrderStatus($data: ChangeOrderInput) {
+  changeOrderStatus(data: $data)
+}

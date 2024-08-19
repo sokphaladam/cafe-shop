@@ -1,11 +1,10 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Typewriter } from "react-simple-typewriter";
+import React, { useState } from "react";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { MeQuery, useMeQuery } from "@/gql/graphql";
-import { Player } from "@lordicon/react";
-import { loadIcon } from "@/lib/loadIcon";
+import { Loading } from "@/components/custom/Loading";
+import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 
 interface Props {
   onCompleted?: (success: boolean) => void;
@@ -15,9 +14,6 @@ export function TokenVerification(props: Props) {
   const token = getCookie("tk_token");
   const { push } = useRouter();
   const [load, setLoad] = useState(true);
-  const [icon, setIcon] = useState<any>(null);
-
-  const playerRef = useRef<Player>(null);
 
   const resetToken = async (res: MeQuery) => {
     if (token && res.me === null) {
@@ -31,43 +27,46 @@ export function TokenVerification(props: Props) {
     }
   };
 
-  const { loading, data } = useMeQuery({
+  const { loading } = useMeQuery({
     onCompleted: async (r) => {
       resetToken(r);
-      if (r && r.me) {
-        if (!!r.me) {
-          props.onCompleted && props.onCompleted(true);
+      setTimeout(() => {
+        if (r && r.me) {
+          if (!!r.me) {
+            props.onCompleted && props.onCompleted(true);
+          } else {
+            props.onCompleted && props.onCompleted(false);
+          }
         } else {
           props.onCompleted && props.onCompleted(false);
+          setLoad(false);
         }
-      } else {
-        props.onCompleted && props.onCompleted(false);
-        setLoad(false);
-      }
+      }, 3000)
     },
   });
-
-  useEffect(() => {
-    loadIcon("clock-time").then((d) => {
-      setIcon(d);
-    });
-  }, []);
-
-  useEffect(() => {
-    setInterval(() => {
-      if (playerRef && icon) {
-        playerRef.current?.playFromBeginning();
-      }
-    }, 2500);
-  }, [icon]);
 
   if (!loading && !load) {
     return <></>;
   }
 
-  const playerReady = () => {
-    playerRef.current?.playFromBeginning();
-  };
+  const words = [
+    {
+      text: "Welcome ",
+      className: "text-blue-500 dark:text-blue-500"
+    },
+    {
+      text: "to",
+      className: "text-blue-500 dark:text-blue-500"
+    },
+    {
+      text: "application",
+      className: "text-blue-500 dark:text-blue-500"
+    },
+    {
+      text: "Loading...",
+      className: "text-blue-500 dark:text-blue-500",
+    },
+  ];
 
   return (
     <div
@@ -75,22 +74,10 @@ export function TokenVerification(props: Props) {
       style={{ display: loading || load ? "" : "none" }}
     >
       <div>
-        <Player icon={icon} ref={playerRef} onReady={playerReady} size={100} />
+        <Loading />
       </div>
       <div className="flex text-lg font-semibold">
-        <h3 className="text-red-500">
-          <Typewriter
-            words={["Welcome to application", "Application Loading..."]}
-            loop={true}
-            delaySpeed={300}
-            cursor
-            onType={() => {
-              if (data && data.me) {
-                setLoad(loading);
-              }
-            }}
-          />
-        </h3>
+        <TypewriterEffectSmooth words={words} />
       </div>
     </div>
   );

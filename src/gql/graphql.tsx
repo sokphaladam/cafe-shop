@@ -110,17 +110,27 @@ export type IntegrateInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addOrderItem?: Maybe<Scalars['Boolean']['output']>;
   changeOrderStatus?: Maybe<Scalars['Boolean']['output']>;
   createBrand?: Maybe<Scalars['Boolean']['output']>;
   createCategory?: Maybe<Scalars['Boolean']['output']>;
   createOrder?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
   createProductStock?: Maybe<Scalars['Boolean']['output']>;
+  decreaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
+  increaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<Scalars['String']['output']>;
+  markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
   updateBrand?: Maybe<Scalars['Boolean']['output']>;
   updateCategory?: Maybe<Scalars['Boolean']['output']>;
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
   updateProductStock?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type MutationAddOrderItemArgs = {
+  data?: InputMaybe<CartItemInput>;
+  orderId: Scalars['Int']['input'];
 };
 
 
@@ -154,9 +164,25 @@ export type MutationCreateProductStockArgs = {
 };
 
 
+export type MutationDecreaseOrderItemArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationIncreaseOrderItemArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
 export type MutationLoginArgs = {
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
+};
+
+
+export type MutationMarkOrderItemStatusArgs = {
+  id: Scalars['Int']['input'];
+  status?: InputMaybe<StatusOrderItem>;
 };
 
 
@@ -208,10 +234,13 @@ export type OrderInput = {
 
 export type OrderItem = {
   __typename?: 'OrderItem';
+  addons?: Maybe<Scalars['String']['output']>;
   discount?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   price?: Maybe<Scalars['Float']['output']>;
+  product?: Maybe<Product>;
   qty?: Maybe<Scalars['Int']['output']>;
+  remark?: Maybe<Scalars['String']['output']>;
   sku?: Maybe<Sku>;
   status?: Maybe<StatusOrderItem>;
 };
@@ -265,6 +294,7 @@ export type Query = {
   brandList?: Maybe<Array<Maybe<Brand>>>;
   category?: Maybe<Category>;
   categoryList?: Maybe<Scalars['JSON']['output']>;
+  generateTokenOrder?: Maybe<Scalars['String']['output']>;
   me?: Maybe<User>;
   order?: Maybe<Order>;
   orderList?: Maybe<Array<Maybe<Order>>>;
@@ -290,6 +320,11 @@ export type QueryBrandListArgs = {
 
 export type QueryCategoryArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type QueryGenerateTokenOrderArgs = {
+  set: Scalars['Int']['input'];
 };
 
 
@@ -364,6 +399,7 @@ export type SkuInput = {
 };
 
 export enum StatusOrder {
+  Cancelled = 'CANCELLED',
   Checkout = 'CHECKOUT',
   Delivery = 'DELIVERY',
   Pending = 'PENDING',
@@ -372,6 +408,7 @@ export enum StatusOrder {
 
 export enum StatusOrderItem {
   Completed = 'COMPLETED',
+  Deleted = 'DELETED',
   Making = 'MAKING',
   OutOfStock = 'OUT_OF_STOCK',
   Pending = 'PENDING',
@@ -444,6 +481,43 @@ export type CreateOrderMutationVariables = Exact<{
 
 export type CreateOrderMutation = { __typename?: 'Mutation', createOrder?: boolean | null };
 
+export type AddOrderItemMutationVariables = Exact<{
+  orderId: Scalars['Int']['input'];
+  data?: InputMaybe<CartItemInput>;
+}>;
+
+
+export type AddOrderItemMutation = { __typename?: 'Mutation', addOrderItem?: boolean | null };
+
+export type MarkOrderItemStatusMutationVariables = Exact<{
+  markOrderItemStatusId: Scalars['Int']['input'];
+  status?: InputMaybe<StatusOrderItem>;
+}>;
+
+
+export type MarkOrderItemStatusMutation = { __typename?: 'Mutation', markOrderItemStatus?: boolean | null };
+
+export type IncreaseOrderItemMutationVariables = Exact<{
+  increaseOrderItemId: Scalars['Int']['input'];
+}>;
+
+
+export type IncreaseOrderItemMutation = { __typename?: 'Mutation', increaseOrderItem?: boolean | null };
+
+export type DecreaseOrderItemMutationVariables = Exact<{
+  decreaseOrderItemId: Scalars['Int']['input'];
+}>;
+
+
+export type DecreaseOrderItemMutation = { __typename?: 'Mutation', decreaseOrderItem?: boolean | null };
+
+export type ChangeOrderStatusMutationVariables = Exact<{
+  data?: InputMaybe<ChangeOrderInput>;
+}>;
+
+
+export type ChangeOrderStatusMutation = { __typename?: 'Mutation', changeOrderStatus?: boolean | null };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -477,6 +551,29 @@ export type CategoryQueryVariables = Exact<{
 
 
 export type CategoryQuery = { __typename?: 'Query', category?: { __typename?: 'Category', id?: number | null, name?: string | null, root?: number | null } | null };
+
+export type OrderListQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', uuid?: string | null, total?: string | null, status?: StatusOrder | null, set?: string | null, paid?: string | null, name?: string | null, id?: number | null, address?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, status?: StatusOrderItem | null, discount?: number | null, sku?: { __typename?: 'SKU', id?: number | null, name?: string | null, discount?: number | null, price?: number | null, unit?: string | null } | null } | null> | null } | null> | null };
+
+export type OrderQueryVariables = Exact<{
+  token?: InputMaybe<Scalars['String']['input']>;
+  orderId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', uuid?: string | null, total?: string | null, status?: StatusOrder | null, set?: string | null, paid?: string | null, name?: string | null, id?: number | null, address?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+
+export type GenerateTokenOrderQueryVariables = Exact<{
+  set: Scalars['Int']['input'];
+}>;
+
+
+export type GenerateTokenOrderQuery = { __typename?: 'Query', generateTokenOrder?: string | null };
 
 
 export const LoginDocument = gql`
@@ -669,6 +766,163 @@ export function useCreateOrderMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateOrderMutationHookResult = ReturnType<typeof useCreateOrderMutation>;
 export type CreateOrderMutationResult = Apollo.MutationResult<CreateOrderMutation>;
 export type CreateOrderMutationOptions = Apollo.BaseMutationOptions<CreateOrderMutation, CreateOrderMutationVariables>;
+export const AddOrderItemDocument = gql`
+    mutation addOrderItem($orderId: Int!, $data: CartItemInput) {
+  addOrderItem(orderId: $orderId, data: $data)
+}
+    `;
+export type AddOrderItemMutationFn = Apollo.MutationFunction<AddOrderItemMutation, AddOrderItemMutationVariables>;
+
+/**
+ * __useAddOrderItemMutation__
+ *
+ * To run a mutation, you first call `useAddOrderItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddOrderItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addOrderItemMutation, { data, loading, error }] = useAddOrderItemMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddOrderItemMutation(baseOptions?: Apollo.MutationHookOptions<AddOrderItemMutation, AddOrderItemMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddOrderItemMutation, AddOrderItemMutationVariables>(AddOrderItemDocument, options);
+      }
+export type AddOrderItemMutationHookResult = ReturnType<typeof useAddOrderItemMutation>;
+export type AddOrderItemMutationResult = Apollo.MutationResult<AddOrderItemMutation>;
+export type AddOrderItemMutationOptions = Apollo.BaseMutationOptions<AddOrderItemMutation, AddOrderItemMutationVariables>;
+export const MarkOrderItemStatusDocument = gql`
+    mutation markOrderItemStatus($markOrderItemStatusId: Int!, $status: StatusOrderItem) {
+  markOrderItemStatus(id: $markOrderItemStatusId, status: $status)
+}
+    `;
+export type MarkOrderItemStatusMutationFn = Apollo.MutationFunction<MarkOrderItemStatusMutation, MarkOrderItemStatusMutationVariables>;
+
+/**
+ * __useMarkOrderItemStatusMutation__
+ *
+ * To run a mutation, you first call `useMarkOrderItemStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkOrderItemStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markOrderItemStatusMutation, { data, loading, error }] = useMarkOrderItemStatusMutation({
+ *   variables: {
+ *      markOrderItemStatusId: // value for 'markOrderItemStatusId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useMarkOrderItemStatusMutation(baseOptions?: Apollo.MutationHookOptions<MarkOrderItemStatusMutation, MarkOrderItemStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkOrderItemStatusMutation, MarkOrderItemStatusMutationVariables>(MarkOrderItemStatusDocument, options);
+      }
+export type MarkOrderItemStatusMutationHookResult = ReturnType<typeof useMarkOrderItemStatusMutation>;
+export type MarkOrderItemStatusMutationResult = Apollo.MutationResult<MarkOrderItemStatusMutation>;
+export type MarkOrderItemStatusMutationOptions = Apollo.BaseMutationOptions<MarkOrderItemStatusMutation, MarkOrderItemStatusMutationVariables>;
+export const IncreaseOrderItemDocument = gql`
+    mutation increaseOrderItem($increaseOrderItemId: Int!) {
+  increaseOrderItem(id: $increaseOrderItemId)
+}
+    `;
+export type IncreaseOrderItemMutationFn = Apollo.MutationFunction<IncreaseOrderItemMutation, IncreaseOrderItemMutationVariables>;
+
+/**
+ * __useIncreaseOrderItemMutation__
+ *
+ * To run a mutation, you first call `useIncreaseOrderItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useIncreaseOrderItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [increaseOrderItemMutation, { data, loading, error }] = useIncreaseOrderItemMutation({
+ *   variables: {
+ *      increaseOrderItemId: // value for 'increaseOrderItemId'
+ *   },
+ * });
+ */
+export function useIncreaseOrderItemMutation(baseOptions?: Apollo.MutationHookOptions<IncreaseOrderItemMutation, IncreaseOrderItemMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<IncreaseOrderItemMutation, IncreaseOrderItemMutationVariables>(IncreaseOrderItemDocument, options);
+      }
+export type IncreaseOrderItemMutationHookResult = ReturnType<typeof useIncreaseOrderItemMutation>;
+export type IncreaseOrderItemMutationResult = Apollo.MutationResult<IncreaseOrderItemMutation>;
+export type IncreaseOrderItemMutationOptions = Apollo.BaseMutationOptions<IncreaseOrderItemMutation, IncreaseOrderItemMutationVariables>;
+export const DecreaseOrderItemDocument = gql`
+    mutation decreaseOrderItem($decreaseOrderItemId: Int!) {
+  decreaseOrderItem(id: $decreaseOrderItemId)
+}
+    `;
+export type DecreaseOrderItemMutationFn = Apollo.MutationFunction<DecreaseOrderItemMutation, DecreaseOrderItemMutationVariables>;
+
+/**
+ * __useDecreaseOrderItemMutation__
+ *
+ * To run a mutation, you first call `useDecreaseOrderItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDecreaseOrderItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [decreaseOrderItemMutation, { data, loading, error }] = useDecreaseOrderItemMutation({
+ *   variables: {
+ *      decreaseOrderItemId: // value for 'decreaseOrderItemId'
+ *   },
+ * });
+ */
+export function useDecreaseOrderItemMutation(baseOptions?: Apollo.MutationHookOptions<DecreaseOrderItemMutation, DecreaseOrderItemMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DecreaseOrderItemMutation, DecreaseOrderItemMutationVariables>(DecreaseOrderItemDocument, options);
+      }
+export type DecreaseOrderItemMutationHookResult = ReturnType<typeof useDecreaseOrderItemMutation>;
+export type DecreaseOrderItemMutationResult = Apollo.MutationResult<DecreaseOrderItemMutation>;
+export type DecreaseOrderItemMutationOptions = Apollo.BaseMutationOptions<DecreaseOrderItemMutation, DecreaseOrderItemMutationVariables>;
+export const ChangeOrderStatusDocument = gql`
+    mutation changeOrderStatus($data: ChangeOrderInput) {
+  changeOrderStatus(data: $data)
+}
+    `;
+export type ChangeOrderStatusMutationFn = Apollo.MutationFunction<ChangeOrderStatusMutation, ChangeOrderStatusMutationVariables>;
+
+/**
+ * __useChangeOrderStatusMutation__
+ *
+ * To run a mutation, you first call `useChangeOrderStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeOrderStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeOrderStatusMutation, { data, loading, error }] = useChangeOrderStatusMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useChangeOrderStatusMutation(baseOptions?: Apollo.MutationHookOptions<ChangeOrderStatusMutation, ChangeOrderStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeOrderStatusMutation, ChangeOrderStatusMutationVariables>(ChangeOrderStatusDocument, options);
+      }
+export type ChangeOrderStatusMutationHookResult = ReturnType<typeof useChangeOrderStatusMutation>;
+export type ChangeOrderStatusMutationResult = Apollo.MutationResult<ChangeOrderStatusMutation>;
+export type ChangeOrderStatusMutationOptions = Apollo.BaseMutationOptions<ChangeOrderStatusMutation, ChangeOrderStatusMutationVariables>;
 export const MeDocument = gql`
     query me {
   me {
@@ -939,3 +1193,174 @@ export type CategoryQueryHookResult = ReturnType<typeof useCategoryQuery>;
 export type CategoryLazyQueryHookResult = ReturnType<typeof useCategoryLazyQuery>;
 export type CategorySuspenseQueryHookResult = ReturnType<typeof useCategorySuspenseQuery>;
 export type CategoryQueryResult = Apollo.QueryResult<CategoryQuery, CategoryQueryVariables>;
+export const OrderListDocument = gql`
+    query orderList($offset: Int, $limit: Int) {
+  orderList(offset: $offset, limit: $limit) {
+    uuid
+    total
+    status
+    set
+    paid
+    name
+    items {
+      id
+      qty
+      price
+      sku {
+        id
+        name
+        discount
+        price
+        unit
+      }
+      status
+      discount
+    }
+    id
+    address
+  }
+}
+    `;
+
+/**
+ * __useOrderListQuery__
+ *
+ * To run a query within a React component, call `useOrderListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderListQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useOrderListQuery(baseOptions?: Apollo.QueryHookOptions<OrderListQuery, OrderListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OrderListQuery, OrderListQueryVariables>(OrderListDocument, options);
+      }
+export function useOrderListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OrderListQuery, OrderListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OrderListQuery, OrderListQueryVariables>(OrderListDocument, options);
+        }
+export function useOrderListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OrderListQuery, OrderListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OrderListQuery, OrderListQueryVariables>(OrderListDocument, options);
+        }
+export type OrderListQueryHookResult = ReturnType<typeof useOrderListQuery>;
+export type OrderListLazyQueryHookResult = ReturnType<typeof useOrderListLazyQuery>;
+export type OrderListSuspenseQueryHookResult = ReturnType<typeof useOrderListSuspenseQuery>;
+export type OrderListQueryResult = Apollo.QueryResult<OrderListQuery, OrderListQueryVariables>;
+export const OrderDocument = gql`
+    query order($token: String, $orderId: Int) {
+  order(token: $token, id: $orderId) {
+    uuid
+    total
+    status
+    set
+    paid
+    name
+    items {
+      id
+      qty
+      sku {
+        price
+        discount
+        id
+        unit
+        name
+      }
+      product {
+        title
+        images
+        code
+        description
+        id
+      }
+      price
+      discount
+      status
+      addons
+      remark
+    }
+    id
+    address
+  }
+}
+    `;
+
+/**
+ * __useOrderQuery__
+ *
+ * To run a query within a React component, call `useOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useOrderQuery(baseOptions?: Apollo.QueryHookOptions<OrderQuery, OrderQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OrderQuery, OrderQueryVariables>(OrderDocument, options);
+      }
+export function useOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OrderQuery, OrderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OrderQuery, OrderQueryVariables>(OrderDocument, options);
+        }
+export function useOrderSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<OrderQuery, OrderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OrderQuery, OrderQueryVariables>(OrderDocument, options);
+        }
+export type OrderQueryHookResult = ReturnType<typeof useOrderQuery>;
+export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
+export type OrderSuspenseQueryHookResult = ReturnType<typeof useOrderSuspenseQuery>;
+export type OrderQueryResult = Apollo.QueryResult<OrderQuery, OrderQueryVariables>;
+export const GenerateTokenOrderDocument = gql`
+    query generateTokenOrder($set: Int!) {
+  generateTokenOrder(set: $set)
+}
+    `;
+
+/**
+ * __useGenerateTokenOrderQuery__
+ *
+ * To run a query within a React component, call `useGenerateTokenOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGenerateTokenOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGenerateTokenOrderQuery({
+ *   variables: {
+ *      set: // value for 'set'
+ *   },
+ * });
+ */
+export function useGenerateTokenOrderQuery(baseOptions: Apollo.QueryHookOptions<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables> & ({ variables: GenerateTokenOrderQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>(GenerateTokenOrderDocument, options);
+      }
+export function useGenerateTokenOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>(GenerateTokenOrderDocument, options);
+        }
+export function useGenerateTokenOrderSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>(GenerateTokenOrderDocument, options);
+        }
+export type GenerateTokenOrderQueryHookResult = ReturnType<typeof useGenerateTokenOrderQuery>;
+export type GenerateTokenOrderLazyQueryHookResult = ReturnType<typeof useGenerateTokenOrderLazyQuery>;
+export type GenerateTokenOrderSuspenseQueryHookResult = ReturnType<typeof useGenerateTokenOrderSuspenseQuery>;
+export type GenerateTokenOrderQueryResult = Apollo.QueryResult<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>;

@@ -11,20 +11,18 @@
   "dependencies": {
     "@apollo/client": "^3.10.8",
     "@apollo/experimental-nextjs-app-support": "^0.11.2",
-    "@lordicon/element": "^1.10.0",
-    "@lordicon/helpers": "^1.10.0",
-    "@lordicon/react": "^1.10.0",
     "@shopify/polaris": "^13.7.0",
     "@shopify/polaris-icons": "^9.2.0",
+    "clsx": "^2.1.1",
     "cookies-next": "^4.2.1",
     "firebase": "^10.12.4",
+    "framer-motion": "^11.3.28",
     "fs": "0.0.1-security",
-    "lottie-web": "^5.12.2",
     "moment": "^2.30.1",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "react-simple-typewriter": "^5.0.1"
+    "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",

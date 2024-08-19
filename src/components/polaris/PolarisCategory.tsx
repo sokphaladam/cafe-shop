@@ -14,6 +14,7 @@ import {
   ChevronRightIcon,
   CheckIcon,
 } from "@shopify/polaris-icons";
+import { FormCategory } from "./form/FormCategory";
 
 const CategoryCallbackContext = React.createContext<{
   value?: number;
@@ -45,6 +46,7 @@ interface Props {
 }
 
 export function PolarisCategory(props: Props) {
+  const [activeForm, setActiveForm] = useState(false);
   const [active, setActive] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState<any>({
@@ -73,8 +75,8 @@ export function PolarisCategory(props: Props) {
         const filterRegex = new RegExp(value, "i");
         const filter = data
           ? data?.categoryList?.raw.filter((x: any) =>
-              x?.name.match(filterRegex)
-            )
+            x?.name.match(filterRegex)
+          )
           : "";
 
         if ((filter || []).length > 0) {
@@ -145,34 +147,41 @@ export function PolarisCategory(props: Props) {
 
   const cat = data
     ? (category.hash as any)[String(props.value.category || 0)] || {
-        path: "",
-        name: "",
-      }
+      path: "",
+      name: "",
+    }
     : { path: "", name: "" };
 
   return (
     <div>
+      {
+        !!props.created && <FormCategory active={activeForm} setActive={(v) => {
+          setActiveForm(v);
+        }} title="Categories" />
+      }
       {!loading && category && (
         <Popover
           activator={
             <TextField
               prefix={<Icon source={SearchIcon as any} tone="base" />}
-              label={`Category${
-                (props.value.category || 0) > 0
-                  ? `: ${cat.path || ""}${cat.name || ""}`
-                  : ""
-              }`}
+              label={`Category${(props.value.category || 0) > 0
+                ? `: ${cat.path || ""}${cat.name || ""}`
+                : ""
+                }`}
               autoComplete="off"
               placeholder="Search"
               onFocus={() => setActive(true)}
               value={keyword}
               onChange={handleQuery}
-              labelAction={{
+              labelAction={props.created ? {
                 content: "Add New",
-              }}
-              // error={
-              //   context.error?.name === "category_id" && "Please search category or select category from suggestion."
-              // }
+                onAction: () => {
+                  setActiveForm(true)
+                }
+              } : {}}
+            // error={
+            //   context.error?.name === "category_id" && "Please search category or select category from suggestion."
+            // }
             />
           }
           active={active}

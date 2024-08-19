@@ -4,7 +4,7 @@ import { PolarisLayout } from "@/components/polaris/PolarisLayout"
 import { ProductList } from "@/components/ProductList"
 import { Topbar } from "@/components/Topbar"
 import { ProviderOrderContext, useOrderContext } from "@/context/OrderContext"
-import { useProductListQuery } from "@/gql/graphql"
+import { Type_Product, useGenerateTokenOrderLazyQuery, useOrderLazyQuery, useOrderQuery, useProductListQuery } from "@/gql/graphql"
 import { Layout, Thumbnail } from "@shopify/polaris"
 import { ProductItem } from "./components/ProductItem"
 import { LayoutCart } from "./components/LayoutCart"
@@ -16,19 +16,38 @@ export function CustomerOrderScreen() {
   const router = useRouter();
   const path = usePathname();
   const [info] = useState({
-    set: params.get('token') ? params.get('token')?.split('TS')[0] : 1,
-    name: params.get('token') || "1TS" + new Date().getTime()
+    set: params.get('token') ? params.get('token')?.split('@')[0] : 1,
+    name: params.get('token') || "1@" + new Date().getTime()
   })
-  const { data, loading } = useProductListQuery();
+
+  const [generate] = useGenerateTokenOrderLazyQuery();
+
+
+  const { data, loading } = useProductListQuery({
+    variables: {
+      filter: {
+        type: [Type_Product.Production]
+      }
+    }
+  });
 
   useEffect(() => {
-    const p = params.get('token');
-    if (!p) {
-      const newParams = new URLSearchParams(params.toString())
-      newParams.set('token', info.name)
-      router.push(path + '?' + newParams.toString())
+    if (info.set) {
+      if (!isNaN(Number(info.name))) {
+        generate({
+          variables: {
+            set: Number(info.set)
+          }
+        }).then(res => {
+          if (res.data?.generateTokenOrder) {
+            const newParams = new URLSearchParams(params.toString())
+            newParams.set('token', res.data.generateTokenOrder.toString())
+            router.push(path + '?' + newParams.toString())
+          }
+        })
+      }
     }
-  }, [info.name, info.set, params, path, router]);
+  }, [generate, info.name, info.set, params, path, router])
 
   if (loading) {
     return <></>

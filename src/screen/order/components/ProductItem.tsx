@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
-import { Product } from '@/gql/graphql';
+import { CartItemInput, Product, useAddOrderItemMutation } from '@/gql/graphql';
 import { Button, ChoiceList, Divider, Modal, RadioButton, TextField, Thumbnail } from '@shopify/polaris';
 import React, { useCallback, useState } from 'react';
 
@@ -11,11 +12,15 @@ interface Props {
 
 export function ProductItem(props: Props) {
   const { toasts, setToasts } = useCustomToast();
-  const { items, setItems } = useOrderContext();
+  const { items, setItems, orderId, refetch } = useOrderContext();
   const [open, setOpen] = useState(false);
   const [addons, setAddons] = useState<any[]>(props.product.addons?.map(() => '') || []);
   const [sku, setSku] = useState<number>(0);
   const [remark, setRemark] = useState('');
+
+  const [addCart] = useAddOrderItemMutation({
+    refetchQueries: ['order']
+  });
 
   const handleAddtoCart = useCallback(() => {
     if (sku === 0) {
@@ -24,36 +29,63 @@ export function ProductItem(props: Props) {
 
     const data = [...(items || [])];
     const index = data.findIndex(f => f.id === props.product.id);
+    const skuIndex = props.product.sku?.findIndex((f: any) => Number(f?.id) === sku);
 
     if (index >= 0) {
       data[index].qty = data[index].qty + 1;
-    } else {
-      data.push({
-        ...props.product,
-        id: props.product.id,
-        addon_value: addons,
-        sku_id: sku,
-        remark,
-        qty: 1,
-      })
     }
-    setItems && setItems(data);
-    process.browser && localStorage.setItem(props.keyItem, JSON.stringify(data));
-    setToasts([
-      ...toasts,
-      {
-        content: `Add ${props.product.title} to cart`,
-        status: 'info'
+    // else {
+    //   data.push({
+    //     ...props.product,
+    //     id: props.product.id,
+    //     addon_value: addons,
+    //     sku_id: sku,
+    //     remark,
+    //     qty: 1,
+    //   })
+
+    //   setItems && setItems(data)
+    // }
+
+    const input: CartItemInput = {
+      skuId: sku,
+      productId: props.product.id,
+      addons: addons.join(','),
+      discount: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.discount) : 0,
+      price: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.price) : 0,
+      qty: index >= 0 ? data[index].qty + 1 : 1,
+      remark: remark
+    }
+
+    addCart({
+      variables: {
+        orderId: Number(orderId),
+        data: input
       }
-    ])
+    }).then(res => {
+      if (res.data?.addOrderItem) {
+        setToasts([
+          ...toasts,
+          {
+            content: `Add ${props.product.title} to cart`,
+            status: 'info'
+          }
+        ])
+        refetch();
+      }
+    })
+
+    // setItems && setItems(data);
+    // process.browser && localStorage.setItem(props.keyItem, JSON.stringify(data));
+
     setOpen(!open)
-  }, [addons, items, open, props.keyItem, props.product, remark, setItems, setToasts, sku, toasts])
+  }, [addCart, addons, items, open, orderId, props.product, refetch, remark, setItems, setToasts, sku, toasts])
 
   return (
     <React.Fragment>
       <Modal open={open} onClose={() => setOpen(!open)} title titleHidden>
         <Modal.Section flush>
-          <img src={props.product.images || ''} alt="" />
+          <img src={props.product.images || ''} alt="" className='w-full max-h-[275px] object-contain' />
           <div className='p-4'>
             <div className='text-lg font-bold'>{props.product.title}</div>
             <div>{props.product.description}</div>

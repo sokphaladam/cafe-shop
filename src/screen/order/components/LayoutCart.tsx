@@ -1,7 +1,7 @@
 import { Telegram } from '@/api/telegram';
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
-import { OrderInput, useCreateOrderMutation } from '@/gql/graphql';
+import { OrderInput, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation, useCreateOrderMutation, useDecreaseOrderItemMutation, useIncreaseOrderItemMutation, useMarkOrderItemStatusMutation } from '@/gql/graphql';
 import { useWindowSize } from '@/hook/useWindowSize';
 import { Button, ButtonGroup, Divider, Icon, Modal, TextField, Thumbnail } from '@shopify/polaris';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,10 +12,24 @@ export function LayoutCart() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState('');
-  const { items, setItems } = useOrderContext();
+  const { items, setItems, orderId, status } = useOrderContext();
   const { toasts, setToasts } = useCustomToast();
   const { width } = useWindowSize();
-  const [createOrder] = useCreateOrderMutation();
+  const [createOrder] = useCreateOrderMutation({
+    refetchQueries: ['order']
+  });
+  const [plus] = useIncreaseOrderItemMutation({
+    refetchQueries: ['order']
+  });
+  const [sub] = useDecreaseOrderItemMutation({
+    refetchQueries: ['order']
+  });
+  const [mark] = useMarkOrderItemStatusMutation({
+    refetchQueries: ['order']
+  })
+  const [change] = useChangeOrderStatusMutation({
+    refetchQueries: ['order']
+  })
 
   const [info] = useState({
     set: params.get('set') || 1,
@@ -23,6 +37,21 @@ export function LayoutCart() {
   })
 
   const handleCreateOrder = useCallback(() => {
+
+    change({
+      variables: {
+        data: {
+          orderId: Number(orderId),
+          status: StatusOrder.Checkout
+        }
+      }
+    }).then(res => {
+      if (res.data?.changeOrderStatus) {
+        setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }])
+      }
+    })
+
+    /*
     const input: OrderInput = {
       set: info.set + "",
       name: info.name,
@@ -52,6 +81,7 @@ export function LayoutCart() {
         setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }])
       }
     })
+      */
   }, [createOrder, info.name, info.set, items, setItems, setToasts, toasts])
 
   const handleCheckout = useCallback(() => {
@@ -88,6 +118,8 @@ export function LayoutCart() {
     return <div></div>
   }
 
+  const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
+
   return (
     <div className={`w-[30%] bg-white rounded-lg sticky top-[11%]`} style={{ height: window.innerHeight / 1.2 }}>
       <Modal title="Confirmation" open={open} onClose={() => setOpen(!open)} primaryAction={{
@@ -101,14 +133,15 @@ export function LayoutCart() {
       <div className='h-[50px] border-collapse border-gray-200 border-b-[0.5px] p-3'>
         <h3 className='font-bold text-lg'>Checkout</h3>
       </div>
-      <div className='h-[400px] overflow-auto' style={{ height: (window.innerHeight / 1.2) - 100 }}>
+      <div className='h-[400px] overflow-auto relative' style={{ height: (window.innerHeight / 1.2) - 100 }}>
+        {!edited && <div className='bg-black opacity-50 absolute top-0 bottom-0 left-0 right-0 z-999 rounded-lg flex flex-col justify-center items-center text-slate-200'>This order already completed.</div>}
         {items?.length === 0 && <div className='flex flex-col items-center justify-center' style={{ height: (window.innerHeight / 1.2) - 100 }}>
           <div>Order anything you want</div></div>}
         {
           items?.map((x, i) => {
             const sku = x.sku.find((s: any) => s.id === x.sku_id);
             return (
-              <div key={i} className='p-4'>
+              <div key={i} className={`p-4 ${x.status === StatusOrderItem.Completed ? 'bg-emerald-400' : ''}`}>
                 <div className='flex flex-row justify-between items-center'>
                   <div className='flex flex-row'>
                     <Thumbnail source={x.images || ''} alt='' size='medium' />
@@ -122,29 +155,49 @@ export function LayoutCart() {
                   </div>
                   <div>
                     <ButtonGroup variant='segmented'>
-                      <Button size='micro' onClick={() => {
+                      <Button disabled={!edited || x.status === StatusOrderItem.Completed} size='micro' onClick={() => {
                         const dummy = [...items];
                         if (dummy[i].qty === 1) {
-                          setItems && setItems(items.filter((_, index) => index !== i))
+                          // setItems && setItems(items.filter((_, index) => index !== i))
+                          mark({
+                            variables: {
+                              markOrderItemStatusId: Number(x.orderItemid),
+                              status: StatusOrderItem.Deleted
+                            }
+                          })
                           return;
                         }
-                        dummy[i].qty = dummy[i].qty - 1;
-                        setItems && setItems(dummy)
+                        // dummy[i].qty = dummy[i].qty - 1;
+                        // setItems && setItems(dummy)
+                        sub({
+                          variables: {
+                            decreaseOrderItemId: Number(x.orderItemid)
+                          }
+                        })
                       }}>-</Button>
                       <Button disabled size='micro'>{x.qty}</Button>
-                      <Button size='micro' onClick={() => {
+                      <Button disabled={!edited || x.status === StatusOrderItem.Completed} size='micro' onClick={() => {
                         const dummy = [...items];
-                        dummy[i].qty = dummy[i].qty + 1;
-                        setItems && setItems(dummy)
+                        plus({
+                          variables: {
+                            increaseOrderItemId: Number(x.orderItemid)
+                          }
+                        })
+                        // dummy[i].qty = dummy[i].qty + 1;
+                        // setItems && setItems(dummy)
                       }}>+</Button>
                     </ButtonGroup>
                   </div>
                 </div>
                 <br />
-                <div>
-                  Special Request: {x.remark}
-                </div>
-                <Divider />
+                {
+                  x.remark && <>
+                    <div className='bg-amber-200 p-1'>
+                      Special Request: {x.remark}
+                    </div>
+                    <Divider />
+                  </>
+                }
               </div>
             )
           })
@@ -152,7 +205,7 @@ export function LayoutCart() {
       </div>
       <div className='absolute bottom-0 left-0 right-0 h-[50px] border-collapse border-gray-200 border-t-[0.5px] flex flex-row justify-center items-center p-4'>
         {/* <Button variant='primary' tone='critical' fullWidth onClick={() => setOpen(!open)}>Checkout</Button> */}
-        <div className={`p-2 w-full text-center ${items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => items?.length === 0 ? {} : handleCreateOrder()}>Checkout</div>
+        <div className={`p-2 w-full text-center ${!edited || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => !edited || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div>
       </div>
     </div>
   )

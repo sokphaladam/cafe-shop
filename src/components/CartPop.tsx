@@ -6,13 +6,22 @@ import { useCustomToast } from './custom/CustomToast';
 import { Button, ButtonGroup, Divider, Icon, Modal, Thumbnail } from '@shopify/polaris';
 import { CartFilledIcon, CartIcon } from '@shopify/polaris-icons';
 import { useWindowSize } from '@/hook/useWindowSize';
+import { OrderInput, useCreateOrderMutation } from '@/gql/graphql';
+import { useSearchParams } from 'next/navigation';
 
 export function CartPop() {
+  const params = useSearchParams();
   const { setToasts, toasts } = useCustomToast();
   const { items, setItems } = useOrderContext();
   const [show, setShow] = useState(false);
   const [count, setCount] = useState(1);
   const { width } = useWindowSize();
+  const [createOrder] = useCreateOrderMutation();
+
+  const [info] = useState({
+    set: params.get('set') || 1,
+    name: params.get('token') || new Date().getTime() + "" + (params.get('set') || 1)
+  })
 
   const handleCheckout = useCallback(() => {
     const telegram = new Telegram();
@@ -49,6 +58,38 @@ export function CartPop() {
       setShow(false)
     }
   }, [items, setItems])
+
+  const handlePlaceOrder = useCallback(() => {
+    const input: OrderInput = {
+      set: info.set + "",
+      name: info.name,
+      address: '',
+      carts: items?.map(item => {
+        const sku = item.sku.find((s: any) => s.id === item.sku_id);
+        return {
+          skuId: item.sku_id,
+          qty: item.qty,
+          addons: item.addon_value.join(','),
+          discount: sku.discount,
+          price: sku.price,
+          productId: item.id,
+          remark: item.remark
+        }
+      })
+    }
+
+    createOrder({
+      variables: {
+        data: input
+      }
+    }).then(res => {
+      if (res.data?.createOrder) {
+        process.browser && localStorage.removeItem(info.name);
+        setItems && setItems([]);
+        setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }])
+      }
+    })
+  }, [createOrder, info.name, info.set, items, setItems, setToasts, toasts])
 
   return (
     <React.Fragment>
@@ -91,14 +132,17 @@ export function CartPop() {
                     </div>
                   </div>
                   <br />
-                  <div>
-                    Special Request: {x.remark}
+                  <div className='bg-amber-200 p-1'>
+                    <b>Special Request:</b> {x.remark}
                   </div>
                   <Divider />
                 </div>
               )
             })
           }
+        </Modal.Section>
+        <Modal.Section>
+          <div onClick={() => items?.length === 0 ? {} : handlePlaceOrder()} className={`${items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white p-2 w-full text-center rounded-lg`}>Place Order</div>
         </Modal.Section>
       </Modal>
       <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative'
