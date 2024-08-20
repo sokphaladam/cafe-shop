@@ -15,9 +15,6 @@ export function LayoutCart() {
   const { items, setItems, orderId, status } = useOrderContext();
   const { toasts, setToasts } = useCustomToast();
   const { width } = useWindowSize();
-  const [createOrder] = useCreateOrderMutation({
-    refetchQueries: ['order']
-  });
   const [plus] = useIncreaseOrderItemMutation({
     refetchQueries: ['order']
   });
@@ -82,7 +79,7 @@ export function LayoutCart() {
       }
     })
       */
-  }, [createOrder, info.name, info.set, items, setItems, setToasts, toasts])
+  }, [change, orderId, setToasts, toasts])
 
   const handleCheckout = useCallback(() => {
     const telegram = new Telegram();
@@ -204,7 +201,6 @@ export function LayoutCart() {
         }
       </div>
       <div className='absolute bottom-0 left-0 right-0 h-[50px] border-collapse border-gray-200 border-t-[0.5px] flex flex-row justify-center items-center p-4'>
-        {/* <Button variant='primary' tone='critical' fullWidth onClick={() => setOpen(!open)}>Checkout</Button> */}
         <div className={`p-2 w-full text-center ${!edited || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => !edited || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div>
       </div>
     </div>

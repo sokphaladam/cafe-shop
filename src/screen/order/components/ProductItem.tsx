@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
-import { CartItemInput, Product, useAddOrderItemMutation } from '@/gql/graphql';
+import { CartItemInput, Product, StatusOrder, useAddOrderItemMutation } from '@/gql/graphql';
 import { Button, ChoiceList, Divider, Modal, RadioButton, TextField, Thumbnail } from '@shopify/polaris';
 import React, { useCallback, useState } from 'react';
 
@@ -12,7 +12,7 @@ interface Props {
 
 export function ProductItem(props: Props) {
   const { toasts, setToasts } = useCustomToast();
-  const { items, setItems, orderId, refetch } = useOrderContext();
+  const { items, setItems, orderId, refetch, status } = useOrderContext();
   const [open, setOpen] = useState(false);
   const [addons, setAddons] = useState<any[]>(props.product.addons?.map(() => '') || []);
   const [sku, setSku] = useState<number>(0);
@@ -79,8 +79,10 @@ export function ProductItem(props: Props) {
     // process.browser && localStorage.setItem(props.keyItem, JSON.stringify(data));
 
     setOpen(!open)
-  }, [addCart, addons, items, open, orderId, props.product, refetch, remark, setItems, setToasts, sku, toasts])
+  }, [addCart, addons, items, open, orderId, props.product, refetch, remark, setToasts, sku, toasts])
 
+
+  const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
   return (
     <React.Fragment>
       <Modal open={open} onClose={() => setOpen(!open)} title titleHidden>
@@ -138,7 +140,9 @@ export function ProductItem(props: Props) {
           </div>
         </Modal.Section>
       </Modal>
-      <div onClick={() => setOpen(!open)} className="bg-white rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer hover:scale-105 hover:bg-gray-50 transition-all">
+      <div onClick={() => {
+        edited && handleAddtoCart()
+      }} className="bg-white rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer hover:scale-105 hover:bg-gray-50 transition-all">
         <div className="max-w-[250px] max-sm:w-[210px] max-lg:w-[180px]">
           <b className="text-lg">{props.product.title}</b>
           <div className="text-red-500 font-bold my-2">${(props.product.sku || [])[0]?.price}</div>
@@ -146,6 +150,6 @@ export function ProductItem(props: Props) {
         </div>
         <div className="w-[75px]"><Thumbnail alt="" source={props.product.images || ""} size="large" /></div>
       </div>
-    </React.Fragment>
+    </React.Fragment >
   )
 }

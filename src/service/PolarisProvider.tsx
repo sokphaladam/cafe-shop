@@ -53,14 +53,14 @@ export function PolarisProvider({ children }: React.PropsWithChildren<any>) {
         navigation={verify ? <NavigationMarkup /> : null}
       >
         <div className='flex flex-col justify-between'>
-          <div>
-            {children}
-          </div>
           {config_app.public.assets.dev === "development" && (
-            <div className="bg-sky-800 w-screen p-1 text-white text-center text-xs sticky bottom-0">
+            <div className="bg-sky-800 w-full p-1 text-white text-center text-xs sticky bottom-0">
               Developer Mode
             </div>
           )}
+          <div>
+            {children}
+          </div>
         </div>
       </Frame>
     </AppProvider>

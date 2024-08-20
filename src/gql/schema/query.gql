@@ -102,30 +102,33 @@ query category($categoryId: Int!) {
   }
 }
 
-query orderList($offset: Int, $limit: Int) {
-  orderList(offset: $offset, limit: $limit) {
-    uuid
-    total
-    status
-    set
-    paid
-    name
+query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy) {
+  orderList(offset: $offset, limit: $limit, viewBy: $viewBy) {
+    id
     items {
       id
-      qty
       price
-      sku {
+      product {
         id
+        images
+        title
+        code
+      }
+      qty
+      discount
+      addons
+      remark
+      sku {
         name
-        discount
-        price
-        unit
       }
       status
-      discount
     }
-    id
-    address
+    status
+    name
+    paid
+    set
+    total
+    uuid
   }
 }
 
@@ -163,8 +166,4 @@ query order($token: String, $orderId: Int) {
     id
     address
   }
-}
-
-query generateTokenOrder($set: Int!) {
-  generateTokenOrder(set: $set)
 }

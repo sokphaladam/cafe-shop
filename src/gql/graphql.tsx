@@ -118,6 +118,7 @@ export type Mutation = {
   createProduct?: Maybe<Scalars['Boolean']['output']>;
   createProductStock?: Maybe<Scalars['Boolean']['output']>;
   decreaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
+  generateTokenOrder?: Maybe<Scalars['String']['output']>;
   increaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<Scalars['String']['output']>;
   markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
@@ -166,6 +167,11 @@ export type MutationCreateProductStockArgs = {
 
 export type MutationDecreaseOrderItemArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type MutationGenerateTokenOrderArgs = {
+  set: Scalars['Int']['input'];
 };
 
 
@@ -245,6 +251,12 @@ export type OrderItem = {
   status?: Maybe<StatusOrderItem>;
 };
 
+export enum OrderViewBy {
+  Admin = 'ADMIN',
+  Kitchen = 'KITCHEN',
+  User = 'USER'
+}
+
 export type Product = {
   __typename?: 'Product';
   addons?: Maybe<Array<Maybe<AddonProduct>>>;
@@ -294,7 +306,6 @@ export type Query = {
   brandList?: Maybe<Array<Maybe<Brand>>>;
   category?: Maybe<Category>;
   categoryList?: Maybe<Scalars['JSON']['output']>;
-  generateTokenOrder?: Maybe<Scalars['String']['output']>;
   me?: Maybe<User>;
   order?: Maybe<Order>;
   orderList?: Maybe<Array<Maybe<Order>>>;
@@ -323,11 +334,6 @@ export type QueryCategoryArgs = {
 };
 
 
-export type QueryGenerateTokenOrderArgs = {
-  set: Scalars['Int']['input'];
-};
-
-
 export type QueryOrderArgs = {
   id?: InputMaybe<Scalars['Int']['input']>;
   token?: InputMaybe<Scalars['String']['input']>;
@@ -337,6 +343,7 @@ export type QueryOrderArgs = {
 export type QueryOrderListArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  viewBy?: InputMaybe<OrderViewBy>;
 };
 
 
@@ -518,6 +525,13 @@ export type ChangeOrderStatusMutationVariables = Exact<{
 
 export type ChangeOrderStatusMutation = { __typename?: 'Mutation', changeOrderStatus?: boolean | null };
 
+export type GenerateTokenOrderMutationVariables = Exact<{
+  set: Scalars['Int']['input'];
+}>;
+
+
+export type GenerateTokenOrderMutation = { __typename?: 'Mutation', generateTokenOrder?: string | null };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -555,10 +569,11 @@ export type CategoryQuery = { __typename?: 'Query', category?: { __typename?: 'C
 export type OrderListQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  viewBy?: InputMaybe<OrderViewBy>;
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', uuid?: string | null, total?: string | null, status?: StatusOrder | null, set?: string | null, paid?: string | null, name?: string | null, id?: number | null, address?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, status?: StatusOrderItem | null, discount?: number | null, sku?: { __typename?: 'SKU', id?: number | null, name?: string | null, discount?: number | null, price?: number | null, unit?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -567,13 +582,6 @@ export type OrderQueryVariables = Exact<{
 
 
 export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', uuid?: string | null, total?: string | null, status?: StatusOrder | null, set?: string | null, paid?: string | null, name?: string | null, id?: number | null, address?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
-
-export type GenerateTokenOrderQueryVariables = Exact<{
-  set: Scalars['Int']['input'];
-}>;
-
-
-export type GenerateTokenOrderQuery = { __typename?: 'Query', generateTokenOrder?: string | null };
 
 
 export const LoginDocument = gql`
@@ -923,6 +931,37 @@ export function useChangeOrderStatusMutation(baseOptions?: Apollo.MutationHookOp
 export type ChangeOrderStatusMutationHookResult = ReturnType<typeof useChangeOrderStatusMutation>;
 export type ChangeOrderStatusMutationResult = Apollo.MutationResult<ChangeOrderStatusMutation>;
 export type ChangeOrderStatusMutationOptions = Apollo.BaseMutationOptions<ChangeOrderStatusMutation, ChangeOrderStatusMutationVariables>;
+export const GenerateTokenOrderDocument = gql`
+    mutation generateTokenOrder($set: Int!) {
+  generateTokenOrder(set: $set)
+}
+    `;
+export type GenerateTokenOrderMutationFn = Apollo.MutationFunction<GenerateTokenOrderMutation, GenerateTokenOrderMutationVariables>;
+
+/**
+ * __useGenerateTokenOrderMutation__
+ *
+ * To run a mutation, you first call `useGenerateTokenOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateTokenOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateTokenOrderMutation, { data, loading, error }] = useGenerateTokenOrderMutation({
+ *   variables: {
+ *      set: // value for 'set'
+ *   },
+ * });
+ */
+export function useGenerateTokenOrderMutation(baseOptions?: Apollo.MutationHookOptions<GenerateTokenOrderMutation, GenerateTokenOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenerateTokenOrderMutation, GenerateTokenOrderMutationVariables>(GenerateTokenOrderDocument, options);
+      }
+export type GenerateTokenOrderMutationHookResult = ReturnType<typeof useGenerateTokenOrderMutation>;
+export type GenerateTokenOrderMutationResult = Apollo.MutationResult<GenerateTokenOrderMutation>;
+export type GenerateTokenOrderMutationOptions = Apollo.BaseMutationOptions<GenerateTokenOrderMutation, GenerateTokenOrderMutationVariables>;
 export const MeDocument = gql`
     query me {
   me {
@@ -1194,30 +1233,33 @@ export type CategoryLazyQueryHookResult = ReturnType<typeof useCategoryLazyQuery
 export type CategorySuspenseQueryHookResult = ReturnType<typeof useCategorySuspenseQuery>;
 export type CategoryQueryResult = Apollo.QueryResult<CategoryQuery, CategoryQueryVariables>;
 export const OrderListDocument = gql`
-    query orderList($offset: Int, $limit: Int) {
-  orderList(offset: $offset, limit: $limit) {
-    uuid
-    total
-    status
-    set
-    paid
-    name
+    query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy) {
+  orderList(offset: $offset, limit: $limit, viewBy: $viewBy) {
+    id
     items {
       id
-      qty
       price
-      sku {
+      product {
         id
+        images
+        title
+        code
+      }
+      qty
+      discount
+      addons
+      remark
+      sku {
         name
-        discount
-        price
-        unit
       }
       status
-      discount
     }
-    id
-    address
+    status
+    name
+    paid
+    set
+    total
+    uuid
   }
 }
     `;
@@ -1236,6 +1278,7 @@ export const OrderListDocument = gql`
  *   variables: {
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
+ *      viewBy: // value for 'viewBy'
  *   },
  * });
  */
@@ -1326,41 +1369,3 @@ export type OrderQueryHookResult = ReturnType<typeof useOrderQuery>;
 export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
 export type OrderSuspenseQueryHookResult = ReturnType<typeof useOrderSuspenseQuery>;
 export type OrderQueryResult = Apollo.QueryResult<OrderQuery, OrderQueryVariables>;
-export const GenerateTokenOrderDocument = gql`
-    query generateTokenOrder($set: Int!) {
-  generateTokenOrder(set: $set)
-}
-    `;
-
-/**
- * __useGenerateTokenOrderQuery__
- *
- * To run a query within a React component, call `useGenerateTokenOrderQuery` and pass it any options that fit your needs.
- * When your component renders, `useGenerateTokenOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGenerateTokenOrderQuery({
- *   variables: {
- *      set: // value for 'set'
- *   },
- * });
- */
-export function useGenerateTokenOrderQuery(baseOptions: Apollo.QueryHookOptions<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables> & ({ variables: GenerateTokenOrderQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>(GenerateTokenOrderDocument, options);
-      }
-export function useGenerateTokenOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>(GenerateTokenOrderDocument, options);
-        }
-export function useGenerateTokenOrderSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>(GenerateTokenOrderDocument, options);
-        }
-export type GenerateTokenOrderQueryHookResult = ReturnType<typeof useGenerateTokenOrderQuery>;
-export type GenerateTokenOrderLazyQueryHookResult = ReturnType<typeof useGenerateTokenOrderLazyQuery>;
-export type GenerateTokenOrderSuspenseQueryHookResult = ReturnType<typeof useGenerateTokenOrderSuspenseQuery>;
-export type GenerateTokenOrderQueryResult = Apollo.QueryResult<GenerateTokenOrderQuery, GenerateTokenOrderQueryVariables>;

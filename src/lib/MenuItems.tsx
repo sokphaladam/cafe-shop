@@ -103,6 +103,18 @@ export function MenuItems(user: User | null) {
           }
         ]
         break;
+      case 4:
+        MenuItem = [{
+          title: 'Kitchen',
+          items: [
+            {
+              label: "Customer Order",
+              icon: CartFilledIcon,
+              url: '/kitchen/order'
+            }
+          ]
+        }]
+        break;
       default:
         MenuItem = []
         break;

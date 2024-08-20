@@ -37,13 +37,23 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
           sku: [x?.sku],
           sku_id: x?.sku?.id,
           qty: x?.qty,
-          remark: x?.remark
+          remark: x?.remark,
+          price: x?.price,
+          discount: x?.discount
         }
       })
 
       // setCarts(cartItems)
     }
   });
+
+  // useEffect(() => {
+  //   startPolling(5000);
+
+  //   return () => {
+  //     stopPolling()
+  //   }
+  // }, [startPolling, stopPolling])
 
   useEffect(() => {
     if (params.get('token')) {
@@ -55,8 +65,6 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
       }, 1000)
     }
   }, [params])
-
-  console.log(carts)
 
   return (
     <OrderContext.Provider value={{
@@ -70,6 +78,8 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
           sku_id: x?.sku?.id,
           qty: x?.qty,
           remark: x?.remark,
+          price: x?.price,
+          discount: x?.discount
         }
       }) : carts, setItems: setCarts, orderId: id, refetch: refetch, status: data ? data.order?.status : undefined
     }}>

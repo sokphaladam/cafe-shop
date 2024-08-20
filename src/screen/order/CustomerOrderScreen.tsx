@@ -4,7 +4,7 @@ import { PolarisLayout } from "@/components/polaris/PolarisLayout"
 import { ProductList } from "@/components/ProductList"
 import { Topbar } from "@/components/Topbar"
 import { ProviderOrderContext, useOrderContext } from "@/context/OrderContext"
-import { Type_Product, useGenerateTokenOrderLazyQuery, useOrderLazyQuery, useOrderQuery, useProductListQuery } from "@/gql/graphql"
+import { Type_Product, useGenerateTokenOrderMutation, useOrderLazyQuery, useOrderQuery, useProductListQuery } from "@/gql/graphql"
 import { Layout, Thumbnail } from "@shopify/polaris"
 import { ProductItem } from "./components/ProductItem"
 import { LayoutCart } from "./components/LayoutCart"
@@ -20,8 +20,7 @@ export function CustomerOrderScreen() {
     name: params.get('token') || "1@" + new Date().getTime()
   })
 
-  const [generate] = useGenerateTokenOrderLazyQuery();
-
+  const [generate] = useGenerateTokenOrderMutation();
 
   const { data, loading } = useProductListQuery({
     variables: {

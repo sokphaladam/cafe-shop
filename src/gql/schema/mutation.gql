@@ -48,3 +48,7 @@ mutation decreaseOrderItem($decreaseOrderItemId: Int!) {
 mutation changeOrderStatus($data: ChangeOrderInput) {
   changeOrderStatus(data: $data)
 }
+
+mutation generateTokenOrder($set: Int!) {
+  generateTokenOrder(set: $set)
+}

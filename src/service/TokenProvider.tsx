@@ -37,6 +37,7 @@ export function TokenVerification(props: Props) {
           } else {
             props.onCompleted && props.onCompleted(false);
           }
+          setLoad(false);
         } else {
           props.onCompleted && props.onCompleted(false);
           setLoad(false);
@@ -45,7 +46,7 @@ export function TokenVerification(props: Props) {
     },
   });
 
-  if (!loading && !load) {
+  if (!load) {
     return <></>;
   }
 
