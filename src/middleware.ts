@@ -1,8 +1,28 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const PUBLIC_FILE = /\.(.*)$/;
+
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
+  if (
+    request.nextUrl.pathname.startsWith("/_next") ||
+    request.nextUrl.pathname.includes("/api/") ||
+    PUBLIC_FILE.test(request.nextUrl.pathname)
+  ) {
+    return;
+  }
+
+  if (request.nextUrl.locale === "default") {
+    const locale = "en";
+    return NextResponse.redirect(
+      new URL(
+        `/${locale}${request.nextUrl.pathname}${request.nextUrl.search}`,
+        request.url
+      )
+    );
+  }
+
   const token = request.cookies.get("tk_token")?.value;
 
   if (!token) {
@@ -24,6 +44,6 @@ export function middleware(request: NextRequest) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    "/((?!api|.next/static|.next/image|assets|favicon.ico|sw.js|affiliate.svg).*)",
+    "/((?!proxy|!api|.next/static|.next/image|assets|favicon.ico|sw.js|affiliate.svg).*)",
   ],
 };

@@ -5,6 +5,7 @@ export const config_app = {
       logo: "/assets/logo.svg",
       connect_icon: "/assets/connect.png",
       dev: process.env.NODE_ENV,
+      alarm: "/assets/mixkit-software-interface-start-2574.wav",
     },
   },
 };

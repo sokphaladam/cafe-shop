@@ -122,6 +122,7 @@ export type Mutation = {
   increaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<Scalars['String']['output']>;
   markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
+  testSubscription?: Maybe<Scalars['Boolean']['output']>;
   updateBrand?: Maybe<Scalars['Boolean']['output']>;
   updateCategory?: Maybe<Scalars['Boolean']['output']>;
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
@@ -189,6 +190,11 @@ export type MutationLoginArgs = {
 export type MutationMarkOrderItemStatusArgs = {
   id: Scalars['Int']['input'];
   status?: InputMaybe<StatusOrderItem>;
+};
+
+
+export type MutationTestSubscriptionArgs = {
+  str?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -422,6 +428,11 @@ export enum StatusOrderItem {
   RequestChange = 'REQUEST_CHANGE'
 }
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  newOrderPending?: Maybe<Scalars['String']['output']>;
+};
+
 export enum Type_Product {
   Addon = 'ADDON',
   Free = 'FREE',
@@ -582,6 +593,11 @@ export type OrderQueryVariables = Exact<{
 
 
 export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', uuid?: string | null, total?: string | null, status?: StatusOrder | null, set?: string | null, paid?: string | null, name?: string | null, id?: number | null, address?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+
+export type SubscriptionLoadSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SubscriptionLoadSubscription = { __typename?: 'Subscription', newOrderPending?: string | null };
 
 
 export const LoginDocument = gql`
@@ -1369,3 +1385,30 @@ export type OrderQueryHookResult = ReturnType<typeof useOrderQuery>;
 export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
 export type OrderSuspenseQueryHookResult = ReturnType<typeof useOrderSuspenseQuery>;
 export type OrderQueryResult = Apollo.QueryResult<OrderQuery, OrderQueryVariables>;
+export const SubscriptionLoadDocument = gql`
+    subscription subscriptionLoad {
+  newOrderPending
+}
+    `;
+
+/**
+ * __useSubscriptionLoadSubscription__
+ *
+ * To run a query within a React component, call `useSubscriptionLoadSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useSubscriptionLoadSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSubscriptionLoadSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSubscriptionLoadSubscription(baseOptions?: Apollo.SubscriptionHookOptions<SubscriptionLoadSubscription, SubscriptionLoadSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<SubscriptionLoadSubscription, SubscriptionLoadSubscriptionVariables>(SubscriptionLoadDocument, options);
+      }
+export type SubscriptionLoadSubscriptionHookResult = ReturnType<typeof useSubscriptionLoadSubscription>;
+export type SubscriptionLoadSubscriptionResult = Apollo.SubscriptionResult<SubscriptionLoadSubscription>;

@@ -141,7 +141,7 @@ export function ProductItem(props: Props) {
         </Modal.Section>
       </Modal>
       <div onClick={() => {
-        edited && handleAddtoCart()
+        !!edited && setOpen(true)
       }} className="bg-white rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer hover:scale-105 hover:bg-gray-50 transition-all">
         <div className="max-w-[250px] max-sm:w-[210px] max-lg:w-[180px]">
           <b className="text-lg">{props.product.title}</b>

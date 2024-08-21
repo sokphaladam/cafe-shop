@@ -15,14 +15,18 @@
     "@shopify/polaris-icons": "^9.2.0",
     "clsx": "^2.1.1",
     "cookies-next": "^4.2.1",
+    "file-loader": "^6.2.0",
     "firebase": "^10.12.4",
     "framer-motion": "^11.3.28",
     "fs": "0.0.1-security",
+    "graphql-ws": "^5.16.0",
     "moment": "^2.30.1",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "url-loader": "^4.1.1",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
