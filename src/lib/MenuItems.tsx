@@ -81,9 +81,9 @@ export function MenuItems(user: User | null) {
             title: 'Orders',
             items: [
               {
-                label: "Customer Order",
+                label: "Order",
                 icon: CartFilledIcon,
-                url: '/orders/list'
+                url: '/order/list'
               }
             ]
           }
@@ -95,9 +95,9 @@ export function MenuItems(user: User | null) {
             title: 'Orders',
             items: [
               {
-                label: "Customer Order",
+                label: "Order",
                 icon: CartFilledIcon,
-                url: '/orders/list'
+                url: '/order/list'
               }
             ]
           }

@@ -26,12 +26,12 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("tk_token")?.value;
 
   if (!token) {
-    const pathAllow = ["/public/order", "/login"];
+    const pathAllow = ["/customer/order", "/login"];
     if (pathAllow.includes(request.nextUrl.pathname)) {
       return NextResponse.next();
     }
 
-    return NextResponse.rewrite(new URL("/public/order", request.url));
+    return NextResponse.rewrite(new URL("/customer/order", request.url));
   }
 
   if (["/login", "/"].includes(request.nextUrl.pathname)) {

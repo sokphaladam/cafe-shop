@@ -102,8 +102,20 @@ query category($categoryId: Int!) {
   }
 }
 
-query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy) {
-  orderList(offset: $offset, limit: $limit, viewBy: $viewBy) {
+query orderList(
+  $offset: Int
+  $limit: Int
+  $viewBy: OrderViewBy
+  $status: [StatusOrder]
+  $orderId: String
+) {
+  orderList(
+    offset: $offset
+    limit: $limit
+    viewBy: $viewBy
+    status: $status
+    orderId: $orderId
+  ) {
     id
     items {
       id
@@ -129,6 +141,7 @@ query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy) {
     set
     total
     uuid
+    note
   }
 }
 

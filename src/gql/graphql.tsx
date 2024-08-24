@@ -229,6 +229,7 @@ export type Order = {
   id?: Maybe<Scalars['Int']['output']>;
   items?: Maybe<Array<Maybe<OrderItem>>>;
   name?: Maybe<Scalars['String']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
   paid?: Maybe<Scalars['String']['output']>;
   set?: Maybe<Scalars['String']['output']>;
   status?: Maybe<StatusOrder>;
@@ -349,6 +350,8 @@ export type QueryOrderArgs = {
 export type QueryOrderListArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  orderId?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Array<InputMaybe<StatusOrder>>>;
   viewBy?: InputMaybe<OrderViewBy>;
 };
 
@@ -581,10 +584,12 @@ export type OrderListQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   viewBy?: InputMaybe<OrderViewBy>;
+  status?: InputMaybe<Array<InputMaybe<StatusOrder>> | InputMaybe<StatusOrder>>;
+  orderId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -1249,8 +1254,14 @@ export type CategoryLazyQueryHookResult = ReturnType<typeof useCategoryLazyQuery
 export type CategorySuspenseQueryHookResult = ReturnType<typeof useCategorySuspenseQuery>;
 export type CategoryQueryResult = Apollo.QueryResult<CategoryQuery, CategoryQueryVariables>;
 export const OrderListDocument = gql`
-    query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy) {
-  orderList(offset: $offset, limit: $limit, viewBy: $viewBy) {
+    query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy, $status: [StatusOrder], $orderId: String) {
+  orderList(
+    offset: $offset
+    limit: $limit
+    viewBy: $viewBy
+    status: $status
+    orderId: $orderId
+  ) {
     id
     items {
       id
@@ -1276,6 +1287,7 @@ export const OrderListDocument = gql`
     set
     total
     uuid
+    note
   }
 }
     `;
@@ -1295,6 +1307,8 @@ export const OrderListDocument = gql`
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
  *      viewBy: // value for 'viewBy'
+ *      status: // value for 'status'
+ *      orderId: // value for 'orderId'
  *   },
  * });
  */

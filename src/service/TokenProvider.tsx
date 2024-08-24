@@ -42,7 +42,7 @@ export function TokenVerification(props: Props) {
           props.onCompleted && props.onCompleted(false);
           setLoad(false);
         }
-      }, 3000)
+      }, 500)
     },
   });
 

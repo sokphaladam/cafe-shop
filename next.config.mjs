@@ -10,7 +10,10 @@ const nextConfig = {
         protocol: 'https'
       }
     ]
-  }
+  },
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
 };
 
 export default nextConfig;
