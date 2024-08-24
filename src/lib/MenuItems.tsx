@@ -108,7 +108,7 @@ export function MenuItems(user: User | null) {
           title: 'Kitchen',
           items: [
             {
-              label: "Customer Order",
+              label: "Today Order",
               icon: CartFilledIcon,
               url: '/kitchen/order'
             }

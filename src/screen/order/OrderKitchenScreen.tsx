@@ -1,37 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 import { useCustomToast } from '@/components/custom/CustomToast';
-import { OrderViewBy, StatusOrderItem, useMarkOrderItemStatusMutation, useOrderListQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
-import { config_app } from '@/lib/config_app';
-import { Box, Button, Card, Divider, Icon, IndexTable, Layout, Page, Spinner, Text } from '@shopify/polaris';
+import { OrderViewBy, StatusOrder, StatusOrderItem, useMarkOrderItemStatusMutation, useOrderListQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
+import { Button, Divider, Icon, Layout, Page, Spinner, Text } from '@shopify/polaris';
 import { CheckIcon, XIcon } from '@shopify/polaris-icons';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 
 export function OrderKitchenScreen() {
-  const ref = useRef<HTMLAudioElement>(null)
   const { setToasts, toasts } = useCustomToast();
   const [mark, { loading: loadingMark }] = useMarkOrderItemStatusMutation({
     refetchQueries: ['order', 'orderList']
   })
   const { data, loading, refetch } = useOrderListQuery({
     variables: {
-      viewBy: OrderViewBy.Kitchen
+      viewBy: OrderViewBy.Kitchen,
+      limit: 25,
+      offset: 0,
+      status: [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery]
     },
   });
   useSubscriptionLoadSubscription({
     onData: (res) => {
       refetch();
-      // if (ref.current) {
-      //   let play = ref.current.play();
-      //   if (play !== undefined) {
-      //     play.then(_ => {
-      //       //
-      //       ref.current?.pause()
-      //     }).catch(_ => {
-      //       //
-      //     })
-      //   }
-      // }
       setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
     }
   });
@@ -60,7 +50,6 @@ export function OrderKitchenScreen() {
 
   return (
     <Page title='Today Orders' fullWidth>
-      {/* <audio style={{ display: 'none' }} ref={ref} id='idAudio' controls src="https://firebasestorage.googleapis.com/v0/b/serv-cafe.appspot.com/o/assets%2Fmixkit-software-interface-start-2574.wav?alt=media&token=b9f0ce33-a7b7-429d-96e8-9a09b5fc2311"></audio> */}
       <Layout>
         <Layout.Section variant='fullWidth'>
           {loading && <Spinner />}
