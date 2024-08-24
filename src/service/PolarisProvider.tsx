@@ -8,6 +8,8 @@ import { TopbarMarkup } from '@/components/TopbarMakerup';
 import { NavigationMarkup } from '@/components/NavigationMarkup';
 import { TokenVerification } from './TokenProvider';
 import Link from 'next/link';
+import { ModalComponent } from '@/components/ModalServer';
+import { Modal } from '@/hook/modal';
 
 const logo = {
   width: 35,
@@ -59,6 +61,7 @@ export function PolarisProvider({ children }: React.PropsWithChildren<any>) {
             </div>
           )}
           <div>
+            <ModalComponent ref={(t) => Modal.setModal(t)} />
             {children}
           </div>
         </div>

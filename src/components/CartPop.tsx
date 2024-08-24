@@ -84,43 +84,11 @@ export function CartPop() {
         setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }])
       }
     })
-
-    /*const input: OrderInput = {
-      set: info.set + "",
-      name: info.name,
-      address: '',
-      carts: items?.map(item => {
-        const sku = item.sku.find((s: any) => s.id === item.sku_id);
-        return {
-          skuId: item.sku_id,
-          qty: item.qty,
-          addons: item.addon_value.join(','),
-          discount: sku.discount,
-          price: sku.price,
-          productId: item.id,
-          remark: item.remark
-        }
-      })
-    }
-
-    createOrder({
-      variables: {
-        data: input
-      }
-    }).then(res => {
-      if (res.data?.createOrder) {
-        process.browser && localStorage.removeItem(info.name);
-        setItems && setItems([]);
-        setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }])
-      }
-    })
-      */
   }, [change, orderId, setToasts, toasts])
 
-  console.log(items)
-
   const loading = loadingMark || loadingPlus || loadingChange || loadingSub
-  const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
+  const edited = [StatusOrder.Delivery].includes(status);
+
   return (
     <React.Fragment>
       <Modal open={show} onClose={() => setShow(!show)} title="Checkout">
@@ -214,67 +182,6 @@ export function CartPop() {
           )
         }
       </div>
-      {/* {
-        show === true && <div className='fixed bottom-0 w-full left-0 right-0'>
-          <div className='relative w-[512px] mx-auto bg-white rounded-md p-4 shadow-md max-md:w-[512/2] max-sm:w-full'>
-            <div className='p-1 font-bold'>
-              <h4>Order Carts</h4>
-            </div>
-            <hr />
-            {
-              items?.map((x, i) => {
-                return (
-                  <div key={i} className='p-1 border-b flex flex-row justify-between align-middle'>
-                    <div className='flex flex-row w-[50%]'>
-                      <img src={x.img} alt="" className='w-[50px] h-[50px] object-cover aspect-square' />
-                      <div className='ml-3'>
-                        <div className='text-base text-slate-500 truncate'>{x.name}</div>
-                        <div className='text-lg font-bold text-gray-800'>${Number(x.price).toFixed(2)}</div>
-                      </div>
-                    </div>
-                    <div className='flex flex-row align-middle self-center w-[25%]'>
-                      <div
-                        className='p-2 bg-slate-200 rounded-md'
-                        onClick={() => {
-                          const data = [...items]
-                          data[i].qty = data[i].qty - 1;
-                          if (data[i].qty === 0) {
-                            setItems && setItems(data.filter(f => f.qty > 0))
-                          }
-                          else {
-                            setItems && setItems(data)
-                          }
-                        }}
-                      >-</div>
-                      <div className='p-2 rounded-md w-[100px] text-center'>{x.qty}</div>
-                      <div
-                        className='p-2 bg-slate-200 rounded-md'
-                        onClick={() => {
-                          const data = [...items]
-                          data[i].qty = data[i].qty + 1;
-                          setItems && setItems(data)
-                        }}
-                      >+</div>
-                    </div>
-                    <div className='flex flex-row align-middle self-center w-[25%] justify-end'>
-                      <div
-                        className='bg-red-500 p-1 rounded-md text-red-200'
-                        onClick={() => handleRemove(i)}
-                      >Remove</div>
-                    </div>
-                  </div>
-                )
-              })
-            }
-            <div className='pt-2 flex flex-row justify-between self-end'>
-              <div className='pl-1'>
-                <h4 className='text-lg font-bold'>Total: <span className='ml-2'>${Number(items?.reduce((a, b) => a = a + (b.price * b.qty), 0)).toFixed(2)}</span></h4>
-              </div>
-              <button className='bg-green-500 text-green-200 p-1 rounded-md text-sm' onClick={handleCheckout}>Checkout</button>
-            </div>
-          </div>
-        </div>
-      } */}
     </React.Fragment>
   )
 }

@@ -1,10 +1,11 @@
 'use client'
-import { StatusOrder, useOrderListQuery } from '@/gql/graphql';
+import { StatusOrder, useOrderListQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
 import { usePagination } from '@/hook/usePagination';
 import { ActionList, Badge, Box, Card, Icon, IndexFilters, IndexTable, Layout, Page, Popover, TabProps, Tabs, Text, Tooltip, useSetIndexFiltersMode } from '@shopify/polaris';
 import { CheckCircleIcon, ClipboardCheckFilledIcon, DeliveryIcon, InfoIcon, MenuVerticalIcon, XCircleIcon } from '@shopify/polaris-icons';
 import React, { useState } from 'react';
 import { OrderListItem } from './components/OrderListItem';
+import { useCustomToast } from '@/components/custom/CustomToast';
 
 const tabs: TabProps[] = [
   {
@@ -16,7 +17,7 @@ const tabs: TabProps[] = [
     id: 'VERIFY'
   },
   {
-    content: 'DELIVERY',
+    content: 'DELIVER',
     id: 'DELIVERY'
   },
   {
@@ -32,11 +33,12 @@ const tabs: TabProps[] = [
 
 
 export function OrderListScreen() {
+  const { setToasts, toasts } = useCustomToast();
   const [select, setSelect] = useState(0)
   const [searchInput, setSearchInput] = useState('')
   const { offset, setOffset, limit, setLimit } = usePagination();
   const { mode, setMode } = useSetIndexFiltersMode();
-  const { data, loading } = useOrderListQuery({
+  const { data, loading, refetch } = useOrderListQuery({
     variables: {
       offset,
       limit,
@@ -44,8 +46,12 @@ export function OrderListScreen() {
       orderId: searchInput
     }
   });
-
-  console.log(data)
+  useSubscriptionLoadSubscription({
+    onData: (res) => {
+      refetch();
+      setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
+    }
+  });
 
   return (
     <Page title='Order List'>

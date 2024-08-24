@@ -78,6 +78,7 @@ export type ChangeOrderInput = {
   id?: InputMaybe<Scalars['Int']['input']>;
   itemStatus?: InputMaybe<StatusOrderItem>;
   orderId: Scalars['Int']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<StatusOrder>;
 };
 

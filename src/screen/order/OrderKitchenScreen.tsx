@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 import { useCustomToast } from '@/components/custom/CustomToast';
-import { OrderViewBy, StatusOrder, StatusOrderItem, useMarkOrderItemStatusMutation, useOrderListQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
-import { Button, Divider, Icon, Layout, Page, Spinner, Text } from '@shopify/polaris';
+import { OrderViewBy, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation, useMarkOrderItemStatusMutation, useOrderListQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
+import { Box, Button, Card, Divider, Icon, Layout, Page, Spinner, Text, Thumbnail } from '@shopify/polaris';
 import { CheckIcon, XIcon } from '@shopify/polaris-icons';
 import React, { useCallback } from 'react';
 
@@ -16,8 +16,11 @@ export function OrderKitchenScreen() {
       viewBy: OrderViewBy.Kitchen,
       limit: 25,
       offset: 0,
-      status: [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery]
+      status: [StatusOrder.Verify]
     },
+  });
+  const [change, { loading: loadingChange }] = useChangeOrderStatusMutation({
+    refetchQueries: ['order', 'orderList']
   });
   useSubscriptionLoadSubscription({
     onData: (res) => {
@@ -44,9 +47,84 @@ export function OrderKitchenScreen() {
     })
   }, [mark])
 
+  const handleUpdate = useCallback((status: StatusOrder, id: number) => {
+    change({
+      variables: {
+        data: {
+          orderId: Number(id),
+          status,
+        }
+      }
+    }).then(res => {
+      if (res.data?.changeOrderStatus) {
+        setToasts([...toasts, { content: 'Update status was success.', status: 'success' }])
+      }
+      else {
+        setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+      }
+    }).catch(() => {
+      setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+    })
+  }, [change, setToasts, toasts])
+
   if (loading || !data) {
     return <></>
   }
+
+  // const itemFirst = data ? data.orderList ? data.orderList[0] : null : null
+
+  // return (
+  //   <Page fullWidth>
+  //     <div className='grid grid-cols-4 gap-4'>
+  //       {
+  //         itemFirst && <div className='p-2 bg-rose-300 rounded-md shadow-md'>
+  //           <div className='relative'><div className='bg-amber-600 absolute -top-2 p-3'>{itemFirst.set}</div><Text as='h4' variant='headingLg' alignment='center'>#{itemFirst?.id}</Text></div>
+  //           <div className='bg-white p-2 rounded-md'>
+  //             {
+  //               itemFirst.items?.map(x => {
+  //                 return (
+  //                   <div key={x?.id} className='flex flex-row items-center justify-between'>
+  //                     <div className='flex flex-row items-center gap-2'>
+  //                       <Thumbnail alt='' source={x?.product?.images + ''} size='small' />
+  //                       <Text as='p' variant='bodyMd'>{x?.product?.title}</Text>
+  //                     </div>
+  //                     <Text as='p' variant='bodyMd'>x{x?.qty}</Text>
+  //                   </div>
+  //                 )
+  //               })
+  //             }
+  //           </div>
+  //         </div>
+  //       }
+  //       <div className='col-span-3 grid grid-cols-3 gap-4'>
+  //         {
+  //           data && data.orderList?.filter((_, i) => i > 0).map((order) => {
+  //             return (
+  //               <div key={order?.id} className='p-2 bg-slate-100 shadow-md rounded-md'>
+  //                 <Text as='h4' variant='headingLg' alignment='center'>#{order?.id}</Text>
+  //                 <div className='bg-white p-2 rounded-md min-h-48 overflow-auto'>
+  //                   {
+  //                     order?.items?.map(x => {
+  //                       return (
+  //                         <div key={x?.id} className='flex flex-row items-center justify-between'>
+  //                           <div className='flex flex-row items-center gap-2'>
+  //                             <Thumbnail alt='' source={x?.product?.images + ''} size='small' />
+  //                             <Text as='p' variant='bodyMd'>{x?.product?.title}</Text>
+  //                           </div>
+  //                           <Text as='p' variant='bodyMd'>x{x?.qty}</Text>
+  //                         </div>
+  //                       )
+  //                     })
+  //                   }
+  //                 </div>
+  //               </div>
+  //             )
+  //           })
+  //         }
+  //       </div>
+  //     </div>
+  //   </Page>
+  // )
 
   return (
     <Page title='Today Orders' fullWidth>
@@ -58,10 +136,10 @@ export function OrderKitchenScreen() {
               return (
                 <div key={order?.id} className='flex flex-row gap-6 my-3'>
                   <div className='min-w-[100px]'>
-                    <Button fullWidth>Set {order?.set || ''}</Button>
-                    <div className='mt-2'>
-                      <Text as='p' variant='bodyMd' fontWeight='bold' tone='base'>Order: #{order?.id}</Text>
+                    <div className='mt-2 mb-2'>
+                      <Text as='p' variant='bodyMd' fontWeight='bold' tone='base'>Order: #{order?.id} (Set {order?.set || ''})</Text>
                     </div>
+                    <Button fullWidth variant='primary' tone='success' disabled={loadingChange} loading={loadingChange} onClick={() => handleUpdate(StatusOrder.Delivery, order?.id || 0)}>Ready</Button>
                   </div>
                   <div className='flex flex-row gap-6 flex-wrap'>
                     {
@@ -87,7 +165,7 @@ export function OrderKitchenScreen() {
                                   [StatusOrderItem.Completed, StatusOrderItem.Deleted].includes(item?.status as any) && <Text as='p' variant='bodyMd' tone={item?.status === StatusOrderItem.Completed ? 'success' : 'critical'}>{item?.status}</Text>
                                 }
                               </div>
-                              {
+                              {/* {
                                 ![StatusOrderItem.Completed, StatusOrderItem.Deleted].includes(item?.status as any) && <div className='flex flex-row gap-2'>
                                   <div onClick={() => {
                                     handleCancel(item?.id || 0)
@@ -100,7 +178,7 @@ export function OrderKitchenScreen() {
                                     <Icon source={CheckIcon as any} />
                                   </div>
                                 </div>
-                              }
+                              } */}
                             </div>
                           </div>
                         )
