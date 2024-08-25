@@ -75,6 +75,7 @@ export type CategoryInput = {
 };
 
 export type ChangeOrderInput = {
+  amount?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
   itemStatus?: InputMaybe<StatusOrderItem>;
   orderId: Scalars['Int']['input'];
@@ -229,6 +230,7 @@ export type Order = {
   address?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   items?: Maybe<Array<Maybe<OrderItem>>>;
+  log?: Maybe<Array<Maybe<OrderLog>>>;
   name?: Maybe<Scalars['String']['output']>;
   note?: Maybe<Scalars['String']['output']>;
   paid?: Maybe<Scalars['String']['output']>;
@@ -257,6 +259,13 @@ export type OrderItem = {
   remark?: Maybe<Scalars['String']['output']>;
   sku?: Maybe<Sku>;
   status?: Maybe<StatusOrderItem>;
+};
+
+export type OrderLog = {
+  __typename?: 'OrderLog';
+  by?: Maybe<User>;
+  date?: Maybe<Scalars['String']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
 };
 
 export enum OrderViewBy {
@@ -437,6 +446,11 @@ export type Subscription = {
   newOrderPending?: Maybe<Scalars['String']['output']>;
 };
 
+
+export type SubscriptionNewOrderPendingArgs = {
+  channel?: InputMaybe<Scalars['String']['input']>;
+};
+
 export enum Type_Product {
   Addon = 'ADDON',
   Free = 'FREE',
@@ -590,7 +604,7 @@ export type OrderListQueryVariables = Exact<{
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -600,7 +614,9 @@ export type OrderQueryVariables = Exact<{
 
 export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', uuid?: string | null, total?: string | null, status?: StatusOrder | null, set?: string | null, paid?: string | null, name?: string | null, id?: number | null, address?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
 
-export type SubscriptionLoadSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type SubscriptionLoadSubscriptionVariables = Exact<{
+  channel?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 
 export type SubscriptionLoadSubscription = { __typename?: 'Subscription', newOrderPending?: string | null };
@@ -1289,6 +1305,14 @@ export const OrderListDocument = gql`
     total
     uuid
     note
+    log {
+      date
+      text
+      by {
+        id
+        display
+      }
+    }
   }
 }
     `;
@@ -1401,8 +1425,8 @@ export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
 export type OrderSuspenseQueryHookResult = ReturnType<typeof useOrderSuspenseQuery>;
 export type OrderQueryResult = Apollo.QueryResult<OrderQuery, OrderQueryVariables>;
 export const SubscriptionLoadDocument = gql`
-    subscription subscriptionLoad {
-  newOrderPending
+    subscription subscriptionLoad($channel: String) {
+  newOrderPending(channel: $channel)
 }
     `;
 
@@ -1418,6 +1442,7 @@ export const SubscriptionLoadDocument = gql`
  * @example
  * const { data, loading, error } = useSubscriptionLoadSubscription({
  *   variables: {
+ *      channel: // value for 'channel'
  *   },
  * });
  */

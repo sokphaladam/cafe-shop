@@ -1,3 +1,3 @@
-subscription subscriptionLoad {
-  newOrderPending
+subscription subscriptionLoad($channel: String) {
+  newOrderPending(channel: $channel)
 }

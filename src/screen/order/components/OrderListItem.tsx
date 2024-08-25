@@ -3,27 +3,12 @@ import { useCustomToast } from '@/components/custom/CustomToast';
 import { Order, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation } from '@/gql/graphql';
 import { Modal } from '@/hook/modal';
 import { ActionList, Badge, Icon, IndexTable, Popover, Text, Thumbnail, Tooltip, Modal as Modals, TextField, ActionListItemDescriptor } from '@shopify/polaris';
-import { InfoIcon, CheckCircleIcon, DeliveryIcon, ClipboardCheckFilledIcon, XCircleIcon, MenuVerticalIcon } from '@shopify/polaris-icons';
+import { MenuVerticalIcon } from '@shopify/polaris-icons';
 import React, { useCallback, useState } from 'react';
+import { LogStatus } from './LogStatus';
 
 interface Props {
   item: Order | null
-}
-
-const toneStatus: any = {
-  [StatusOrder.Pending]: "attention-strong",
-  [StatusOrder.Verify]: "info-strong",
-  [StatusOrder.Delivery]: "success",
-  [StatusOrder.Checkout]: "success-strong",
-  [StatusOrder.Cancelled]: "critical-strong"
-}
-
-const toneIcon: any = {
-  [StatusOrder.Pending]: InfoIcon,
-  [StatusOrder.Verify]: CheckCircleIcon,
-  [StatusOrder.Delivery]: DeliveryIcon,
-  [StatusOrder.Checkout]: ClipboardCheckFilledIcon,
-  [StatusOrder.Cancelled]: XCircleIcon
 }
 
 export function OrderListItem({ item }: Props) {
@@ -196,11 +181,7 @@ export function OrderListItem({ item }: Props) {
         </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           <div className='flex flex-row justify-center'>
-            <Badge tone={toneStatus[item?.status || '']} icon={toneIcon[item?.status || ""]} size='small'>
-              {
-                <small>{item?.status || ''}</small> as any
-              }
-            </Badge>
+            <LogStatus item={item} />
           </div>
         </IndexTable.Cell>
         <IndexTable.Cell>

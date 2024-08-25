@@ -1,5 +1,5 @@
 overwrite: true
-schema: "http://localhost:4000/"
+schema: "https://graph.mood.international"
 require:
   - ts-node/register
 documents: "src/gql/**/*.gql"

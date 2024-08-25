@@ -142,6 +142,14 @@ query orderList(
     total
     uuid
     note
+    log {
+      date
+      text
+      by {
+        id
+        display
+      }
+    }
   }
 }
 
