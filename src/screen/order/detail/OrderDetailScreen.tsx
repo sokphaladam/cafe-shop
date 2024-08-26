@@ -1,9 +1,10 @@
 'use client'
-import React from 'react';
-import { Badge, Box, Button, Card, Divider, Frame, IndexTable, Layout, Loading, Page, Text, Thumbnail } from '@shopify/polaris';
-import { StatusOrder, useOrderQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
+import React, { useCallback, useState } from 'react';
+import { Badge, Box, Button, Card, Divider, Frame, IndexTable, Layout, Loading, Page, Text, Thumbnail, Modal as Modals, TextField } from '@shopify/polaris';
+import { StatusOrder, useChangeOrderStatusMutation, useOrderQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
 import { InfoIcon, CheckCircleIcon, DeliveryIcon, ClipboardCheckFilledIcon, XCircleIcon } from '@shopify/polaris-icons';
 import { useCustomToast } from '@/components/custom/CustomToast';
+import { Modal } from '@/hook/modal';
 
 interface Props { id: number }
 
@@ -25,17 +26,73 @@ const toneIcon: any = {
 
 export function OrderDetailScreen(props: Props) {
   const { setToasts, toasts } = useCustomToast();
-  const { data, loading, refetch } = useOrderQuery({
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [reasonInput, setReasonInput] = useState('');
+  const [amountInput, setAmountInput] = useState('');
+  const toggelOpen = useCallback(() => setOpen(!open), [open])
+  const toggleActive = useCallback(() => setActive(!active), [active])
+  const togglePaid = useCallback(() => setPaid(!paid), [paid])
+
+  const { data, loading } = useOrderQuery({
     variables: {
       orderId: Number(props.id)
     }
   })
+  const [change] = useChangeOrderStatusMutation({
+    refetchQueries: ['order', 'orderList']
+  });
   // useSubscriptionLoadSubscription({
   //   onData: (res) => {
   //     refetch();
   //     setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
   //   }
   // });
+
+  const handleUpdate = useCallback((status: StatusOrder) => {
+    toggelOpen();
+    if (status === StatusOrder.Cancelled) {
+      toggleActive();
+      return;
+    }
+    if (status === StatusOrder.Checkout) {
+      togglePaid()
+      return;
+    }
+    else {
+      Modal.dialog({
+        title: 'Confirmation',
+        body: [
+          <div key={1}>You are select order <b>#{data?.order?.id}</b> to <b>{status.toLowerCase()}</b>.</div>
+        ],
+        buttons: [
+          { title: 'No', },
+          {
+            title: 'Yes', class: 'primary', onPress: () => {
+              change({
+                variables: {
+                  data: {
+                    orderId: Number(data?.order?.id),
+                    status,
+                  }
+                }
+              }).then(res => {
+                if (res.data?.changeOrderStatus) {
+                  setToasts([...toasts, { content: 'Update status was success.', status: 'success' }])
+                }
+                else {
+                  setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+                }
+              }).catch(() => {
+                setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+              })
+            }
+          },
+        ]
+      })
+    }
+  }, [change, data?.order?.id, setToasts, toasts, toggelOpen, toggleActive, togglePaid])
 
   if (loading) {
     <Page title='Order Detail'>
@@ -44,8 +101,6 @@ export function OrderDetailScreen(props: Props) {
       </Frame>
     </Page>
   }
-
-  console.log(data)
 
   const total = data?.order?.items?.reduce((a: any, b: any) => {
     const dis_price = Number(b.price) * (Number(b.discount) / 100);
@@ -58,7 +113,127 @@ export function OrderDetailScreen(props: Props) {
   const totalAfterVat = total + vat
 
   return (
-    <Page title={`Order Detail #${props.id}`}>
+    <Page title={`Order Detail #${props.id}`} subtitle={data?.order?.status === StatusOrder.Checkout && Number(data?.order?.paid || 0) ? <Badge tone='success-strong'>
+      {<small>PAID</small> as any}
+    </Badge> as any : ''}>
+      {/* Cancel */}
+      <Modals
+        open={active}
+        onClose={toggleActive}
+        title={`Cancel Order #${data?.order?.id}`}
+        primaryAction={{
+          content: "Cancel",
+          destructive: true,
+          onAction: () => {
+            if (!reasonInput) {
+              setToasts([...toasts, { content: 'Please input the reason!', status: 'error' }])
+              return;
+            }
+            change({
+              variables: {
+                data: {
+                  orderId: Number(data?.order?.id),
+                  status: StatusOrder.Cancelled,
+                  reason: reasonInput,
+                }
+              }
+            }).then(res => {
+              if (res.data?.changeOrderStatus) {
+                setToasts([...toasts, { content: 'Update status was success.', status: 'success' }])
+                setReasonInput('')
+                toggleActive()
+              }
+              else {
+                setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+              }
+            }).catch(() => {
+              setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+            })
+          }
+
+        }}
+      >
+        <Modals.Section>
+          <TextField
+            autoComplete='off'
+            label="Why do you want to cancel the order?"
+            multiline={5}
+            placeholder='Please give me a reason...'
+            value={reasonInput}
+            onChange={setReasonInput}
+            requiredIndicator
+          />
+        </Modals.Section>
+      </Modals>
+      {/* Checkout */}
+      <Modals
+        open={paid}
+        onClose={togglePaid}
+        title={`Checkout Order #${data?.order?.id}`}
+        primaryAction={{
+          content: "Checkout",
+          destructive: true,
+          onAction: () => {
+            if (!amountInput) {
+              setToasts([...toasts, { content: 'Please input the amount of customer are paid for order!', status: 'error' }])
+              return;
+            }
+            change({
+              variables: {
+                data: {
+                  orderId: Number(data?.order?.id),
+                  status: StatusOrder.Checkout,
+                  reason: reasonInput,
+                  amount: String(amountInput)
+                }
+              }
+            }).then(res => {
+              if (res.data?.changeOrderStatus) {
+                setToasts([...toasts, { content: 'Update status was success.', status: 'success' }])
+                setReasonInput('')
+                setAmountInput('')
+                togglePaid()
+              }
+              else {
+                setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+              }
+            }).catch(() => {
+              setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }])
+            })
+          }
+
+        }}
+        footer={
+          <div className='font-bold'>
+            Total: <span className='pl-2'>${totalAfterVat.toFixed(2)}</span>
+            <br />
+            Paid: <span className='pl-2'>${Number(amountInput || 0).toFixed(2)}</span>
+            <br />
+            Return to customer: <span className='pl-2'>${(Number(amountInput || 0) - Number(totalAfterVat)).toFixed(2)}</span>
+          </div>
+        }
+      >
+        <Modals.Section>
+          <TextField
+            type='number'
+            autoComplete='off'
+            value={amountInput}
+            onChange={setAmountInput}
+            label="Amount cutomer paid"
+            placeholder='Please input amount of customer are paid for order here'
+            requiredIndicator
+          />
+          <br />
+          <TextField
+            autoComplete='off'
+            label="Do you have remark?"
+            multiline={5}
+            placeholder='comment here...'
+            value={reasonInput}
+            onChange={setReasonInput}
+          />
+        </Modals.Section>
+      </Modals>
       <Layout>
         <Layout.Section variant='oneHalf'>
           <Card padding={'0'}>
@@ -67,15 +242,15 @@ export function OrderDetailScreen(props: Props) {
                 <div className='flex flex-row gap-4'>
                   <Button size='micro'>Print Recipt</Button>
                   {
-                    data?.order?.status === StatusOrder.Pending && <Button size='micro' tone='success' variant='primary'>Verify</Button>
+                    data?.order?.status === StatusOrder.Pending && <Button onClick={() => handleUpdate(StatusOrder.Verify)} size='micro' tone='success' variant='primary'>Verify</Button>
                   }
                   {
-                    data?.order?.status === StatusOrder.Verify && <Button size='micro' tone='success' variant='primary'>Deliver</Button>
+                    data?.order?.status === StatusOrder.Verify && <Button size='micro' tone='success' variant='primary' onClick={() => handleUpdate(StatusOrder.Delivery)}>Deliver</Button>
                   }
                   {
-                    [StatusOrder.Delivery, StatusOrder.Checkout].includes(data?.order?.status as any) && <Button size='micro' tone='success' variant='primary'>Checkout</Button>
+                    [StatusOrder.Delivery, StatusOrder.Checkout].includes(data?.order?.status as any) && Number(data?.order?.paid || 0) <= 0 && <Button size='micro' tone='success' variant='primary' onClick={() => handleUpdate(StatusOrder.Checkout)}>Checkout</Button>
                   }
-                  <Button size='micro' tone='critical' variant='primary'>Cancel</Button>
+                  {[StatusOrder.Checkout].includes(data?.order?.status as any) && Number(data?.order?.paid || 0) <= 0 && <Button size='micro' tone='critical' variant='primary' onClick={() => handleUpdate(StatusOrder.Cancelled)}>Cancel</Button>}
                 </div>
                 <div className='flex flex-col items-end'>
                   <b><small>{data?.order?.uuid || ""}</small></b>

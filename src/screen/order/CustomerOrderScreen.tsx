@@ -26,6 +26,7 @@ export function CustomerOrderScreen() {
   const [generate] = useGenerateTokenOrderMutation();
 
   const { data, loading } = useProductListQuery({
+    fetchPolicy: 'cache-and-network',
     variables: {
       filter: {
         type: [Type_Product.Production]

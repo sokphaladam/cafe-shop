@@ -15,15 +15,9 @@ export function LayoutCart() {
   const { items, setItems, orderId, status } = useOrderContext();
   const { toasts, setToasts } = useCustomToast();
   const { width } = useWindowSize();
-  const [plus] = useIncreaseOrderItemMutation({
-    refetchQueries: ['order']
-  });
-  const [sub] = useDecreaseOrderItemMutation({
-    refetchQueries: ['order']
-  });
-  const [mark] = useMarkOrderItemStatusMutation({
-    refetchQueries: ['order']
-  })
+  const [plus] = useIncreaseOrderItemMutation();
+  const [sub] = useDecreaseOrderItemMutation();
+  const [mark] = useMarkOrderItemStatusMutation()
   const [change] = useChangeOrderStatusMutation({
     refetchQueries: ['order']
   })
@@ -155,7 +149,7 @@ export function LayoutCart() {
                       <Button disabled={!edited || x.status === StatusOrderItem.Completed} size='micro' onClick={() => {
                         const dummy = [...items];
                         if (dummy[i].qty === 1) {
-                          // setItems && setItems(items.filter((_, index) => index !== i))
+                          setItems && setItems(items.filter((_, index) => index !== i))
                           mark({
                             variables: {
                               markOrderItemStatusId: Number(x.orderItemid),
@@ -164,8 +158,8 @@ export function LayoutCart() {
                           })
                           return;
                         }
-                        // dummy[i].qty = dummy[i].qty - 1;
-                        // setItems && setItems(dummy)
+                        dummy[i].qty = dummy[i].qty - 1;
+                        setItems && setItems(dummy)
                         sub({
                           variables: {
                             decreaseOrderItemId: Number(x.orderItemid)
@@ -180,8 +174,8 @@ export function LayoutCart() {
                             increaseOrderItemId: Number(x.orderItemid)
                           }
                         })
-                        // dummy[i].qty = dummy[i].qty + 1;
-                        // setItems && setItems(dummy)
+                        dummy[i].qty = dummy[i].qty + 1;
+                        setItems && setItems(dummy)
                       }}>+</Button>
                     </ButtonGroup>
                   </div>
@@ -201,7 +195,7 @@ export function LayoutCart() {
         }
       </div>
       <div className='absolute bottom-0 left-0 right-0 h-[50px] border-collapse border-gray-200 border-t-[0.5px] flex flex-row justify-center items-center p-4'>
-        <div className={`p-2 w-full text-center ${status === StatusOrder.Delivery || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => !edited || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div>
+        <div className={`p-2 w-full text-center ${status !== StatusOrder.Delivery || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => status !== StatusOrder.Delivery || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div>
       </div>
     </div>
   )
