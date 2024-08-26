@@ -115,7 +115,7 @@ export function LayoutCart() {
     return <div></div>
   }
 
-  const edited = [StatusOrder.Delivery].includes(status);
+  const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
 
   return (
     <div className={`w-[30%] bg-white rounded-lg sticky top-[11%]`} style={{ height: window.innerHeight / 1.2 }}>
@@ -201,7 +201,7 @@ export function LayoutCart() {
         }
       </div>
       <div className='absolute bottom-0 left-0 right-0 h-[50px] border-collapse border-gray-200 border-t-[0.5px] flex flex-row justify-center items-center p-4'>
-        <div className={`p-2 w-full text-center ${!edited || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => !edited || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div>
+        <div className={`p-2 w-full text-center ${status === StatusOrder.Delivery || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => !edited || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div>
       </div>
     </div>
   )

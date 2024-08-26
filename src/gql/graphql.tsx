@@ -612,7 +612,7 @@ export type OrderQueryVariables = Exact<{
 }>;
 
 
-export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', uuid?: string | null, total?: string | null, status?: StatusOrder | null, set?: string | null, paid?: string | null, name?: string | null, id?: number | null, address?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
 
 export type SubscriptionLoadSubscriptionVariables = Exact<{
   channel?: InputMaybe<Scalars['String']['input']>;
@@ -1356,12 +1356,23 @@ export type OrderListQueryResult = Apollo.QueryResult<OrderListQuery, OrderListQ
 export const OrderDocument = gql`
     query order($token: String, $orderId: Int) {
   order(token: $token, id: $orderId) {
-    uuid
-    total
+    id
+    address
     status
-    set
-    paid
     name
+    paid
+    set
+    total
+    uuid
+    note
+    log {
+      date
+      text
+      by {
+        id
+        display
+      }
+    }
     items {
       id
       qty
@@ -1385,8 +1396,6 @@ export const OrderDocument = gql`
       addons
       remark
     }
-    id
-    address
   }
 }
     `;

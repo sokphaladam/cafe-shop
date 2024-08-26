@@ -155,12 +155,23 @@ query orderList(
 
 query order($token: String, $orderId: Int) {
   order(token: $token, id: $orderId) {
-    uuid
-    total
+    id
+    address
     status
-    set
-    paid
     name
+    paid
+    set
+    total
+    uuid
+    note
+    log {
+      date
+      text
+      by {
+        id
+        display
+      }
+    }
     items {
       id
       qty
@@ -184,7 +195,5 @@ query order($token: String, $orderId: Int) {
       addons
       remark
     }
-    id
-    address
   }
 }

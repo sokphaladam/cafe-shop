@@ -46,12 +46,12 @@ export function OrderListScreen() {
       orderId: searchInput
     }
   });
-  useSubscriptionLoadSubscription({
-    onData: (res) => {
-      refetch();
-      setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
-    }
-  });
+  // useSubscriptionLoadSubscription({
+  //   onData: (res) => {
+  //     refetch();
+  //     setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
+  //   }
+  // });
 
   return (
     <Page title='Order List'>
