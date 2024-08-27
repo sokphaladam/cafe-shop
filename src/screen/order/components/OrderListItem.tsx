@@ -6,6 +6,7 @@ import { ActionList, Badge, Icon, IndexTable, Popover, Text, Thumbnail, Tooltip,
 import { MenuVerticalIcon } from '@shopify/polaris-icons';
 import React, { useCallback, useState } from 'react';
 import { LogStatus } from './LogStatus';
+import Link from 'next/link';
 
 interface Props {
   item: Order | null
@@ -156,7 +157,9 @@ export function OrderListItem({ item }: Props) {
       </Modals>
       <IndexTable.Row id={item?.id + ""} position={item?.id || 0}>
         <IndexTable.Cell>
-          <Text as='p' variant='bodySm'>#{item?.id}</Text>
+          <Link href={`/order/detail/${item?.id}`}>
+            <Text as='p' variant='bodySm'>#{item?.id}</Text>
+          </Link>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           {/* <Text as='p' variant='bodySm' alignment='center'>{item?.items?.length}</Text> */}

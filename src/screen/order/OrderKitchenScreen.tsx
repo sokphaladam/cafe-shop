@@ -22,12 +22,12 @@ export function OrderKitchenScreen() {
   const [change, { loading: loadingChange }] = useChangeOrderStatusMutation({
     refetchQueries: ['order', 'orderList']
   });
-  useSubscriptionLoadSubscription({
-    onData: (res) => {
-      refetch();
-      setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
-    }
-  });
+  // useSubscriptionLoadSubscription({
+  //   onData: (res) => {
+  //     refetch();
+  //     setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
+  //   }
+  // });
 
   const handleCancel = useCallback((id: number) => {
     mark({

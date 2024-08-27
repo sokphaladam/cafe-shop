@@ -33,6 +33,7 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
         return {
           orderItemid: x?.id,
           ...x?.product,
+          status: x?.status,
           addon_value: x?.addons?.split(','),
           sku: [x?.sku],
           sku_id: x?.sku?.id,
@@ -43,7 +44,7 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
         }
       })
 
-      // setCarts(cartItems)
+      setCarts(cartItems)
     }
   });
 
@@ -68,20 +69,7 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
 
   return (
     <OrderContext.Provider value={{
-      items: data ? (data?.order?.items || []).map(x => {
-        return {
-          orderItemid: x?.id,
-          ...x?.product,
-          status: x?.status,
-          addon_value: x?.addons?.split(','),
-          sku: [x?.sku],
-          sku_id: x?.sku?.id,
-          qty: x?.qty,
-          remark: x?.remark,
-          price: x?.price,
-          discount: x?.discount
-        }
-      }) : carts, setItems: setCarts, orderId: id, refetch: refetch, status: data ? data.order?.status : undefined
+      items: carts, setItems: setCarts, orderId: id, refetch: refetch, status: data ? data.order?.status : undefined
     }}>
       {children}
     </OrderContext.Provider>

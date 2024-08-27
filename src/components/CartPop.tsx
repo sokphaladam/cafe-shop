@@ -87,7 +87,7 @@ export function CartPop() {
   }, [change, orderId, setToasts, toasts])
 
   const loading = loadingMark || loadingPlus || loadingChange || loadingSub
-  const edited = [StatusOrder.Delivery].includes(status);
+  const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
 
   return (
     <React.Fragment>
@@ -114,7 +114,7 @@ export function CartPop() {
                         <Button size='micro' disabled={!edited || x.status === StatusOrderItem.Completed || loading} onClick={() => {
                           const dummy = [...items];
                           if (dummy[i].qty === 1) {
-                            // setItems && setItems(items.filter((_, index) => index !== i))
+                            setItems && setItems(items.filter((_, index) => index !== i))
                             mark({
                               variables: {
                                 markOrderItemStatusId: Number(x.orderItemid),
@@ -123,8 +123,8 @@ export function CartPop() {
                             })
                             return;
                           }
-                          // dummy[i].qty = dummy[i].qty - 1;
-                          // setItems && setItems(dummy)
+                          dummy[i].qty = dummy[i].qty - 1;
+                          setItems && setItems(dummy)
                           sub({
                             variables: {
                               decreaseOrderItemId: Number(x.orderItemid)
@@ -133,9 +133,9 @@ export function CartPop() {
                         }}>-</Button>
                         <Button disabled size='micro'>{x.qty}</Button>
                         <Button size='micro' disabled={!edited || x.status === StatusOrderItem.Completed || loading} onClick={() => {
-                          // const dummy = [...items];
-                          // dummy[i].qty = dummy[i].qty + 1;
-                          // setItems && setItems(dummy)
+                          const dummy = [...items];
+                          dummy[i].qty = dummy[i].qty + 1;
+                          setItems && setItems(dummy)
                           plus({
                             variables: {
                               increaseOrderItemId: Number(x.orderItemid)
@@ -162,8 +162,8 @@ export function CartPop() {
         </Modal.Section>
         <Modal.Section>
           <div
-            onClick={() => loading || !edited || items?.length === 0 ? {} : handlePlaceOrder()}
-            className={`${loading || !edited || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white p-2 w-full text-center rounded-lg`}>Place Order</div>
+            onClick={() => loading || status !== StatusOrder.Delivery || items?.length === 0 ? {} : handlePlaceOrder()}
+            className={`${loading || status !== StatusOrder.Delivery || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white p-2 w-full text-center rounded-lg`}>Place Order</div>
         </Modal.Section>
       </Modal>
       <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative'
