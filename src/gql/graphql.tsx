@@ -129,6 +129,8 @@ export type Mutation = {
   updateCategory?: Maybe<Scalars['Boolean']['output']>;
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
   updateProductStock?: Maybe<Scalars['Boolean']['output']>;
+  updateSetting?: Maybe<Scalars['Boolean']['output']>;
+  verifyOtpOrder?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -225,9 +227,22 @@ export type MutationUpdateProductStockArgs = {
   id: Scalars['Int']['input'];
 };
 
+
+export type MutationUpdateSettingArgs = {
+  option?: InputMaybe<Scalars['String']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationVerifyOtpOrderArgs = {
+  code: Scalars['String']['input'];
+  token: Scalars['String']['input'];
+};
+
 export type Order = {
   __typename?: 'Order';
   address?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   items?: Maybe<Array<Maybe<OrderItem>>>;
   log?: Maybe<Array<Maybe<OrderLog>>>;
@@ -238,6 +253,7 @@ export type Order = {
   status?: Maybe<StatusOrder>;
   total?: Maybe<Scalars['String']['output']>;
   uuid?: Maybe<Scalars['String']['output']>;
+  vat?: Maybe<Scalars['String']['output']>;
 };
 
 export type OrderInput = {
@@ -330,6 +346,7 @@ export type Query = {
   productList?: Maybe<Array<Maybe<Product>>>;
   productStock?: Maybe<ProductStock>;
   productStockList?: Maybe<Array<Maybe<ProductStock>>>;
+  settingList?: Maybe<Array<Maybe<Setting>>>;
   user?: Maybe<User>;
   userList?: Maybe<Array<Maybe<User>>>;
 };
@@ -424,6 +441,13 @@ export type SkuInput = {
   unit?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Setting = {
+  __typename?: 'Setting';
+  option?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
 export enum StatusOrder {
   Cancelled = 'CANCELLED',
   Checkout = 'CHECKOUT',
@@ -444,10 +468,16 @@ export enum StatusOrderItem {
 export type Subscription = {
   __typename?: 'Subscription';
   newOrderPending?: Maybe<Scalars['String']['output']>;
+  orderSubscript?: Maybe<Scalars['JSON']['output']>;
 };
 
 
 export type SubscriptionNewOrderPendingArgs = {
+  channel?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type SubscriptionOrderSubscriptArgs = {
   channel?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -561,6 +591,14 @@ export type GenerateTokenOrderMutationVariables = Exact<{
 
 export type GenerateTokenOrderMutation = { __typename?: 'Mutation', generateTokenOrder?: string | null };
 
+export type VerifyOtpOrderMutationVariables = Exact<{
+  token: Scalars['String']['input'];
+  code: Scalars['String']['input'];
+}>;
+
+
+export type VerifyOtpOrderMutation = { __typename?: 'Mutation', verifyOtpOrder?: boolean | null };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -604,7 +642,7 @@ export type OrderListQueryVariables = Exact<{
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -612,7 +650,12 @@ export type OrderQueryVariables = Exact<{
 }>;
 
 
-export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+
+export type SettingListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SettingListQuery = { __typename?: 'Query', settingList?: Array<{ __typename?: 'Setting', value?: string | null, type?: string | null, option?: string | null } | null> | null };
 
 export type SubscriptionLoadSubscriptionVariables = Exact<{
   channel?: InputMaybe<Scalars['String']['input']>;
@@ -620,6 +663,13 @@ export type SubscriptionLoadSubscriptionVariables = Exact<{
 
 
 export type SubscriptionLoadSubscription = { __typename?: 'Subscription', newOrderPending?: string | null };
+
+export type OrderSubscriptSubscriptionVariables = Exact<{
+  channel?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type OrderSubscriptSubscription = { __typename?: 'Subscription', orderSubscript?: any | null };
 
 
 export const LoginDocument = gql`
@@ -1000,6 +1050,38 @@ export function useGenerateTokenOrderMutation(baseOptions?: Apollo.MutationHookO
 export type GenerateTokenOrderMutationHookResult = ReturnType<typeof useGenerateTokenOrderMutation>;
 export type GenerateTokenOrderMutationResult = Apollo.MutationResult<GenerateTokenOrderMutation>;
 export type GenerateTokenOrderMutationOptions = Apollo.BaseMutationOptions<GenerateTokenOrderMutation, GenerateTokenOrderMutationVariables>;
+export const VerifyOtpOrderDocument = gql`
+    mutation verifyOtpOrder($token: String!, $code: String!) {
+  verifyOtpOrder(token: $token, code: $code)
+}
+    `;
+export type VerifyOtpOrderMutationFn = Apollo.MutationFunction<VerifyOtpOrderMutation, VerifyOtpOrderMutationVariables>;
+
+/**
+ * __useVerifyOtpOrderMutation__
+ *
+ * To run a mutation, you first call `useVerifyOtpOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyOtpOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [verifyOtpOrderMutation, { data, loading, error }] = useVerifyOtpOrderMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      code: // value for 'code'
+ *   },
+ * });
+ */
+export function useVerifyOtpOrderMutation(baseOptions?: Apollo.MutationHookOptions<VerifyOtpOrderMutation, VerifyOtpOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<VerifyOtpOrderMutation, VerifyOtpOrderMutationVariables>(VerifyOtpOrderDocument, options);
+      }
+export type VerifyOtpOrderMutationHookResult = ReturnType<typeof useVerifyOtpOrderMutation>;
+export type VerifyOtpOrderMutationResult = Apollo.MutationResult<VerifyOtpOrderMutation>;
+export type VerifyOtpOrderMutationOptions = Apollo.BaseMutationOptions<VerifyOtpOrderMutation, VerifyOtpOrderMutationVariables>;
 export const MeDocument = gql`
     query me {
   me {
@@ -1280,6 +1362,7 @@ export const OrderListDocument = gql`
     orderId: $orderId
   ) {
     id
+    code
     items {
       id
       price
@@ -1305,6 +1388,7 @@ export const OrderListDocument = gql`
     total
     uuid
     note
+    vat
     log {
       date
       text
@@ -1365,6 +1449,8 @@ export const OrderDocument = gql`
     total
     uuid
     note
+    code
+    vat
     log {
       date
       text
@@ -1433,6 +1519,47 @@ export type OrderQueryHookResult = ReturnType<typeof useOrderQuery>;
 export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
 export type OrderSuspenseQueryHookResult = ReturnType<typeof useOrderSuspenseQuery>;
 export type OrderQueryResult = Apollo.QueryResult<OrderQuery, OrderQueryVariables>;
+export const SettingListDocument = gql`
+    query settingList {
+  settingList {
+    value
+    type
+    option
+  }
+}
+    `;
+
+/**
+ * __useSettingListQuery__
+ *
+ * To run a query within a React component, call `useSettingListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSettingListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSettingListQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSettingListQuery(baseOptions?: Apollo.QueryHookOptions<SettingListQuery, SettingListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SettingListQuery, SettingListQueryVariables>(SettingListDocument, options);
+      }
+export function useSettingListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SettingListQuery, SettingListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SettingListQuery, SettingListQueryVariables>(SettingListDocument, options);
+        }
+export function useSettingListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SettingListQuery, SettingListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SettingListQuery, SettingListQueryVariables>(SettingListDocument, options);
+        }
+export type SettingListQueryHookResult = ReturnType<typeof useSettingListQuery>;
+export type SettingListLazyQueryHookResult = ReturnType<typeof useSettingListLazyQuery>;
+export type SettingListSuspenseQueryHookResult = ReturnType<typeof useSettingListSuspenseQuery>;
+export type SettingListQueryResult = Apollo.QueryResult<SettingListQuery, SettingListQueryVariables>;
 export const SubscriptionLoadDocument = gql`
     subscription subscriptionLoad($channel: String) {
   newOrderPending(channel: $channel)
@@ -1461,3 +1588,31 @@ export function useSubscriptionLoadSubscription(baseOptions?: Apollo.Subscriptio
       }
 export type SubscriptionLoadSubscriptionHookResult = ReturnType<typeof useSubscriptionLoadSubscription>;
 export type SubscriptionLoadSubscriptionResult = Apollo.SubscriptionResult<SubscriptionLoadSubscription>;
+export const OrderSubscriptDocument = gql`
+    subscription orderSubscript($channel: String) {
+  orderSubscript(channel: $channel)
+}
+    `;
+
+/**
+ * __useOrderSubscriptSubscription__
+ *
+ * To run a query within a React component, call `useOrderSubscriptSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useOrderSubscriptSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderSubscriptSubscription({
+ *   variables: {
+ *      channel: // value for 'channel'
+ *   },
+ * });
+ */
+export function useOrderSubscriptSubscription(baseOptions?: Apollo.SubscriptionHookOptions<OrderSubscriptSubscription, OrderSubscriptSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<OrderSubscriptSubscription, OrderSubscriptSubscriptionVariables>(OrderSubscriptDocument, options);
+      }
+export type OrderSubscriptSubscriptionHookResult = ReturnType<typeof useOrderSubscriptSubscription>;
+export type OrderSubscriptSubscriptionResult = Apollo.SubscriptionResult<OrderSubscriptSubscription>;

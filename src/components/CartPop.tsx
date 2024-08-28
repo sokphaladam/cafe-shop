@@ -8,11 +8,12 @@ import { CartFilledIcon, CartIcon } from '@shopify/polaris-icons';
 import { useWindowSize } from '@/hook/useWindowSize';
 import { OrderInput, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation, useCreateOrderMutation, useDecreaseOrderItemMutation, useIncreaseOrderItemMutation, useMarkOrderItemStatusMutation } from '@/gql/graphql';
 import { useSearchParams } from 'next/navigation';
+import { useSetting } from '@/service/useSettingProvider';
 
 export function CartPop() {
   const params = useSearchParams();
   const { setToasts, toasts } = useCustomToast();
-  const { items, setItems, orderId, status } = useOrderContext();
+  const { items, setItems, orderId, status, vat: vatPer } = useOrderContext();
   const [show, setShow] = useState(false);
   const [count, setCount] = useState(1);
   const { width } = useWindowSize();
@@ -86,6 +87,19 @@ export function CartPop() {
     })
   }, [change, orderId, setToasts, toasts])
 
+  if (!orderId) {
+    return <></>
+  }
+
+  const total = items?.reduce((a: any, b: any) => {
+    const dis_price = Number(b.price) * (Number(b.discount) / 100);
+    const amount = Number(b.qty) * (Number(b.price) - dis_price);
+    return (a = a + amount);
+  }, 0);
+
+  const vat = total * Number(vatPer || 0) / 100;
+  const totalAfterVat = total + vat
+
   const loading = loadingMark || loadingPlus || loadingChange || loadingSub
   const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
 
@@ -156,15 +170,25 @@ export function CartPop() {
           }
         </Modal.Section>
         <Modal.Section>
-          <div className='pl-1 text-right'>
-            <h4 className='text-lg font-bold'>Total: <span className='ml-2 text-emerald-700'>${Number(items?.reduce((a, b) => a = a + (b.price * b.qty), 0)).toFixed(2)}</span></h4>
-          </div>
+          <div className='text-star w-full flex flex-col items-end'>
+            <h6 className='text-xs font-bold text-gray-600 flex flex-row items-center'>
+              <div className='w-[75px]'>Amount:</div>
+              <div className='w-[100px] text-right'>${Number(total || 0).toFixed(2)}</div>
+            </h6>
+            <h6 className='text-xs my-1 mb-2 font-bold text-gray-600 flex flex-row items-center'>
+              <div className='w-[75px]'>Vat.:</div>
+              <div className='w-[100px] text-right'>${vat.toFixed(2)} ({vatPer}%)</div>
+            </h6>
+            <h4 className='text-lg font-bold flex flex-row items-center'>
+              <div className='w-[75px]'>Total: </div>
+              <span className=' text-emerald-700 w-[100px] text-right'>${Number(totalAfterVat || 0).toFixed(2)}</span>
+            </h4></div>
         </Modal.Section>
-        <Modal.Section>
+        {/* <Modal.Section>
           <div
             onClick={() => loading || status !== StatusOrder.Delivery || items?.length === 0 ? {} : handlePlaceOrder()}
             className={`${loading || status !== StatusOrder.Delivery || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white p-2 w-full text-center rounded-lg`}>Place Order</div>
-        </Modal.Section>
+        </Modal.Section> */}
       </Modal>
       <div className='w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative'
         onClick={() => {

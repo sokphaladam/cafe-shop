@@ -5,6 +5,7 @@ import { UserProvider } from "./UserProvider";
 import { ApolloWrapper } from "./ApolloProvider";
 import { LanguageProvider } from "./LanguageProvider";
 import { NetworkProvider } from "./NetworkProvider";
+import { SettingProvider } from "./useSettingProvider";
 
 export function AppProvider({ children }: React.PropsWithChildren<any>) {
   return (
@@ -12,9 +13,11 @@ export function AppProvider({ children }: React.PropsWithChildren<any>) {
       <ApolloWrapper>
         <LanguageProvider>
           <UserProvider>
-            <PolarisProvider>
-              <CustomToastMultiple>{children}</CustomToastMultiple>
-            </PolarisProvider>
+            <SettingProvider>
+              <PolarisProvider>
+                <CustomToastMultiple>{children}</CustomToastMultiple>
+              </PolarisProvider>
+            </SettingProvider>
           </UserProvider>
         </LanguageProvider>
       </ApolloWrapper>

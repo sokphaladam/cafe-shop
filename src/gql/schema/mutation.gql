@@ -52,3 +52,7 @@ mutation changeOrderStatus($data: ChangeOrderInput) {
 mutation generateTokenOrder($set: Int!) {
   generateTokenOrder(set: $set)
 }
+
+mutation verifyOtpOrder($token: String!, $code: String!) {
+  verifyOtpOrder(token: $token, code: $code)
+}

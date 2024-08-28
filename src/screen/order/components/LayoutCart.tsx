@@ -3,6 +3,7 @@ import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
 import { OrderInput, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation, useCreateOrderMutation, useDecreaseOrderItemMutation, useIncreaseOrderItemMutation, useMarkOrderItemStatusMutation } from '@/gql/graphql';
 import { useWindowSize } from '@/hook/useWindowSize';
+import { useSetting } from '@/service/useSettingProvider';
 import { Button, ButtonGroup, Divider, Icon, Modal, TextField, Thumbnail } from '@shopify/polaris';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
@@ -12,7 +13,7 @@ export function LayoutCart() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState('');
-  const { items, setItems, orderId, status } = useOrderContext();
+  const { items, setItems, orderId, status, vat: VatP } = useOrderContext();
   const { toasts, setToasts } = useCustomToast();
   const { width } = useWindowSize();
   const [plus] = useIncreaseOrderItemMutation();
@@ -105,6 +106,19 @@ export function LayoutCart() {
     }).catch(err => console.log(err));
   }, [items, open, phone, setItems])
 
+  if (!orderId) {
+    return <></>
+  }
+
+  const total = items?.reduce((a: any, b: any) => {
+    const dis_price = Number(b.price) * (Number(b.discount) / 100);
+    const amount = Number(b.qty) * (Number(b.price) - dis_price);
+    return (a = a + amount);
+  }, 0);
+
+  const vat = total * Number(VatP || 0) / 100;
+  const totalAfterVat = total + vat
+
   if ((width || 0) <= 640) {
     return <div></div>
   }
@@ -194,8 +208,23 @@ export function LayoutCart() {
           })
         }
       </div>
-      <div className='absolute bottom-0 left-0 right-0 h-[50px] border-collapse border-gray-200 border-t-[0.5px] flex flex-row justify-center items-center p-4'>
-        <div className={`p-2 w-full text-center ${status !== StatusOrder.Delivery || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => status !== StatusOrder.Delivery || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div>
+      <div className='absolute bottom-0 left-0 right-0 h-[90px] border-collapse border-gray-200 border-t-[0.5px] flex flex-row justify-start items-center p-4'>
+        {/* <div className={`p-2 w-full text-center ${status !== StatusOrder.Delivery || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'} text-white rounded-md cursor-pointer`} onClick={() => status !== StatusOrder.Delivery || items?.length === 0 ? {} : handleCreateOrder()}>Place Order</div> */}
+        <div className='text-start w-full flex flex-col items-end'>
+          <div className='text-star w-full flex flex-col items-end'>
+            <h6 className='text-xs font-bold text-gray-600 flex flex-row items-center'>
+              <div className='w-[75px]'>Amount:</div>
+              <div className='w-[100px] text-right'>${Number(total || 0).toFixed(2)}</div>
+            </h6>
+            <h6 className='text-xs my-1 mb-2 font-bold text-gray-600 flex flex-row items-center'>
+              <div className='w-[75px]'>Vat.:</div>
+              <div className='w-[100px] text-right'>${vat.toFixed(2)} ({VatP}%)</div>
+            </h6>
+            <h4 className='text-lg font-bold flex flex-row items-center'>
+              <div className='w-[75px]'>Total: </div>
+              <span className=' text-emerald-700 w-[100px] text-right'>${Number(totalAfterVat || 0).toFixed(2)}</span>
+            </h4></div>
+        </div>
       </div>
     </div>
   )

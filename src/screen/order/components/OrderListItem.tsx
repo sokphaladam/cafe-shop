@@ -7,6 +7,7 @@ import { MenuVerticalIcon } from '@shopify/polaris-icons';
 import React, { useCallback, useState } from 'react';
 import { LogStatus } from './LogStatus';
 import Link from 'next/link';
+import { useSetting } from '@/service/useSettingProvider';
 
 interface Props {
   item: Order | null
@@ -64,11 +65,16 @@ export function OrderListItem({ item }: Props) {
     }
   }, [change, item?.id, setToasts, toasts, toggelOpen, toggleActive])
 
-  const total = Number(item?.total || 0) > 0 ? item?.total : item?.items?.reduce((a: any, b: any) => {
+  const total = item?.items?.reduce((a: any, b: any) => {
     const dis_price = Number(b.price) * (Number(b.discount) / 100);
     const amount = Number(b.qty) * (Number(b.price) - dis_price);
     return (a = a + amount);
-  }, 0)
+  }, 0);
+
+  const vatPer = item?.vat || '0';
+  const vat = total * Number(vatPer || 0) / 100;
+
+  const totalAfterVat = total + vat
 
   const text = item?.items?.filter((_, i) => i > 4).map((x) => x?.product?.title + " x" + x?.qty).join(',');
 
@@ -188,10 +194,16 @@ export function OrderListItem({ item }: Props) {
           </div>
         </IndexTable.Cell>
         <IndexTable.Cell>
-          <Text as='p' variant='bodyMd' fontWeight='bold' tone='base' alignment='end'>{Number(item?.items?.reduce((a, b) => a = a + Number(b?.qty || 0), 0))}</Text>
+          <Text as='p' variant='bodySm' tone='base' alignment='end'>{Number(item?.items?.reduce((a, b) => a = a + Number(b?.qty || 0), 0))}</Text>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-end'>
-          <Text as='p' variant='bodyMd' fontWeight='bold' tone='success' alignment='end'>$ {Number(total).toFixed(2)}</Text>
+          <Text as='p' variant='bodySm' tone='base' alignment='end'>$ {Number(total).toFixed(2)}</Text>
+        </IndexTable.Cell>
+        <IndexTable.Cell className='text-end'>
+          <Text as='p' variant='bodySm' tone='base' alignment='end'>$ {Number(vat).toFixed(2)} ({vatPer || 0}%)</Text>
+        </IndexTable.Cell>
+        <IndexTable.Cell className='text-end'>
+          <Text as='p' variant='bodyMd' fontWeight='bold' tone='success' alignment='end'>$ {Number(totalAfterVat).toFixed(2)}</Text>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-end'>
           <Text as='p' variant='bodyMd' fontWeight='bold' tone='critical' alignment='end'>$ {Number(item?.paid).toFixed(2)}</Text>

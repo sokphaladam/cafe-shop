@@ -1,10 +1,11 @@
 'use client'
 import React, { useCallback, useState } from 'react';
 import { Badge, Box, Button, Card, Divider, Frame, IndexTable, Layout, Loading, Page, Text, Thumbnail, Modal as Modals, TextField } from '@shopify/polaris';
-import { StatusOrder, useChangeOrderStatusMutation, useOrderQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
+import { StatusOrder, useChangeOrderStatusMutation, useOrderQuery, useOrderSubscriptSubscription } from '@/gql/graphql';
 import { InfoIcon, CheckCircleIcon, DeliveryIcon, ClipboardCheckFilledIcon, XCircleIcon } from '@shopify/polaris-icons';
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { Modal } from '@/hook/modal';
+import { useSetting } from '@/service/useSettingProvider';
 
 interface Props { id: number }
 
@@ -29,13 +30,14 @@ export function OrderDetailScreen(props: Props) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(false);
   const [paid, setPaid] = useState(false);
+  const setting = useSetting();
   const [reasonInput, setReasonInput] = useState('');
   const [amountInput, setAmountInput] = useState('');
   const toggelOpen = useCallback(() => setOpen(!open), [open])
   const toggleActive = useCallback(() => setActive(!active), [active])
   const togglePaid = useCallback(() => setPaid(!paid), [paid])
 
-  const { data, loading } = useOrderQuery({
+  const { data, loading, refetch } = useOrderQuery({
     variables: {
       orderId: Number(props.id)
     }
@@ -43,12 +45,13 @@ export function OrderDetailScreen(props: Props) {
   const [change] = useChangeOrderStatusMutation({
     refetchQueries: ['order', 'orderList']
   });
-  // useSubscriptionLoadSubscription({
-  //   onData: (res) => {
-  //     refetch();
-  //     setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
-  //   }
-  // });
+  useOrderSubscriptSubscription({
+    onData: (res) => {
+      if (res.data.data?.orderSubscript.status === 2 || !!res.data.data?.orderSubscript.uuid) {
+        refetch();
+      }
+    }
+  });
 
   const handleUpdate = useCallback((status: StatusOrder) => {
     toggelOpen();
@@ -108,7 +111,9 @@ export function OrderDetailScreen(props: Props) {
     return (a = a + amount);
   }, 0);
 
-  const vat = total * 10 / 100;
+  const vatPer = data?.order?.vat || "0";
+  const exchangeRate = setting.find(f => f.option === 'EXCHANGE_RATE');
+  const vat = total * Number(vatPer || 0) / 100;
 
   const totalAfterVat = total + vat
 
@@ -174,17 +179,17 @@ export function OrderDetailScreen(props: Props) {
           content: "Checkout",
           destructive: true,
           onAction: () => {
-            if (!amountInput) {
-              setToasts([...toasts, { content: 'Please input the amount of customer are paid for order!', status: 'error' }])
-              return;
-            }
+            // if (!amountInput) {
+            //   setToasts([...toasts, { content: 'Please input the amount of customer are paid for order!', status: 'error' }])
+            //   return;
+            // }
             change({
               variables: {
                 data: {
                   orderId: Number(data?.order?.id),
                   status: StatusOrder.Checkout,
-                  reason: reasonInput,
-                  amount: String(amountInput)
+                  reason: reasonInput || "",
+                  amount: amountInput ? String(amountInput) : String(totalAfterVat.toFixed(2))
                 }
               }
             }).then(res => {
@@ -205,11 +210,13 @@ export function OrderDetailScreen(props: Props) {
         }}
         footer={
           <div className='font-bold'>
+            Exchange Rate: <span className='pl-2'>$1 = ៛{exchangeRate?.value}</span>
+            <br />
             Total: <span className='pl-2'>${totalAfterVat.toFixed(2)}</span>
             <br />
-            Paid: <span className='pl-2'>${Number(amountInput || 0).toFixed(2)}</span>
+            Paid: <span className='pl-2'>${Number(amountInput || totalAfterVat).toFixed(2)}</span>
             <br />
-            Return to customer: <span className='pl-2'>${(Number(amountInput || 0) - Number(totalAfterVat)).toFixed(2)}</span>
+            Return to customer: <span className='pl-2'>${(Number(amountInput || totalAfterVat) - Number(totalAfterVat)).toFixed(2)}</span>
           </div>
         }
       >
@@ -217,7 +224,7 @@ export function OrderDetailScreen(props: Props) {
           <TextField
             type='number'
             autoComplete='off'
-            value={amountInput}
+            value={amountInput || totalAfterVat.toFixed(2)}
             onChange={setAmountInput}
             label="Amount cutomer paid"
             placeholder='Please input amount of customer are paid for order here'
@@ -340,7 +347,7 @@ export function OrderDetailScreen(props: Props) {
                     {
                       data && <div className="mr-1">
                         <Text as="strong" variant="bodySm" alignment="end">
-                          ${vat.toFixed(2)} (10%)
+                          ${vat.toFixed(2)} ({vatPer || 0}%)
                         </Text>
                       </div>
                     }

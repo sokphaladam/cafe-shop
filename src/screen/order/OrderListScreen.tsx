@@ -1,5 +1,5 @@
 'use client'
-import { StatusOrder, useOrderListQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
+import { StatusOrder, useOrderListQuery, useOrderSubscriptSubscription } from '@/gql/graphql';
 import { usePagination } from '@/hook/usePagination';
 import { ActionList, Badge, Box, Card, Icon, IndexFilters, IndexTable, Layout, Page, Popover, TabProps, Tabs, Text, Tooltip, useSetIndexFiltersMode } from '@shopify/polaris';
 import { CheckCircleIcon, ClipboardCheckFilledIcon, DeliveryIcon, InfoIcon, MenuVerticalIcon, XCircleIcon } from '@shopify/polaris-icons';
@@ -46,12 +46,13 @@ export function OrderListScreen() {
       orderId: searchInput
     }
   });
-  // useSubscriptionLoadSubscription({
-  //   onData: (res) => {
-  //     refetch();
-  //     setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
-  //   }
-  // });
+  useOrderSubscriptSubscription({
+    onData: (res) => {
+      if (res.data.data?.orderSubscript.status === 2 || !!res.data.data?.orderSubscript.uuid) {
+        refetch();
+      }
+    }
+  });
 
   return (
     <Page title='Order List'>
@@ -88,6 +89,8 @@ export function OrderListScreen() {
                   { title: "Items", alignment: 'center' },
                   { title: "Status", alignment: 'center' },
                   { title: "Qty", alignment: 'end' },
+                  { title: "Amount", alignment: 'end' },
+                  { title: "Vat.", alignment: 'end' },
                   { title: "Total", alignment: 'end' },
                   { title: "Paid", alignment: 'end' },
                   { title: 'Note', alignment: 'start' },

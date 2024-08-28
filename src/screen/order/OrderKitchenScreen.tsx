@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 import { useCustomToast } from '@/components/custom/CustomToast';
-import { OrderViewBy, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation, useMarkOrderItemStatusMutation, useOrderListQuery, useSubscriptionLoadSubscription } from '@/gql/graphql';
+import { OrderViewBy, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation, useMarkOrderItemStatusMutation, useOrderListQuery, useOrderSubscriptSubscription } from '@/gql/graphql';
 import { Box, Button, Card, Divider, Icon, Layout, Page, Spinner, Text, Thumbnail } from '@shopify/polaris';
 import { CheckIcon, XIcon } from '@shopify/polaris-icons';
 import React, { useCallback } from 'react';
@@ -22,12 +22,14 @@ export function OrderKitchenScreen() {
   const [change, { loading: loadingChange }] = useChangeOrderStatusMutation({
     refetchQueries: ['order', 'orderList']
   });
-  // useSubscriptionLoadSubscription({
-  //   onData: (res) => {
-  //     refetch();
-  //     setToasts([...toasts, { content: res.data.data?.newOrderPending + '', status: 'info' }])
-  //   }
-  // });
+  useOrderSubscriptSubscription({
+    onData: (res) => {
+      console.log(res.data.data?.orderSubscript)
+      if (res.data.data?.orderSubscript.status === '1') {
+        refetch();
+      }
+    }
+  });
 
   const handleCancel = useCallback((id: number) => {
     mark({
