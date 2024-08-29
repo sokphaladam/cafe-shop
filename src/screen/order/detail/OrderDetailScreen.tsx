@@ -248,7 +248,8 @@ export function OrderDetailScreen(props: Props) {
             <Box padding={'300'}>
               <div className='flex flex-row justify-between items-baseline'>
                 <div className='flex flex-row gap-4'>
-                  <PrintOrder order={data?.order} subtotal={total} vat={vat+''} total={totalAfterVat}/>
+                  <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} />
+                  <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} kitchen />
                   {
                     data?.order?.status === StatusOrder.Pending && <Button onClick={() => handleUpdate(StatusOrder.Verify)} size='micro' tone='success' variant='primary'>Verify</Button>
                   }
@@ -382,7 +383,7 @@ export function OrderDetailScreen(props: Props) {
           <br />
           <Card padding={'0'}>
             <Box>
-            <IndexTable
+              <IndexTable
                 headings={[
                   { title: '#' },
                   { title: "Date", alignment: "end" },
@@ -392,15 +393,15 @@ export function OrderDetailScreen(props: Props) {
               >
                 {data?.order?.log?.map((x, i) => {
                   return (
-                    <IndexTable.Row key={x?.text} position={i} id={x?.text+""}>
+                    <IndexTable.Row key={x?.text} position={i} id={x?.text + ""}>
                       <IndexTable.Cell>
                         <small>{x?.text}</small>
                       </IndexTable.Cell>
                       <IndexTable.Cell>
                         <div className='text-end'>
-                        <small>{x?.date}</small>
-                        {x?.by && 
-                        <div><small>({x?.by?.display})</small></div>}
+                          <small>{x?.date}</small>
+                          {x?.by &&
+                            <div><small>({x?.by?.display})</small></div>}
                         </div>
                       </IndexTable.Cell>
                     </IndexTable.Row>

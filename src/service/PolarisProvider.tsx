@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react';
 import enTranslations from '@shopify/polaris/locales/en.json';
 import { AppProvider, Page, LegacyCard, Button, Frame } from '@shopify/polaris';
 import '@shopify/polaris/build/esm/styles.css';
+import "@/app/globals.css";
 import { config_app } from '@/lib/config_app';
 import { TopbarMarkup } from '@/components/TopbarMakerup';
 import { NavigationMarkup } from '@/components/NavigationMarkup';

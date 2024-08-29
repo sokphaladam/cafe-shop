@@ -65,19 +65,6 @@ export function OrderListItem({ item }: Props) {
     }
   }, [change, item?.id, setToasts, toasts, toggelOpen, toggleActive])
 
-  const total = item?.items?.reduce((a: any, b: any) => {
-    const dis_price = Number(b.price) * (Number(b.discount) / 100);
-    const amount = Number(b.qty) * (Number(b.price) - dis_price);
-    return (a = a + amount);
-  }, 0);
-
-  const vatPer = item?.vat || '0';
-  const vat = total * Number(vatPer || 0) / 100;
-
-  const totalAfterVat = total + vat
-
-  const text = item?.items?.filter((_, i) => i > 4).map((x) => x?.product?.title + " x" + x?.qty).join(',');
-
   let menus: ActionListItemDescriptor[] = []
 
   switch (item?.status) {
@@ -110,6 +97,19 @@ export function OrderListItem({ item }: Props) {
       //
       break;
   }
+
+  const total = item?.items?.reduce((a: any, b: any) => {
+    const dis_price = Number(b.price) * (Number(b.discount) / 100);
+    const amount = Number(b.qty) * (Number(b.price) - dis_price);
+    return (a = a + amount);
+  }, 0);
+
+  const vatPer = item?.vat || '0';
+  const vat = total * Number(vatPer || 0) / 100;
+
+  const totalAfterVat = total + vat
+
+  const text = item?.items?.filter((_, i) => i > 2).map((x) => x?.product?.title + " x" + x?.qty).join(',');
 
   return (
     <React.Fragment>
@@ -172,7 +172,7 @@ export function OrderListItem({ item }: Props) {
           <div className='flex flex-row items-center'>
             {
               item?.items?.map((x, i) => {
-                if (i > 4) return <></>
+                if (i > 2) return <></>
                 return (
                   <div key={x?.id} className='mx-1'>
                     <Tooltip content={x?.product?.title + " x" + x?.qty}>
@@ -184,12 +184,12 @@ export function OrderListItem({ item }: Props) {
             }
             {
               (item?.items?.length || 0) > 4 &&
-              <Tooltip content={text}><div className='mx-1 font-bold cursor-pointer'>+{Number(item?.items?.length || 0) - 4}</div></Tooltip>
+              <Tooltip content={text}><div className='mx-1 font-bold cursor-pointer'>+{Number(item?.items?.length || 0) - 3}</div></Tooltip>
             }
           </div>
         </IndexTable.Cell>
         <IndexTable.Cell>
-          <Text as='p' variant='bodySm' tone='base'>Set: {Number(item?.set)<10 ? '0'+item?.set : item?.set} ({item?.code})</Text>
+          <Text as='p' variant='bodySm' tone='base'>Set: {Number(item?.set) < 10 ? '0' + item?.set : item?.set} ({item?.code})</Text>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           <div className='flex flex-row justify-center'>
