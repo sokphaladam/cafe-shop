@@ -188,6 +188,9 @@ export function OrderListItem({ item }: Props) {
             }
           </div>
         </IndexTable.Cell>
+        <IndexTable.Cell>
+          <Text as='p' variant='bodySm' tone='base'>Set: {Number(item?.set)<10 ? '0'+item?.set : item?.set} ({item?.code})</Text>
+        </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           <div className='flex flex-row justify-center'>
             <LogStatus item={item} />

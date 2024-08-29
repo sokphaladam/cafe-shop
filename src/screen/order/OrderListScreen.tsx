@@ -87,6 +87,7 @@ export function OrderListScreen() {
                 headings={[
                   { title: 'Order' },
                   { title: "Items", alignment: 'center' },
+                  {title: 'Info', alignment: 'start'},
                   { title: "Status", alignment: 'center' },
                   { title: "Qty", alignment: 'end' },
                   { title: "Amount", alignment: 'end' },

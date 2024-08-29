@@ -6,6 +6,7 @@ import { InfoIcon, CheckCircleIcon, DeliveryIcon, ClipboardCheckFilledIcon, XCir
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { Modal } from '@/hook/modal';
 import { useSetting } from '@/service/useSettingProvider';
+import { PrintOrder } from '../components/PrintOrder';
 
 interface Props { id: number }
 
@@ -247,7 +248,7 @@ export function OrderDetailScreen(props: Props) {
             <Box padding={'300'}>
               <div className='flex flex-row justify-between items-baseline'>
                 <div className='flex flex-row gap-4'>
-                  <Button size='micro'>Print Recipt</Button>
+                  <PrintOrder order={data?.order} subtotal={total} vat={vat+''} total={totalAfterVat}/>
                   {
                     data?.order?.status === StatusOrder.Pending && <Button onClick={() => handleUpdate(StatusOrder.Verify)} size='micro' tone='success' variant='primary'>Verify</Button>
                   }
@@ -375,6 +376,36 @@ export function OrderDetailScreen(props: Props) {
                     </div>
                   </IndexTable.Cell>
                 </IndexTable.Row>
+              </IndexTable>
+            </Box>
+          </Card>
+          <br />
+          <Card padding={'0'}>
+            <Box>
+            <IndexTable
+                headings={[
+                  { title: '#' },
+                  { title: "Date", alignment: "end" },
+                ]}
+                itemCount={1}
+                selectable={false}
+              >
+                {data?.order?.log?.map((x, i) => {
+                  return (
+                    <IndexTable.Row key={x?.text} position={i} id={x?.text+""}>
+                      <IndexTable.Cell>
+                        <small>{x?.text}</small>
+                      </IndexTable.Cell>
+                      <IndexTable.Cell>
+                        <div className='text-end'>
+                        <small>{x?.date}</small>
+                        {x?.by && 
+                        <div><small>({x?.by?.display})</small></div>}
+                        </div>
+                      </IndexTable.Cell>
+                    </IndexTable.Row>
+                  )
+                })}
               </IndexTable>
             </Box>
           </Card>
