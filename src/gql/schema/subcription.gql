@@ -1,3 +1,7 @@
 subscription subscriptionLoad($channel: String) {
   newOrderPending(channel: $channel)
 }
+
+subscription orderSubscript($channel: String) {
+  orderSubscript(channel: $channel)
+}

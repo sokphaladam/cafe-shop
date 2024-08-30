@@ -88,11 +88,11 @@ export function LoginScreen() {
                 <Image
                   alt=""
                   src={config_app.public.assets.logo || "/affiliate.svg"}
-                  width={45}
+                  width={56}
                   height={45}
                   objectFit="container"
                 />
-                <b className='ml-2 text-[12pt] text-[#674F36]'>Caffe Panel</b>
+                <b className='ml-2 text-[12pt] text-[#674F36]'>Mood Panel</b>
               </div>
               <div className="mt-10">
                 <Text as="h4" variant="headingLg">
@@ -109,7 +109,7 @@ export function LoginScreen() {
                   <TextField
                     autoComplete="off"
                     label="Username"
-                    type="tel"
+                    type="text"
                     value={usernameInput}
                     onChange={setUsernameInput}
                   // disabled={loading}

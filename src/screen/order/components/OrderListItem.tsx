@@ -3,10 +3,11 @@ import { useCustomToast } from '@/components/custom/CustomToast';
 import { Order, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation } from '@/gql/graphql';
 import { Modal } from '@/hook/modal';
 import { ActionList, Badge, Icon, IndexTable, Popover, Text, Thumbnail, Tooltip, Modal as Modals, TextField, ActionListItemDescriptor } from '@shopify/polaris';
-import { MenuVerticalIcon } from '@shopify/polaris-icons';
+import { DeliveryFilledIcon, MenuVerticalIcon, StarFilledIcon, StarIcon } from '@shopify/polaris-icons';
 import React, { useCallback, useState } from 'react';
 import { LogStatus } from './LogStatus';
 import Link from 'next/link';
+import { useSetting } from '@/service/useSettingProvider';
 
 interface Props {
   item: Order | null
@@ -64,14 +65,6 @@ export function OrderListItem({ item }: Props) {
     }
   }, [change, item?.id, setToasts, toasts, toggelOpen, toggleActive])
 
-  const total = Number(item?.total || 0) > 0 ? item?.total : item?.items?.reduce((a: any, b: any) => {
-    const dis_price = Number(b.price) * (Number(b.discount) / 100);
-    const amount = Number(b.qty) * (Number(b.price) - dis_price);
-    return (a = a + amount);
-  }, 0)
-
-  const text = item?.items?.filter((_, i) => i > 4).map((x) => x?.product?.title + " x" + x?.qty).join(',');
-
   let menus: ActionListItemDescriptor[] = []
 
   switch (item?.status) {
@@ -104,6 +97,21 @@ export function OrderListItem({ item }: Props) {
       //
       break;
   }
+
+  const total = item?.items?.reduce((a: any, b: any) => {
+    const dis_price = Number(b.price) * (Number(b.discount) / 100);
+    const amount = Number(b.qty) * (Number(b.price) - dis_price);
+    return (a = a + amount);
+  }, 0);
+
+  const vatPer = item?.vat || '0';
+  const vat = total * Number(vatPer || 0) / 100;
+
+  const totalAfterVat = total + vat
+
+  const text = item?.items?.filter((_, i) => i > 2).map((x) => x?.product?.title + " x" + x?.qty).join(',');
+
+  const isSignature = (item?.log?.filter(f => f?.text?.toLowerCase() === 'signature').length || 0) > 0;
 
   return (
     <React.Fragment>
@@ -157,16 +165,28 @@ export function OrderListItem({ item }: Props) {
       </Modals>
       <IndexTable.Row id={item?.id + ""} position={item?.id || 0}>
         <IndexTable.Cell>
-          <Link href={`/order/detail/${item?.id}`}>
-            <Text as='p' variant='bodySm'>#{item?.id}</Text>
-          </Link>
+          <div className='flex flex-row items-center justify-start'>
+            <Link href={`/order/detail/${item?.id}`}>
+              <Text as='p' variant='bodySm'>#{item?.id}</Text>
+            </Link>
+            {
+              isSignature && <div>
+                <Icon source={StarFilledIcon} tone='magic' />
+              </div>
+            }
+            {
+              item?.delivery && <div>
+                <Icon source={DeliveryFilledIcon} tone='success' />
+              </div>
+            }
+          </div>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           {/* <Text as='p' variant='bodySm' alignment='center'>{item?.items?.length}</Text> */}
           <div className='flex flex-row items-center'>
             {
               item?.items?.map((x, i) => {
-                if (i > 4) return <></>
+                if (i > 2) return <></>
                 return (
                   <div key={x?.id} className='mx-1'>
                     <Tooltip content={x?.product?.title + " x" + x?.qty}>
@@ -178,9 +198,17 @@ export function OrderListItem({ item }: Props) {
             }
             {
               (item?.items?.length || 0) > 4 &&
-              <Tooltip content={text}><div className='mx-1 font-bold cursor-pointer'>+{Number(item?.items?.length || 0) - 4}</div></Tooltip>
+              <Tooltip content={text}><div className='mx-1 font-bold cursor-pointer'>+{Number(item?.items?.length || 0) - 3}</div></Tooltip>
             }
           </div>
+        </IndexTable.Cell>
+        <IndexTable.Cell>
+          <Text as='p' variant='bodySm' tone='base'>Set: {Number(item?.set) < 10 ? '0' + item?.set : item?.set} (#{item?.code})</Text>
+        </IndexTable.Cell>
+        <IndexTable.Cell>
+          {
+            item?.delivery && <Text as='p' variant='bodySm' tone='base'>{item?.delivery?.name} (#{item?.deliveryCode})</Text>
+          }
         </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           <div className='flex flex-row justify-center'>
@@ -188,10 +216,16 @@ export function OrderListItem({ item }: Props) {
           </div>
         </IndexTable.Cell>
         <IndexTable.Cell>
-          <Text as='p' variant='bodyMd' fontWeight='bold' tone='base' alignment='end'>{Number(item?.items?.reduce((a, b) => a = a + Number(b?.qty || 0), 0))}</Text>
+          <Text as='p' variant='bodySm' tone='base' alignment='end'>{Number(item?.items?.reduce((a, b) => a = a + Number(b?.qty || 0), 0))}</Text>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-end'>
-          <Text as='p' variant='bodyMd' fontWeight='bold' tone='success' alignment='end'>$ {Number(total).toFixed(2)}</Text>
+          <Text as='p' variant='bodySm' tone='base' alignment='end'>$ {Number(total).toFixed(2)}</Text>
+        </IndexTable.Cell>
+        <IndexTable.Cell className='text-end'>
+          <Text as='p' variant='bodySm' tone='base' alignment='end'>$ {Number(vat).toFixed(2)} ({vatPer || 0}%)</Text>
+        </IndexTable.Cell>
+        <IndexTable.Cell className='text-end'>
+          <Text as='p' variant='bodyMd' fontWeight='bold' tone='success' alignment='end'>$ {Number(totalAfterVat).toFixed(2)}</Text>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-end'>
           <Text as='p' variant='bodyMd' fontWeight='bold' tone='critical' alignment='end'>$ {Number(item?.paid).toFixed(2)}</Text>

@@ -12,12 +12,7 @@ query me {
   }
 }
 
-query ProductList(
-  $offset: Int
-  $limit: Int
-  $code: String
-  $filter: FilterProduct
-) {
+query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProduct) {
   productList(offset: $offset, limit: $limit, code: $code, filter: $filter) {
     id
     title
@@ -102,21 +97,16 @@ query category($categoryId: Int!) {
   }
 }
 
-query orderList(
-  $offset: Int
-  $limit: Int
-  $viewBy: OrderViewBy
-  $status: [StatusOrder]
-  $orderId: String
-) {
-  orderList(
-    offset: $offset
-    limit: $limit
-    viewBy: $viewBy
-    status: $status
-    orderId: $orderId
-  ) {
+query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy, $status: [StatusOrder], $orderId: String) {
+  orderList(offset: $offset, limit: $limit, viewBy: $viewBy, status: $status, orderId: $orderId) {
     id
+    code
+    deliveryCode
+    delivery {
+      id
+      name
+      contact
+    }
     items {
       id
       price
@@ -142,6 +132,7 @@ query orderList(
     total
     uuid
     note
+    vat
     log {
       date
       text
@@ -164,6 +155,8 @@ query order($token: String, $orderId: Int) {
     total
     uuid
     note
+    code
+    vat
     log {
       date
       text
@@ -171,6 +164,12 @@ query order($token: String, $orderId: Int) {
         id
         display
       }
+    }
+    deliveryCode
+    delivery {
+      id
+      name
+      contact
     }
     items {
       id
@@ -195,5 +194,41 @@ query order($token: String, $orderId: Int) {
       addons
       remark
     }
+  }
+}
+
+query settingList {
+  settingList {
+    value
+    type
+    option
+  }
+}
+
+query deliveryList($offset: Int, $limit: Int) {
+  deliveryList(offset: $offset, limit: $limit) {
+    contact
+    id
+    name
+  }
+}
+
+query tableSetList($limit: Int, $offset: Int) {
+  tableSetList(limit: $limit, offset: $offset) {
+    set
+    order {
+      id
+      uuid
+      status
+      code
+    }
+  }
+}
+
+query deliveryById($deliveryByIdId: Int!) {
+  deliveryById(id: $deliveryByIdId) {
+    contact
+    id
+    name
   }
 }

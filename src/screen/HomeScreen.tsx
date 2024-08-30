@@ -36,7 +36,7 @@ export function HomeScreen() {
       {/* <div onClick={handleSendTest}>Test send</div> */}
       {checkStatus === true && (
         <>
-          <Topbar />
+          <Topbar isCart />
           <br />
           <ProductList />
         </>)
