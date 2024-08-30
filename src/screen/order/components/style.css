@@ -5,6 +5,7 @@ table {
   border-collapse: collapse;
   width: 100%;
   font-size: 9pt;
+  /* color: black; */
 }
 
 table td,
@@ -13,6 +14,7 @@ table th {
   border: 1px solid #ddd;
   border-left-width: 0;
   border-right-width: 0;
+  color: black;
 }
 
 table th {
