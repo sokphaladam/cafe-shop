@@ -3,7 +3,7 @@ import { useCustomToast } from '@/components/custom/CustomToast';
 import { Order, StatusOrder, StatusOrderItem, useChangeOrderStatusMutation } from '@/gql/graphql';
 import { Modal } from '@/hook/modal';
 import { ActionList, Badge, Icon, IndexTable, Popover, Text, Thumbnail, Tooltip, Modal as Modals, TextField, ActionListItemDescriptor } from '@shopify/polaris';
-import { MenuVerticalIcon } from '@shopify/polaris-icons';
+import { DeliveryFilledIcon, MenuVerticalIcon, StarFilledIcon, StarIcon } from '@shopify/polaris-icons';
 import React, { useCallback, useState } from 'react';
 import { LogStatus } from './LogStatus';
 import Link from 'next/link';
@@ -111,6 +111,8 @@ export function OrderListItem({ item }: Props) {
 
   const text = item?.items?.filter((_, i) => i > 2).map((x) => x?.product?.title + " x" + x?.qty).join(',');
 
+  const isSignature = (item?.log?.filter(f => f?.text?.toLowerCase() === 'signature').length || 0) > 0;
+
   return (
     <React.Fragment>
       <Modals
@@ -163,9 +165,21 @@ export function OrderListItem({ item }: Props) {
       </Modals>
       <IndexTable.Row id={item?.id + ""} position={item?.id || 0}>
         <IndexTable.Cell>
-          <Link href={`/order/detail/${item?.id}`}>
-            <Text as='p' variant='bodySm'>#{item?.id}</Text>
-          </Link>
+          <div className='flex flex-row items-center justify-start'>
+            <Link href={`/order/detail/${item?.id}`}>
+              <Text as='p' variant='bodySm'>#{item?.id}</Text>
+            </Link>
+            {
+              isSignature && <div>
+                <Icon source={StarFilledIcon} tone='magic' />
+              </div>
+            }
+            {
+              item?.delivery && <div>
+                <Icon source={DeliveryFilledIcon} tone='success' />
+              </div>
+            }
+          </div>
         </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           {/* <Text as='p' variant='bodySm' alignment='center'>{item?.items?.length}</Text> */}
@@ -189,7 +203,12 @@ export function OrderListItem({ item }: Props) {
           </div>
         </IndexTable.Cell>
         <IndexTable.Cell>
-          <Text as='p' variant='bodySm' tone='base'>Set: {Number(item?.set) < 10 ? '0' + item?.set : item?.set} ({item?.code})</Text>
+          <Text as='p' variant='bodySm' tone='base'>Set: {Number(item?.set) < 10 ? '0' + item?.set : item?.set} (#{item?.code})</Text>
+        </IndexTable.Cell>
+        <IndexTable.Cell>
+          {
+            item?.delivery && <Text as='p' variant='bodySm' tone='base'>{item?.delivery?.name} (#{item?.deliveryCode})</Text>
+          }
         </IndexTable.Cell>
         <IndexTable.Cell className='text-center'>
           <div className='flex flex-row justify-center'>

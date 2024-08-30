@@ -55,7 +55,7 @@ export function OrderListScreen() {
   });
 
   return (
-    <Page title='Order List'>
+    <Page title='Order List' fullWidth>
       <Layout>
         <Layout.Section>
           <Card padding={'0'}>
@@ -86,8 +86,9 @@ export function OrderListScreen() {
               <IndexTable
                 headings={[
                   { title: 'Order' },
-                  { title: "Items", alignment: 'center' },
-                  {title: 'Info', alignment: 'start'},
+                  { title: "Items", alignment: 'start' },
+                  { title: 'Info', alignment: 'start' },
+                  { title: 'Delivery Pickup', alignment: 'start' },
                   { title: "Status", alignment: 'center' },
                   { title: "Qty", alignment: 'end' },
                   { title: "Amount", alignment: 'end' },

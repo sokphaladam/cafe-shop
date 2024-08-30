@@ -10,11 +10,7 @@ mutation updateProduct($updateProductId: Int!, $data: ProductInput) {
   updateProduct(id: $updateProductId, data: $data)
 }
 
-mutation updateCategory(
-  $updateCategoryId: Int!
-  $data: CategoryInput
-  $isActive: Boolean
-) {
+mutation updateCategory($updateCategoryId: Int!, $data: CategoryInput, $isActive: Boolean) {
   updateCategory(id: $updateCategoryId, data: $data, isActive: $isActive)
 }
 
@@ -30,10 +26,7 @@ mutation addOrderItem($orderId: Int!, $data: CartItemInput) {
   addOrderItem(orderId: $orderId, data: $data)
 }
 
-mutation markOrderItemStatus(
-  $markOrderItemStatusId: Int!
-  $status: StatusOrderItem
-) {
+mutation markOrderItemStatus($markOrderItemStatusId: Int!, $status: StatusOrderItem) {
   markOrderItemStatus(id: $markOrderItemStatusId, status: $status)
 }
 
@@ -55,4 +48,24 @@ mutation generateTokenOrder($set: Int!) {
 
 mutation verifyOtpOrder($token: String!, $code: String!) {
   verifyOtpOrder(token: $token, code: $code)
+}
+
+mutation signatureOrder($signatureOrderId: Int!, $password: String!, $username: String!) {
+  signatureOrder(id: $signatureOrderId, password: $password, username: $username)
+}
+
+mutation updateSetting($option: String, $value: String) {
+  updateSetting(option: $option, value: $value)
+}
+
+mutation generateTableSet($sets: Int!) {
+  generateTableSet(sets: $sets)
+}
+
+mutation createDelivery($data: DeliveryInput) {
+  createDelivery(data: $data)
+}
+
+mutation updateDelivery($updateDeliveryId: Int!, $data: DeliveryInput) {
+  updateDelivery(id: $updateDeliveryId, data: $data)
 }

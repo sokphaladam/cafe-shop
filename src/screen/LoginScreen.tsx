@@ -109,7 +109,7 @@ export function LoginScreen() {
                   <TextField
                     autoComplete="off"
                     label="Username"
-                    type="tel"
+                    type="text"
                     value={usernameInput}
                     onChange={setUsernameInput}
                   // disabled={loading}

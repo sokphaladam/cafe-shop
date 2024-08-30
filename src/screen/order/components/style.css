@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
 
-table {
+#print_table {
   font-family: "Lato", sans-serif;
   border-collapse: collapse;
   width: 100%;
@@ -8,16 +8,16 @@ table {
   /* color: black; */
 }
 
-table td,
-table th {
+#print_table td,
+#print_table th {
   padding: 4px;
-  border: 1px solid #ddd;
+  border: 1px solid #000;
   border-left-width: 0;
   border-right-width: 0;
   color: black;
 }
 
-table th {
+#print_table th {
   padding-top: 6px;
   padding-bottom: 6px;
   text-align: left;

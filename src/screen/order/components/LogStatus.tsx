@@ -29,7 +29,7 @@ export function LogStatus({ item }: { item: Order | null }) {
       padding={'default'}
       width={'wide'}
       content={
-        <div className='w-[250px] bg-white'>
+        <div className='w-[350px] bg-white absolute -m-2'>
           <IndexTable
             headings={[
               { title: '#' },

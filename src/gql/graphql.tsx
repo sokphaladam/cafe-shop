@@ -76,11 +76,25 @@ export type CategoryInput = {
 
 export type ChangeOrderInput = {
   amount?: InputMaybe<Scalars['String']['input']>;
+  deliverPickupCode?: InputMaybe<Scalars['String']['input']>;
+  deliverPickupId?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
   itemStatus?: InputMaybe<StatusOrderItem>;
   orderId: Scalars['Int']['input'];
   reason?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<StatusOrder>;
+};
+
+export type Delivery = {
+  __typename?: 'Delivery';
+  contact?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type DeliveryInput = {
+  contact?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FilterProduct = {
@@ -116,17 +130,21 @@ export type Mutation = {
   changeOrderStatus?: Maybe<Scalars['Boolean']['output']>;
   createBrand?: Maybe<Scalars['Boolean']['output']>;
   createCategory?: Maybe<Scalars['Boolean']['output']>;
+  createDelivery?: Maybe<Scalars['Boolean']['output']>;
   createOrder?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
   createProductStock?: Maybe<Scalars['Boolean']['output']>;
   decreaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
+  generateTableSet?: Maybe<Scalars['Boolean']['output']>;
   generateTokenOrder?: Maybe<Scalars['String']['output']>;
   increaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<Scalars['String']['output']>;
   markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
+  signatureOrder?: Maybe<Scalars['Boolean']['output']>;
   testSubscription?: Maybe<Scalars['Boolean']['output']>;
   updateBrand?: Maybe<Scalars['Boolean']['output']>;
   updateCategory?: Maybe<Scalars['Boolean']['output']>;
+  updateDelivery?: Maybe<Scalars['Boolean']['output']>;
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
   updateProductStock?: Maybe<Scalars['Boolean']['output']>;
   updateSetting?: Maybe<Scalars['Boolean']['output']>;
@@ -155,6 +173,11 @@ export type MutationCreateCategoryArgs = {
 };
 
 
+export type MutationCreateDeliveryArgs = {
+  data?: InputMaybe<DeliveryInput>;
+};
+
+
 export type MutationCreateOrderArgs = {
   data?: InputMaybe<OrderInput>;
 };
@@ -172,6 +195,11 @@ export type MutationCreateProductStockArgs = {
 
 export type MutationDecreaseOrderItemArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type MutationGenerateTableSetArgs = {
+  sets: Scalars['Int']['input'];
 };
 
 
@@ -197,6 +225,13 @@ export type MutationMarkOrderItemStatusArgs = {
 };
 
 
+export type MutationSignatureOrderArgs = {
+  id: Scalars['Int']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
 export type MutationTestSubscriptionArgs = {
   str?: InputMaybe<Scalars['String']['input']>;
 };
@@ -213,6 +248,12 @@ export type MutationUpdateCategoryArgs = {
   data?: InputMaybe<CategoryInput>;
   id: Scalars['Int']['input'];
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type MutationUpdateDeliveryArgs = {
+  data?: InputMaybe<DeliveryInput>;
+  id: Scalars['Int']['input'];
 };
 
 
@@ -243,6 +284,8 @@ export type Order = {
   __typename?: 'Order';
   address?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
+  delivery?: Maybe<Delivery>;
+  deliveryCode?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   items?: Maybe<Array<Maybe<OrderItem>>>;
   log?: Maybe<Array<Maybe<OrderLog>>>;
@@ -339,6 +382,8 @@ export type Query = {
   brandList?: Maybe<Array<Maybe<Brand>>>;
   category?: Maybe<Category>;
   categoryList?: Maybe<Scalars['JSON']['output']>;
+  deliveryById?: Maybe<Delivery>;
+  deliveryList?: Maybe<Array<Maybe<Delivery>>>;
   me?: Maybe<User>;
   order?: Maybe<Order>;
   orderList?: Maybe<Array<Maybe<Order>>>;
@@ -347,6 +392,8 @@ export type Query = {
   productStock?: Maybe<ProductStock>;
   productStockList?: Maybe<Array<Maybe<ProductStock>>>;
   settingList?: Maybe<Array<Maybe<Setting>>>;
+  tableSet?: Maybe<TableSet>;
+  tableSetList?: Maybe<Array<Maybe<TableSet>>>;
   user?: Maybe<User>;
   userList?: Maybe<Array<Maybe<User>>>;
 };
@@ -365,6 +412,17 @@ export type QueryBrandListArgs = {
 
 export type QueryCategoryArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type QueryDeliveryByIdArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryDeliveryListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -402,6 +460,17 @@ export type QueryProductStockArgs = {
 
 
 export type QueryProductStockListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryTableSetArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryTableSetListArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -489,6 +558,12 @@ export enum Type_Product {
   Raw = 'RAW',
   SecondHand = 'SECOND_HAND'
 }
+
+export type TableSet = {
+  __typename?: 'TableSet';
+  order?: Maybe<Order>;
+  set?: Maybe<Scalars['Int']['output']>;
+};
 
 export type User = {
   __typename?: 'User';
@@ -599,6 +674,45 @@ export type VerifyOtpOrderMutationVariables = Exact<{
 
 export type VerifyOtpOrderMutation = { __typename?: 'Mutation', verifyOtpOrder?: boolean | null };
 
+export type SignatureOrderMutationVariables = Exact<{
+  signatureOrderId: Scalars['Int']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+}>;
+
+
+export type SignatureOrderMutation = { __typename?: 'Mutation', signatureOrder?: boolean | null };
+
+export type UpdateSettingMutationVariables = Exact<{
+  option?: InputMaybe<Scalars['String']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateSettingMutation = { __typename?: 'Mutation', updateSetting?: boolean | null };
+
+export type GenerateTableSetMutationVariables = Exact<{
+  sets: Scalars['Int']['input'];
+}>;
+
+
+export type GenerateTableSetMutation = { __typename?: 'Mutation', generateTableSet?: boolean | null };
+
+export type CreateDeliveryMutationVariables = Exact<{
+  data?: InputMaybe<DeliveryInput>;
+}>;
+
+
+export type CreateDeliveryMutation = { __typename?: 'Mutation', createDelivery?: boolean | null };
+
+export type UpdateDeliveryMutationVariables = Exact<{
+  updateDeliveryId: Scalars['Int']['input'];
+  data?: InputMaybe<DeliveryInput>;
+}>;
+
+
+export type UpdateDeliveryMutation = { __typename?: 'Mutation', updateDelivery?: boolean | null };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -642,7 +756,7 @@ export type OrderListQueryVariables = Exact<{
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, deliveryCode?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -650,12 +764,35 @@ export type OrderQueryVariables = Exact<{
 }>;
 
 
-export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, deliveryCode?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
 
 export type SettingListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SettingListQuery = { __typename?: 'Query', settingList?: Array<{ __typename?: 'Setting', value?: string | null, type?: string | null, option?: string | null } | null> | null };
+
+export type DeliveryListQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type DeliveryListQuery = { __typename?: 'Query', deliveryList?: Array<{ __typename?: 'Delivery', contact?: string | null, id?: number | null, name?: string | null } | null> | null };
+
+export type TableSetListQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type TableSetListQuery = { __typename?: 'Query', tableSetList?: Array<{ __typename?: 'TableSet', set?: number | null, order?: { __typename?: 'Order', id?: number | null, uuid?: string | null, status?: StatusOrder | null, code?: string | null } | null } | null> | null };
+
+export type DeliveryByIdQueryVariables = Exact<{
+  deliveryByIdId: Scalars['Int']['input'];
+}>;
+
+
+export type DeliveryByIdQuery = { __typename?: 'Query', deliveryById?: { __typename?: 'Delivery', contact?: string | null, id?: number | null, name?: string | null } | null };
 
 export type SubscriptionLoadSubscriptionVariables = Exact<{
   channel?: InputMaybe<Scalars['String']['input']>;
@@ -1082,6 +1219,165 @@ export function useVerifyOtpOrderMutation(baseOptions?: Apollo.MutationHookOptio
 export type VerifyOtpOrderMutationHookResult = ReturnType<typeof useVerifyOtpOrderMutation>;
 export type VerifyOtpOrderMutationResult = Apollo.MutationResult<VerifyOtpOrderMutation>;
 export type VerifyOtpOrderMutationOptions = Apollo.BaseMutationOptions<VerifyOtpOrderMutation, VerifyOtpOrderMutationVariables>;
+export const SignatureOrderDocument = gql`
+    mutation signatureOrder($signatureOrderId: Int!, $password: String!, $username: String!) {
+  signatureOrder(id: $signatureOrderId, password: $password, username: $username)
+}
+    `;
+export type SignatureOrderMutationFn = Apollo.MutationFunction<SignatureOrderMutation, SignatureOrderMutationVariables>;
+
+/**
+ * __useSignatureOrderMutation__
+ *
+ * To run a mutation, you first call `useSignatureOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignatureOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signatureOrderMutation, { data, loading, error }] = useSignatureOrderMutation({
+ *   variables: {
+ *      signatureOrderId: // value for 'signatureOrderId'
+ *      password: // value for 'password'
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useSignatureOrderMutation(baseOptions?: Apollo.MutationHookOptions<SignatureOrderMutation, SignatureOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SignatureOrderMutation, SignatureOrderMutationVariables>(SignatureOrderDocument, options);
+      }
+export type SignatureOrderMutationHookResult = ReturnType<typeof useSignatureOrderMutation>;
+export type SignatureOrderMutationResult = Apollo.MutationResult<SignatureOrderMutation>;
+export type SignatureOrderMutationOptions = Apollo.BaseMutationOptions<SignatureOrderMutation, SignatureOrderMutationVariables>;
+export const UpdateSettingDocument = gql`
+    mutation updateSetting($option: String, $value: String) {
+  updateSetting(option: $option, value: $value)
+}
+    `;
+export type UpdateSettingMutationFn = Apollo.MutationFunction<UpdateSettingMutation, UpdateSettingMutationVariables>;
+
+/**
+ * __useUpdateSettingMutation__
+ *
+ * To run a mutation, you first call `useUpdateSettingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSettingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSettingMutation, { data, loading, error }] = useUpdateSettingMutation({
+ *   variables: {
+ *      option: // value for 'option'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useUpdateSettingMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSettingMutation, UpdateSettingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSettingMutation, UpdateSettingMutationVariables>(UpdateSettingDocument, options);
+      }
+export type UpdateSettingMutationHookResult = ReturnType<typeof useUpdateSettingMutation>;
+export type UpdateSettingMutationResult = Apollo.MutationResult<UpdateSettingMutation>;
+export type UpdateSettingMutationOptions = Apollo.BaseMutationOptions<UpdateSettingMutation, UpdateSettingMutationVariables>;
+export const GenerateTableSetDocument = gql`
+    mutation generateTableSet($sets: Int!) {
+  generateTableSet(sets: $sets)
+}
+    `;
+export type GenerateTableSetMutationFn = Apollo.MutationFunction<GenerateTableSetMutation, GenerateTableSetMutationVariables>;
+
+/**
+ * __useGenerateTableSetMutation__
+ *
+ * To run a mutation, you first call `useGenerateTableSetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateTableSetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateTableSetMutation, { data, loading, error }] = useGenerateTableSetMutation({
+ *   variables: {
+ *      sets: // value for 'sets'
+ *   },
+ * });
+ */
+export function useGenerateTableSetMutation(baseOptions?: Apollo.MutationHookOptions<GenerateTableSetMutation, GenerateTableSetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenerateTableSetMutation, GenerateTableSetMutationVariables>(GenerateTableSetDocument, options);
+      }
+export type GenerateTableSetMutationHookResult = ReturnType<typeof useGenerateTableSetMutation>;
+export type GenerateTableSetMutationResult = Apollo.MutationResult<GenerateTableSetMutation>;
+export type GenerateTableSetMutationOptions = Apollo.BaseMutationOptions<GenerateTableSetMutation, GenerateTableSetMutationVariables>;
+export const CreateDeliveryDocument = gql`
+    mutation createDelivery($data: DeliveryInput) {
+  createDelivery(data: $data)
+}
+    `;
+export type CreateDeliveryMutationFn = Apollo.MutationFunction<CreateDeliveryMutation, CreateDeliveryMutationVariables>;
+
+/**
+ * __useCreateDeliveryMutation__
+ *
+ * To run a mutation, you first call `useCreateDeliveryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDeliveryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDeliveryMutation, { data, loading, error }] = useCreateDeliveryMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateDeliveryMutation(baseOptions?: Apollo.MutationHookOptions<CreateDeliveryMutation, CreateDeliveryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDeliveryMutation, CreateDeliveryMutationVariables>(CreateDeliveryDocument, options);
+      }
+export type CreateDeliveryMutationHookResult = ReturnType<typeof useCreateDeliveryMutation>;
+export type CreateDeliveryMutationResult = Apollo.MutationResult<CreateDeliveryMutation>;
+export type CreateDeliveryMutationOptions = Apollo.BaseMutationOptions<CreateDeliveryMutation, CreateDeliveryMutationVariables>;
+export const UpdateDeliveryDocument = gql`
+    mutation updateDelivery($updateDeliveryId: Int!, $data: DeliveryInput) {
+  updateDelivery(id: $updateDeliveryId, data: $data)
+}
+    `;
+export type UpdateDeliveryMutationFn = Apollo.MutationFunction<UpdateDeliveryMutation, UpdateDeliveryMutationVariables>;
+
+/**
+ * __useUpdateDeliveryMutation__
+ *
+ * To run a mutation, you first call `useUpdateDeliveryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDeliveryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateDeliveryMutation, { data, loading, error }] = useUpdateDeliveryMutation({
+ *   variables: {
+ *      updateDeliveryId: // value for 'updateDeliveryId'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateDeliveryMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDeliveryMutation, UpdateDeliveryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateDeliveryMutation, UpdateDeliveryMutationVariables>(UpdateDeliveryDocument, options);
+      }
+export type UpdateDeliveryMutationHookResult = ReturnType<typeof useUpdateDeliveryMutation>;
+export type UpdateDeliveryMutationResult = Apollo.MutationResult<UpdateDeliveryMutation>;
+export type UpdateDeliveryMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryMutation, UpdateDeliveryMutationVariables>;
 export const MeDocument = gql`
     query me {
   me {
@@ -1363,6 +1659,12 @@ export const OrderListDocument = gql`
   ) {
     id
     code
+    deliveryCode
+    delivery {
+      id
+      name
+      contact
+    }
     items {
       id
       price
@@ -1458,6 +1760,12 @@ export const OrderDocument = gql`
         id
         display
       }
+    }
+    deliveryCode
+    delivery {
+      id
+      name
+      contact
     }
     items {
       id
@@ -1560,6 +1868,138 @@ export type SettingListQueryHookResult = ReturnType<typeof useSettingListQuery>;
 export type SettingListLazyQueryHookResult = ReturnType<typeof useSettingListLazyQuery>;
 export type SettingListSuspenseQueryHookResult = ReturnType<typeof useSettingListSuspenseQuery>;
 export type SettingListQueryResult = Apollo.QueryResult<SettingListQuery, SettingListQueryVariables>;
+export const DeliveryListDocument = gql`
+    query deliveryList($offset: Int, $limit: Int) {
+  deliveryList(offset: $offset, limit: $limit) {
+    contact
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useDeliveryListQuery__
+ *
+ * To run a query within a React component, call `useDeliveryListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDeliveryListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDeliveryListQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useDeliveryListQuery(baseOptions?: Apollo.QueryHookOptions<DeliveryListQuery, DeliveryListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DeliveryListQuery, DeliveryListQueryVariables>(DeliveryListDocument, options);
+      }
+export function useDeliveryListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeliveryListQuery, DeliveryListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DeliveryListQuery, DeliveryListQueryVariables>(DeliveryListDocument, options);
+        }
+export function useDeliveryListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DeliveryListQuery, DeliveryListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DeliveryListQuery, DeliveryListQueryVariables>(DeliveryListDocument, options);
+        }
+export type DeliveryListQueryHookResult = ReturnType<typeof useDeliveryListQuery>;
+export type DeliveryListLazyQueryHookResult = ReturnType<typeof useDeliveryListLazyQuery>;
+export type DeliveryListSuspenseQueryHookResult = ReturnType<typeof useDeliveryListSuspenseQuery>;
+export type DeliveryListQueryResult = Apollo.QueryResult<DeliveryListQuery, DeliveryListQueryVariables>;
+export const TableSetListDocument = gql`
+    query tableSetList($limit: Int, $offset: Int) {
+  tableSetList(limit: $limit, offset: $offset) {
+    set
+    order {
+      id
+      uuid
+      status
+      code
+    }
+  }
+}
+    `;
+
+/**
+ * __useTableSetListQuery__
+ *
+ * To run a query within a React component, call `useTableSetListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTableSetListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTableSetListQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      offset: // value for 'offset'
+ *   },
+ * });
+ */
+export function useTableSetListQuery(baseOptions?: Apollo.QueryHookOptions<TableSetListQuery, TableSetListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TableSetListQuery, TableSetListQueryVariables>(TableSetListDocument, options);
+      }
+export function useTableSetListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TableSetListQuery, TableSetListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TableSetListQuery, TableSetListQueryVariables>(TableSetListDocument, options);
+        }
+export function useTableSetListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TableSetListQuery, TableSetListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TableSetListQuery, TableSetListQueryVariables>(TableSetListDocument, options);
+        }
+export type TableSetListQueryHookResult = ReturnType<typeof useTableSetListQuery>;
+export type TableSetListLazyQueryHookResult = ReturnType<typeof useTableSetListLazyQuery>;
+export type TableSetListSuspenseQueryHookResult = ReturnType<typeof useTableSetListSuspenseQuery>;
+export type TableSetListQueryResult = Apollo.QueryResult<TableSetListQuery, TableSetListQueryVariables>;
+export const DeliveryByIdDocument = gql`
+    query deliveryById($deliveryByIdId: Int!) {
+  deliveryById(id: $deliveryByIdId) {
+    contact
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useDeliveryByIdQuery__
+ *
+ * To run a query within a React component, call `useDeliveryByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDeliveryByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDeliveryByIdQuery({
+ *   variables: {
+ *      deliveryByIdId: // value for 'deliveryByIdId'
+ *   },
+ * });
+ */
+export function useDeliveryByIdQuery(baseOptions: Apollo.QueryHookOptions<DeliveryByIdQuery, DeliveryByIdQueryVariables> & ({ variables: DeliveryByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DeliveryByIdQuery, DeliveryByIdQueryVariables>(DeliveryByIdDocument, options);
+      }
+export function useDeliveryByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeliveryByIdQuery, DeliveryByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DeliveryByIdQuery, DeliveryByIdQueryVariables>(DeliveryByIdDocument, options);
+        }
+export function useDeliveryByIdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DeliveryByIdQuery, DeliveryByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DeliveryByIdQuery, DeliveryByIdQueryVariables>(DeliveryByIdDocument, options);
+        }
+export type DeliveryByIdQueryHookResult = ReturnType<typeof useDeliveryByIdQuery>;
+export type DeliveryByIdLazyQueryHookResult = ReturnType<typeof useDeliveryByIdLazyQuery>;
+export type DeliveryByIdSuspenseQueryHookResult = ReturnType<typeof useDeliveryByIdSuspenseQuery>;
+export type DeliveryByIdQueryResult = Apollo.QueryResult<DeliveryByIdQuery, DeliveryByIdQueryVariables>;
 export const SubscriptionLoadDocument = gql`
     subscription subscriptionLoad($channel: String) {
   newOrderPending(channel: $channel)
