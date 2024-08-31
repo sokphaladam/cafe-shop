@@ -134,6 +134,7 @@ export type Mutation = {
   createOrder?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
   createProductStock?: Maybe<Scalars['Boolean']['output']>;
+  createUser?: Maybe<Scalars['Boolean']['output']>;
   decreaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
   generateTableSet?: Maybe<Scalars['Boolean']['output']>;
   generateTokenOrder?: Maybe<Scalars['String']['output']>;
@@ -148,6 +149,7 @@ export type Mutation = {
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
   updateProductStock?: Maybe<Scalars['Boolean']['output']>;
   updateSetting?: Maybe<Scalars['Boolean']['output']>;
+  updateUser?: Maybe<Scalars['Boolean']['output']>;
   verifyOtpOrder?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -190,6 +192,11 @@ export type MutationCreateProductArgs = {
 
 export type MutationCreateProductStockArgs = {
   data?: InputMaybe<ProductStockInput>;
+};
+
+
+export type MutationCreateUserArgs = {
+  data?: InputMaybe<UserInput>;
 };
 
 
@@ -272,6 +279,12 @@ export type MutationUpdateProductStockArgs = {
 export type MutationUpdateSettingArgs = {
   option?: InputMaybe<Scalars['String']['input']>;
   value?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateUserArgs = {
+  data?: InputMaybe<UserInput>;
+  id: Scalars['Int']['input'];
 };
 
 
@@ -567,13 +580,40 @@ export type TableSet = {
 
 export type User = {
   __typename?: 'User';
+  bankAcc?: Maybe<Scalars['String']['output']>;
+  bankName?: Maybe<Scalars['String']['output']>;
+  bankType?: Maybe<Scalars['String']['output']>;
+  baseSalary?: Maybe<Scalars['String']['output']>;
   contact?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
   display?: Maybe<Scalars['String']['output']>;
   gender?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
   isActive?: Maybe<Scalars['Boolean']['output']>;
+  ownerId?: Maybe<Scalars['String']['output']>;
+  position?: Maybe<Scalars['String']['output']>;
+  profile?: Maybe<Scalars['String']['output']>;
   role?: Maybe<Role>;
+  startingAt?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserInput = {
+  bankAcc?: InputMaybe<Scalars['String']['input']>;
+  bankName?: InputMaybe<Scalars['String']['input']>;
+  bankType?: InputMaybe<Scalars['String']['input']>;
+  baseSalary?: InputMaybe<Scalars['String']['input']>;
+  contact?: InputMaybe<Scalars['String']['input']>;
+  createdDate?: InputMaybe<Scalars['String']['input']>;
+  display?: InputMaybe<Scalars['String']['input']>;
+  gender?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  ownerId?: InputMaybe<Scalars['String']['input']>;
+  position?: InputMaybe<Scalars['String']['input']>;
+  profile?: InputMaybe<Scalars['String']['input']>;
+  roleId?: InputMaybe<Scalars['Int']['input']>;
+  startingAt?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LoginMutationVariables = Exact<{
@@ -713,10 +753,25 @@ export type UpdateDeliveryMutationVariables = Exact<{
 
 export type UpdateDeliveryMutation = { __typename?: 'Mutation', updateDelivery?: boolean | null };
 
+export type CreateUserMutationVariables = Exact<{
+  data?: InputMaybe<UserInput>;
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser?: boolean | null };
+
+export type UpdateUserMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data?: InputMaybe<UserInput>;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser?: boolean | null };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, display?: string | null, contact?: string | null, gender?: string | null, createdDate?: string | null, role?: { __typename?: 'Role', id?: number | null, name?: string | null } | null } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, display?: string | null, contact?: string | null, gender?: string | null, createdDate?: string | null, isActive?: boolean | null, ownerId?: string | null, startingAt?: string | null, bankName?: string | null, bankAcc?: string | null, bankType?: string | null, position?: string | null, baseSalary?: string | null, type?: string | null, profile?: string | null, role?: { __typename?: 'Role', name?: string | null, id?: number | null } | null } | null };
 
 export type ProductListQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1378,6 +1433,69 @@ export function useUpdateDeliveryMutation(baseOptions?: Apollo.MutationHookOptio
 export type UpdateDeliveryMutationHookResult = ReturnType<typeof useUpdateDeliveryMutation>;
 export type UpdateDeliveryMutationResult = Apollo.MutationResult<UpdateDeliveryMutation>;
 export type UpdateDeliveryMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryMutation, UpdateDeliveryMutationVariables>;
+export const CreateUserDocument = gql`
+    mutation createUser($data: UserInput) {
+  createUser(data: $data)
+}
+    `;
+export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+
+/**
+ * __useCreateUserMutation__
+ *
+ * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
+      }
+export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
+export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
+export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const UpdateUserDocument = gql`
+    mutation updateUser($id: Int!, $data: UserInput) {
+  updateUser(id: $id, data: $data)
+}
+    `;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export const MeDocument = gql`
     query me {
   me {
@@ -1386,10 +1504,20 @@ export const MeDocument = gql`
     contact
     gender
     role {
-      id
       name
+      id
     }
     createdDate
+    isActive
+    ownerId
+    startingAt
+    bankName
+    bankAcc
+    bankType
+    position
+    baseSalary
+    type
+    profile
   }
 }
     `;

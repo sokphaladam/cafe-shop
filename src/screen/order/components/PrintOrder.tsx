@@ -72,7 +72,11 @@ export function PrintOrder(props: Props) {
         <div className="flex flex-row justify-center relative overflow-x-hidden">
           <div className='text-center font-["Lato"] p-1' style={{ width: '80mm', color: 'black' }} ref={contentToPrint}>
             <div className="w-full flex flex-row justify-center">
-              <img src={config_app.public.assets.logo} alt="" style={{ width: 60, height: 60, objectFit: 'cover' }} />
+              <img
+                src={config_app.public.assets.logo}
+                alt=""
+                style={{ width: 'auto', height: 35, objectFit: 'contain' }}
+              />
             </div>
             <br />
             <div className="flex flex-row justify-between">

@@ -69,3 +69,11 @@ mutation createDelivery($data: DeliveryInput) {
 mutation updateDelivery($updateDeliveryId: Int!, $data: DeliveryInput) {
   updateDelivery(id: $updateDeliveryId, data: $data)
 }
+
+mutation createUser($data: UserInput) {
+  createUser(data: $data)
+}
+
+mutation updateUser($id: Int!, $data: UserInput) {
+  updateUser(id: $id, data: $data)
+}
