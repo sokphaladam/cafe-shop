@@ -1,6 +1,6 @@
 'use client';
 import { Setting, useSettingListQuery, useUpdateSettingMutation } from '@/gql/graphql';
-import { haversineDistance } from '@/lib/loacationDistance';
+import { google_haversine_distance, haversineDistance } from '@/lib/loacationDistance';
 import { Box, Card, IndexTable, Layout, Page, TextField } from '@shopify/polaris';
 import React, { useState } from 'react';
 
@@ -78,7 +78,23 @@ export function SettingScreen() {
                   Number(msg.coords.latitude),
                   Number(msg.coords.longitude),
                 );
-                alert('Current' + msg.coords.latitude + ',' + msg.coords.longitude + '(' + km.toFixed(2) + 'km)');
+
+                const mi = google_haversine_distance(
+                  {
+                    position: { lat: Number(str[0]), lng: Number(str[1]) },
+                  },
+                  {
+                    position: { lat: Number(msg.coords.latitude), lng: Number(msg.coords.longitude) },
+                  },
+                );
+
+                let text = 'Current:' + msg.coords.latitude + ',' + msg.coords.longitude + ' (' + km.toFixed(2) + 'km)';
+
+                if (mi) {
+                  text = text + `\n (${mi.toFixed(2)} mi.)`;
+                }
+
+                alert(text);
                 console.log(km);
               });
             }
