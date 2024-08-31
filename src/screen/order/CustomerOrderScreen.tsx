@@ -1,16 +1,22 @@
-'use client'
-import { useCustomToast } from "@/components/custom/CustomToast"
-import { PolarisLayout } from "@/components/polaris/PolarisLayout"
-import { ProductList } from "@/components/ProductList"
-import { Topbar } from "@/components/Topbar"
-import { ProviderOrderContext, useOrderContext } from "@/context/OrderContext"
-import { Type_Product, useGenerateTokenOrderMutation, useOrderLazyQuery, useOrderQuery, useProductListQuery } from "@/gql/graphql"
-import { ProductItem } from "./components/ProductItem"
-import { LayoutCart } from "./components/LayoutCart"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useCallback, useEffect, useRef, useState } from "react"
-import { VerifyCustomerOrderScreen } from "./VerifyCustomerOrderScreen"
-import { useSetting } from "@/service/useSettingProvider"
+'use client';
+import { useCustomToast } from '@/components/custom/CustomToast';
+import { PolarisLayout } from '@/components/polaris/PolarisLayout';
+import { ProductList } from '@/components/ProductList';
+import { Topbar } from '@/components/Topbar';
+import { ProviderOrderContext, useOrderContext } from '@/context/OrderContext';
+import {
+  Type_Product,
+  useGenerateTokenOrderMutation,
+  useOrderLazyQuery,
+  useOrderQuery,
+  useProductListQuery,
+} from '@/gql/graphql';
+import { ProductItem } from './components/ProductItem';
+import { LayoutCart } from './components/LayoutCart';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { VerifyCustomerOrderScreen } from './VerifyCustomerOrderScreen';
+import { useSetting } from '@/service/useSettingProvider';
 
 export function CustomerOrderScreen() {
   const params = useSearchParams();
@@ -19,9 +25,9 @@ export function CustomerOrderScreen() {
   const setting = useSetting();
   const [info] = useState({
     set: params.get('token') ? params.get('token')?.split('@')[0] : null,
-    name: params.get('token') || "1@" + new Date().getTime(),
-    code: params.get('otpCode') || ''
-  })
+    name: params.get('token') || '1@' + new Date().getTime(),
+    code: params.get('otpCode') || '',
+  });
   const ref = useRef<HTMLButtonElement | null>(null);
   const [oneTime, setOneTime] = useState(false);
   const [count, setCount] = useState(0);
@@ -34,9 +40,9 @@ export function CustomerOrderScreen() {
     fetchPolicy: 'cache-and-network',
     variables: {
       filter: {
-        type: [Type_Product.Production]
-      }
-    }
+        type: [Type_Product.Production],
+      },
+    },
   });
 
   useEffect(() => {
@@ -45,79 +51,81 @@ export function CustomerOrderScreen() {
         ref.current?.click();
       }
     }
-  }, [loading, oneTime, setting.length])
+  }, [loading, oneTime, setting.length]);
 
   const handleGenerate = useCallback(() => {
     if (!isNaN(Number(params.get('token')))) {
       const check = !oneTime && info.set && !isNaN(Number(info.name)) && count < 1;
       if (check) {
-        setCount(count + 1)
-        setOneTime(true)
+        setCount(count + 1);
+        setOneTime(true);
         generate({
           variables: {
-            set: Number(info.set)
-          }
-        }).then(res => {
+            set: Number(info.set),
+          },
+        }).then((res) => {
           if (res.data?.generateTokenOrder) {
-            const newParams = new URLSearchParams(params.toString())
-            newParams.set('token', res.data.generateTokenOrder.toString())
-            router.push(path + '?' + newParams.toString())
+            const newParams = new URLSearchParams(params.toString());
+            newParams.set('token', res.data.generateTokenOrder.toString());
+            router.push(path + '?' + newParams.toString());
           }
-        })
+        });
       }
     }
-  }, [count, generate, info.name, info.set, oneTime, params, path, router])
+  }, [count, generate, info.name, info.set, oneTime, params, path, router]);
 
-  if (loading) {
-    return <>
-      <Topbar isCart={false} />
-    </>
+  if (loading || !params.get('token')) {
+    return (
+      <>
+        <Topbar isCart={false} />
+      </>
+    );
   }
 
   const groups = data?.productList?.reduce((a: any, b: any) => {
     const key = b?.category?.name;
 
     if (!a[key]) {
-      a[key] = []
+      a[key] = [];
     }
 
-    a[key].push(b)
-    return a
+    a[key].push(b);
+    return a;
   }, {});
 
   return (
     <Suspense>
       <div>
-        <button ref={ref} onClick={handleGenerate} style={{ position: 'fixed', top: -9999, display: 'none' }}>generate click</button>
-        {
-          !verify ? <VerifyCustomerOrderScreen onVerify={setVerify} />
-            : <ProviderOrderContext>
-              <Topbar isCart />
-              <br />
-              <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 max-sm:p-4">
-                <div className="w-[70%] flex flex-col gap-4 max-sm:w-full">
-                  {
-                    groups && Object.keys(groups).map(g => {
-                      return (
-                        <div key={g}>
-                          <div className="text-xl my-2 font-semibold">{g}</div>
-                          <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-                            {
-                              groups[g].map((x: any, i: any) => {
-                                return <ProductItem key={i} product={x} keyItem={info.name} />
-                              })
-                            }
-                          </div>
+        <button ref={ref} onClick={handleGenerate} style={{ position: 'fixed', top: -9999, display: 'none' }}>
+          generate click
+        </button>
+        {!verify ? (
+          <VerifyCustomerOrderScreen onVerify={setVerify} />
+        ) : (
+          <ProviderOrderContext>
+            <Topbar isCart />
+            <br />
+            <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 max-sm:p-4">
+              <div className="w-[70%] flex flex-col gap-4 max-sm:w-full">
+                {groups &&
+                  Object.keys(groups).map((g) => {
+                    return (
+                      <div key={g}>
+                        <div className="text-xl my-2 font-semibold">{g}</div>
+                        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+                          {groups[g].map((x: any, i: any) => {
+                            return <ProductItem key={i} product={x} keyItem={info.name} />;
+                          })}
                         </div>
-                      )
-                    })
-                  }
-                </div>
-                <LayoutCart />
+                      </div>
+                    );
+                  })}
               </div>
-            </ProviderOrderContext>
-        }
+              <LayoutCart />
+            </div>
+          </ProviderOrderContext>
+        )}
       </div>
     </Suspense>
-  )
+  );
 }

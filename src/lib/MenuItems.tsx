@@ -6,9 +6,9 @@ import {
   CartFilledIcon,
   DeliveryIcon,
   MagicIcon,
-  SettingsFilledIcon,
   SettingsIcon,
   TabletIcon,
+  AttachmentIcon,
 } from '@shopify/polaris-icons';
 
 export function MenuItems(user: User | null) {
@@ -138,6 +138,16 @@ export function MenuItems(user: User | null) {
                 label: 'Order',
                 icon: CartFilledIcon,
                 url: '/order/list',
+              },
+            ],
+          },
+          {
+            title: 'Employee',
+            items: [
+              {
+                label: 'Attendance',
+                icon: AttachmentIcon,
+                url: '/employee/attendance',
               },
             ],
           },

@@ -5,10 +5,20 @@ query me {
     contact
     gender
     role {
-      id
       name
+      id
     }
     createdDate
+    isActive
+    ownerId
+    startingAt
+    bankName
+    bankAcc
+    bankType
+    position
+    baseSalary
+    type
+    profile
   }
 }
 
