@@ -9,6 +9,11 @@ import {
   SettingsIcon,
   TabletIcon,
   AttachmentIcon,
+  FileIcon,
+  PersonIcon,
+  PageClockIcon,
+  StarIcon,
+  CreditCardIcon,
 } from '@shopify/polaris-icons';
 
 export function MenuItems(user: User | null) {
@@ -47,7 +52,37 @@ export function MenuItems(user: User | null) {
         {
           label: 'Customer Order',
           icon: CartFilledIcon,
-          url: '/orders/list',
+          url: '/order/list',
+        },
+      ],
+    },
+    {
+      title: 'Employee',
+      items: [
+        {
+          label: 'Attendance',
+          icon: AttachmentIcon,
+          url: '/employee/attendance',
+        },
+        {
+          label: 'Attendance (Admin)',
+          icon: AttachmentIcon,
+          url: '#',
+        },
+        {
+          label: 'Leave',
+          icon: FileIcon,
+          url: '#',
+        },
+        {
+          label: 'Staff',
+          icon: PersonIcon,
+          url: '#',
+        },
+        {
+          label: 'Overtime',
+          icon: PageClockIcon,
+          url: '#',
         },
       ],
     },
@@ -68,6 +103,16 @@ export function MenuItems(user: User | null) {
           label: 'Delivery',
           icon: DeliveryIcon,
           url: '/setting/delivery',
+        },
+        {
+          label: 'Position',
+          icon: StarIcon,
+          url: '#',
+        },
+        {
+          label: 'Payment Info',
+          icon: CreditCardIcon,
+          url: '#',
         },
       ],
     },

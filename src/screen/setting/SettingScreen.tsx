@@ -1,11 +1,13 @@
 'use client';
 import { Setting, useSettingListQuery, useUpdateSettingMutation } from '@/gql/graphql';
+import { Modal } from '@/hook/modal';
 import { google_haversine_distance, haversineDistance } from '@/lib/loacationDistance';
 import { Box, Card, IndexTable, Layout, Page, TextField } from '@shopify/polaris';
 import React, { useState } from 'react';
 
 function ListTextInput({ setting }: { setting: Setting }) {
   const [value, setValue] = useState(setting.value || '');
+  const [edit, setEdit] = useState(false);
 
   const [update] = useUpdateSettingMutation({
     refetchQueries: ['settingList'],
@@ -15,42 +17,71 @@ function ListTextInput({ setting }: { setting: Setting }) {
     <div
       onKeyDown={(e) => {
         if (e.keyCode === 13) {
-          if (value.trim() !== setting.value?.trim()) {
-            if (!value.trim()) {
-              return;
-            }
-
-            update({
-              variables: {
-                option: setting.option,
-                value: value,
+          setEdit(!edit);
+          Modal.dialog({
+            title: 'Confirmation',
+            body: [<div key={1}>Are you sure want to update value {setting.option}?</div>],
+            buttons: [
+              {
+                title: 'Yes',
+                class: 'primary',
+                onPress: () => {
+                  if (value.trim() !== setting.value?.trim()) {
+                    if (!value.trim()) {
+                      return;
+                    }
+                    update({
+                      variables: {
+                        option: setting.option,
+                        value: value,
+                      },
+                    });
+                  }
+                },
               },
-            });
-          }
+            ],
+          });
         }
       }}
+      onDoubleClick={() => setEdit(!edit)}
     >
-      <TextField
-        autoComplete="off"
-        value={value}
-        label
-        labelHidden
-        onChange={setValue}
-        onBlur={() => {
-          if (value.trim() !== setting.value?.trim()) {
-            if (!value.trim()) {
-              return;
-            }
-
-            update({
-              variables: {
-                option: setting.option,
-                value: value,
-              },
+      {edit ? (
+        <TextField
+          autoComplete="off"
+          value={value}
+          label
+          labelHidden
+          onChange={setValue}
+          onBlur={() => {
+            setEdit(!edit);
+            Modal.dialog({
+              title: 'Confirmation',
+              body: [<div key={1}>Are you sure want to update value {setting.option}?</div>],
+              buttons: [
+                {
+                  title: 'Yes',
+                  class: 'primary',
+                  onPress: () => {
+                    if (value.trim() !== setting.value?.trim()) {
+                      if (!value.trim()) {
+                        return;
+                      }
+                      update({
+                        variables: {
+                          option: setting.option,
+                          value: value,
+                        },
+                      });
+                    }
+                  },
+                },
+              ],
             });
-          }
-        }}
-      />
+          }}
+        />
+      ) : (
+        <div>{value}</div>
+      )}
     </div>
   );
 }

@@ -24,6 +24,7 @@ import { useSetting } from '@/service/useSettingProvider';
 import { PrintOrder } from '../components/PrintOrder';
 import { SignatureOrder } from '../components/SignatureOrder';
 import { DeliveryPickup } from '../components/DeliveryPickup';
+import { PrintOrderToKitchen } from '../components/PrintOrderToKitchen';
 
 interface Props {
   id: number;
@@ -282,6 +283,7 @@ export function OrderDetailScreen(props: Props) {
                 <div className="flex flex-row gap-4">
                   <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} />
                   <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} kitchen />
+                  {/* <PrintOrderToKitchen /> */}
                   <SignatureOrder order={data?.order || {}} size="micro" />
                   {data?.order?.status === StatusOrder.Pending && (
                     <Button

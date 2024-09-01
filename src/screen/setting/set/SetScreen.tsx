@@ -1,12 +1,17 @@
 'use client';
 
-import { useGenerateTableSetMutation, useGenerateTokenOrderMutation, useTableSetListQuery } from '@/gql/graphql';
+import {
+  useGenerateTableSetMutation,
+  useGenerateTokenOrderMutation,
+  useOrderSubscriptSubscription,
+  useTableSetListQuery,
+} from '@/gql/graphql';
 import { Modal } from '@/hook/modal';
 import { Box, Card, Frame, Grid, Layout, Loading, Page, Spinner, Text } from '@shopify/polaris';
 import { useCallback } from 'react';
 
 export function SetScreen() {
-  const { data, loading } = useTableSetListQuery({
+  const { data, loading, refetch } = useTableSetListQuery({
     variables: {
       offset: 0,
       limit: 1000,
@@ -17,6 +22,13 @@ export function SetScreen() {
   });
   const [generate, propsUpdate] = useGenerateTokenOrderMutation({
     refetchQueries: ['tableSetList'],
+  });
+  useOrderSubscriptSubscription({
+    onData: (res) => {
+      if (res.data.data?.orderSubscript.status === 2 || !!res.data.data?.orderSubscript.uuid) {
+        refetch();
+      }
+    },
   });
 
   const handleGenerate = useCallback(
@@ -73,7 +85,7 @@ export function SetScreen() {
                   <Grid.Cell key={x?.set}>
                     <div
                       className="cursor-pointer"
-                      onClick={() => (propsUpdate.loading ? {} : handleGenerate(x?.set + ''))}
+                      onClick={() => (propsUpdate.loading || x?.order ? {} : handleGenerate(x?.set + ''))}
                     >
                       <Card background={x?.order ? 'bg-fill-success-active' : 'bg-fill'}>
                         <Box>
