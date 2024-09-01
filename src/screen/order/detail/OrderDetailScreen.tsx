@@ -334,7 +334,7 @@ export function OrderDetailScreen(props: Props) {
                   </b>
                   <b className="mb-2">
                     <small>
-                      SET: {data?.order?.set} (#{data?.order?.code})
+                      TABLE: {data?.order?.set} (#{data?.order?.code})
                     </small>
                   </b>
                   <Badge
@@ -392,9 +392,11 @@ export function OrderDetailScreen(props: Props) {
               <div className="flex flex-row justify-between items-start">
                 <div>
                   <div>
-                    <Text as="h4" variant="bodyMd" fontWeight="bold">
-                      Delivery Pickup
-                    </Text>
+                    {data?.order?.delivery && (
+                      <Text as="h4" variant="bodyMd" fontWeight="bold">
+                        Delivery Pickup
+                      </Text>
+                    )}
                   </div>
                   {data?.order?.delivery && (
                     <div className="mt-3">
