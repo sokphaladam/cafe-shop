@@ -74,10 +74,20 @@ export function CustomerOrderScreen() {
     }
   }, [count, generate, info.name, info.set, oneTime, params, path, router]);
 
+  const pwdwifi = setting.find((f) => f.option === 'GUEST_WIFI')?.value;
+
   if (loading || !params.get('token')) {
     return (
       <>
         <Topbar isCart={false} />
+        <div className="w-full text-center">
+          <div>
+            Wifi: <b>MooD-WiFi</b>
+          </div>
+          <div>
+            Password: <b>{pwdwifi}</b>
+          </div>
+        </div>
       </>
     );
   }
@@ -104,6 +114,14 @@ export function CustomerOrderScreen() {
         ) : (
           <ProviderOrderContext>
             <Topbar isCart />
+            <div className="w-full text-center">
+              <div>
+                Wifi: <b>MooD-WiFi</b>
+              </div>
+              <div>
+                Password: <b>{pwdwifi}</b>
+              </div>
+            </div>
             <br />
             <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 max-sm:p-4">
               <div className="w-[70%] flex flex-col gap-4 max-sm:w-full">

@@ -282,8 +282,8 @@ export function OrderDetailScreen(props: Props) {
               <div className="flex flex-row justify-between items-baseline">
                 <div className="flex flex-row gap-4">
                   <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} />
-                  <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} kitchen />
-                  {/* <PrintOrderToKitchen /> */}
+                  {/* <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} kitchen /> */}
+                  <PrintOrderToKitchen order={data?.order} />
                   <SignatureOrder order={data?.order || {}} size="micro" />
                   {data?.order?.status === StatusOrder.Pending && (
                     <Button
