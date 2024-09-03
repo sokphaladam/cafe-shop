@@ -1,14 +1,8 @@
 'use client';
-
 import { useCustomToast } from '@/components/custom/CustomToast';
-import {
-  DeliveryInput,
-  useCreateDeliveryMutation,
-  useDeliveryByIdQuery,
-  useUpdateDeliveryMutation,
-} from '@/gql/graphql';
+import { useCreatePositionMutation, usePositionQuery, useUpdatePositionMutation } from '@/gql/graphql';
 import { InlineGrid, Modal, TextField } from '@shopify/polaris';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface Props {
   id?: number;
@@ -21,35 +15,36 @@ interface Props {
     | undefined;
 }
 
-export function FormDelivery(props: Props) {
+export function FormPosition(props: Props) {
   const { toasts, setToasts } = useCustomToast();
   const [Id, setId] = useState(0);
-  const [info, setInfo] = useState<DeliveryInput>();
+  const [nameInput, setNameInput] = useState('');
 
-  useDeliveryByIdQuery({
+  usePositionQuery({
     skip: !props.id,
     fetchPolicy: 'no-cache',
     variables: {
-      deliveryByIdId: Number(props.id),
+      positionId: Number(props.id),
     },
     onCompleted: (data) => {
-      if (data.deliveryById) {
-        setInfo(data.deliveryById);
-        setId(data.deliveryById?.id || 0);
+      if (data.position) {
+        setNameInput(data.position.name || '');
+        setId(data.position?.id || 0);
       }
     },
   });
 
-  const [create, propsCreate] = useCreateDeliveryMutation({
-    refetchQueries: ['deliveryList', 'deliveryById'],
+  const [create, propsCreate] = useCreatePositionMutation({
+    refetchQueries: ['getPositionList', 'position'],
   });
-  const [update, propsUpdate] = useUpdateDeliveryMutation({
-    refetchQueries: ['deliveryList', 'deliveryById'],
+
+  const [update, propsUpdate] = useUpdatePositionMutation({
+    refetchQueries: ['getPositionList', 'position'],
   });
 
   const toggleActive = useCallback(() => {
     props.setActive(!props.active);
-    setInfo({});
+    setNameInput('');
     setId(0);
   }, [props]);
 
@@ -57,15 +52,12 @@ export function FormDelivery(props: Props) {
     if (!props.id) {
       create({
         variables: {
-          data: {
-            name: info?.name,
-            contact: info?.contact,
-          },
+          name: nameInput.trim(),
         },
       })
         .then((res) => {
-          if (res.data?.createDelivery) {
-            setToasts([...toasts, { content: 'Create new delivery.', status: 'success' }]);
+          if (res.data?.createPosition) {
+            setToasts([...toasts, { content: 'Create new position.', status: 'success' }]);
             toggleActive();
           } else {
             setToasts([...toasts, { content: 'Oop! somthing was wrong.', status: 'error' }]);
@@ -77,16 +69,13 @@ export function FormDelivery(props: Props) {
     } else {
       update({
         variables: {
-          data: {
-            name: info?.name,
-            contact: info?.contact,
-          },
-          updateDeliveryId: Number(props.id),
+          name: nameInput.trim(),
+          updatePositionId: Number(props.id),
         },
       })
         .then((res) => {
-          if (res.data?.updateDelivery) {
-            setToasts([...toasts, { content: 'Update delivery #' + props.id, status: 'success' }]);
+          if (res.data?.updatePosition) {
+            setToasts([...toasts, { content: 'Update position #' + props.id, status: 'success' }]);
             toggleActive();
           } else {
             setToasts([...toasts, { content: 'Oop! somthing was wrong.', status: 'error' }]);
@@ -96,7 +85,7 @@ export function FormDelivery(props: Props) {
           setToasts([...toasts, { content: 'Oop! somthing was wrong.', status: 'error' }]);
         });
     }
-  }, [props.id, create, info, setToasts, toasts, toggleActive, update]);
+  }, [props.id, create, nameInput, setToasts, toasts, toggleActive, update]);
 
   return (
     <Modal
@@ -118,32 +107,13 @@ export function FormDelivery(props: Props) {
       ]}
     >
       <Modal.Section>
-        <InlineGrid columns={['twoThirds', 'oneThird']} gap={'200'}>
-          <TextField
-            label="Name"
-            placeholder="Enter delivery name..."
-            value={info?.name || ''}
-            onChange={(v) => {
-              setInfo({
-                ...info,
-                name: v,
-              });
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Contact"
-            placeholder="Enter phone number..."
-            value={info?.contact || ''}
-            onChange={(v) => {
-              setInfo({
-                ...info,
-                contact: v,
-              });
-            }}
-            autoComplete="off"
-          />
-        </InlineGrid>
+        <TextField
+          label="Position Name"
+          placeholder="Enter position name..."
+          value={nameInput}
+          onChange={setNameInput}
+          autoComplete="off"
+        />
       </Modal.Section>
     </Modal>
   );

@@ -97,37 +97,53 @@ export function SettingScreen() {
       fullWidth
       secondaryActions={[
         {
+          content: 'Download service kitchen printer',
+          onAction: () => {
+            process.browser &&
+              window.open(
+                'https://firebasestorage.googleapis.com/v0/b/serv-cafe.appspot.com/o/file%2FNew%20folder.rar?alt=media&token=2beb44e4-bb95-4d8b-8861-00cde9651c15',
+                '_blank',
+              );
+          },
+        },
+        {
           content: 'Check Current Location',
           onAction: () => {
             if (process.browser) {
-              navigator.geolocation.getCurrentPosition((msg) => {
-                console.log(msg.coords);
-                const str: any = center?.split(',');
-                const km = haversineDistance(
-                  Number(str[0]),
-                  Number(str[1]),
-                  Number(msg.coords.latitude),
-                  Number(msg.coords.longitude),
-                );
+              navigator.geolocation.getCurrentPosition(
+                (msg) => {
+                  console.log(msg.coords);
+                  const str: any = center?.split(',');
+                  const km = haversineDistance(
+                    Number(str[0]),
+                    Number(str[1]),
+                    Number(msg.coords.latitude),
+                    Number(msg.coords.longitude),
+                  );
 
-                const mi = google_haversine_distance(
-                  {
-                    position: { lat: Number(str[0]), lng: Number(str[1]) },
-                  },
-                  {
-                    position: { lat: Number(msg.coords.latitude), lng: Number(msg.coords.longitude) },
-                  },
-                );
+                  const mi = google_haversine_distance(
+                    {
+                      position: { lat: Number(str[0]), lng: Number(str[1]) },
+                    },
+                    {
+                      position: { lat: Number(msg.coords.latitude), lng: Number(msg.coords.longitude) },
+                    },
+                  );
 
-                let text = 'Current:' + msg.coords.latitude + ',' + msg.coords.longitude + ' (' + km.toFixed(2) + 'km)';
+                  let text =
+                    'Current:' + msg.coords.latitude + ',' + msg.coords.longitude + ' (' + km.toFixed(2) + 'km)';
 
-                if (mi) {
-                  text = text + `\n (${mi.toFixed(2)} mi.)`;
-                }
+                  if (mi) {
+                    text = text + `\n (${mi.toFixed(2)} mi.)`;
+                  }
 
-                alert(text);
-                console.log(km);
-              });
+                  alert(text);
+                  console.log(km);
+                },
+                (err) => {
+                  alert(err.PERMISSION_DENIED === 1 ? 'Your location cannot access' : '');
+                },
+              );
             }
           },
         },

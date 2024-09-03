@@ -1,10 +1,11 @@
-"use client";
-import React, { useCallback, useState } from "react";
-import { IconableAction, TopBar } from "@shopify/polaris";
-import { ExitIcon } from "@shopify/polaris-icons";
-import { deleteCookie } from "cookies-next";
-import { useRouter, usePathname } from "next/navigation";
-import { useUser } from "@/service/UserProvider";
+'use client';
+import React, { useCallback, useState } from 'react';
+import { Icon, IconableAction, Text, TopBar } from '@shopify/polaris';
+import { CheckSmallIcon, ExitIcon } from '@shopify/polaris-icons';
+import { deleteCookie } from 'cookies-next';
+import { useRouter, usePathname } from 'next/navigation';
+import { useUser } from '@/service/UserProvider';
+import { useLanguage } from '@/service/LanguageProvider';
 
 interface Props {
   mobileNavigationActive: any;
@@ -15,30 +16,31 @@ export function TopbarMarkup(props: Props) {
   const user = useUser();
   const { push, refresh } = useRouter();
   const pathname = usePathname();
+  const { lng, setLng } = useLanguage();
   const [userMenuActive, setUserMenuActive] = useState(false);
+  const [isSecondaryMenuOpen, setIsSecondaryMenuOpen] = useState(false);
 
-  const toggleUserMenuActive = useCallback(
-    () => setUserMenuActive((userMenuActive) => !userMenuActive),
-    []
-  );
+  const toggleUserMenuActive = useCallback(() => setUserMenuActive((userMenuActive) => !userMenuActive), []);
 
   const toggleMobileNavigationActive = useCallback(
-    () =>
-      props.setMobileNavigationActive(
-        (mobileNavigationActive: any) => !mobileNavigationActive
-      ),
-    [props]
+    () => props.setMobileNavigationActive((mobileNavigationActive: any) => !mobileNavigationActive),
+    [props],
+  );
+
+  const toggleIsSecondaryMenuOpen = useCallback(
+    () => setIsSecondaryMenuOpen((isSecondaryMenuOpen) => !isSecondaryMenuOpen),
+    [],
   );
 
   const userMenuActions: { items: IconableAction[] }[] = [
     {
       items: [
         {
-          content: "Logout",
+          content: 'Logout',
           icon: ExitIcon,
           onAction: async () => {
-            await deleteCookie("tk_token");
-            await push("/");
+            await deleteCookie('tk_token');
+            await push('/');
             if (process.browser) {
               setTimeout(() => {
                 window.location.reload();
@@ -53,11 +55,43 @@ export function TopbarMarkup(props: Props) {
   const userMenuMarkup = (
     <TopBar.UserMenu
       actions={userMenuActions}
-      name={user?.display || ""}
+      name={user?.display || ''}
       detail={''}
-      initials={(user?.display || '').split(' ').map(x => x.charAt(0).toUpperCase()).join('')}
+      initials={(user?.display || '')
+        .split(' ')
+        .map((x) => x.charAt(0).toUpperCase())
+        .join('')}
       open={userMenuActive}
       onToggle={toggleUserMenuActive}
+    />
+  );
+
+  const secondaryMenuMarkup = (
+    <TopBar.Menu
+      activatorContent={
+        <span>
+          <Text as="span">EN</Text>
+        </span>
+      }
+      open={isSecondaryMenuOpen}
+      onOpen={toggleIsSecondaryMenuOpen}
+      onClose={toggleIsSecondaryMenuOpen}
+      actions={[
+        {
+          items: [
+            {
+              content: 'English',
+              prefix: lng === 'en' ? <Icon source={CheckSmallIcon} /> : '',
+              onAction: () => setLng('en'),
+            },
+            {
+              content: 'Khmer',
+              prefix: lng === 'km' ? <Icon source={CheckSmallIcon} /> : '',
+              onAction: () => setLng('km'),
+            },
+          ],
+        },
+      ]}
     />
   );
 
@@ -66,6 +100,7 @@ export function TopbarMarkup(props: Props) {
       showNavigationToggle
       userMenu={userMenuMarkup}
       onNavigationToggle={toggleMobileNavigationActive}
+      secondaryMenu={secondaryMenuMarkup}
     />
   );
 }

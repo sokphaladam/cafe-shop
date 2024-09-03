@@ -242,3 +242,68 @@ query deliveryById($deliveryByIdId: Int!) {
     name
   }
 }
+
+query getPositionList($offset: Int = 0, $limit: Int = 30) {
+  getPositionList(offset: $offset, limit: $limit) {
+    createdDate
+    id
+    name
+    updatedDate
+  }
+}
+
+query position($positionId: Int!) {
+  position(id: $positionId) {
+    createdDate
+    id
+    name
+    updatedDate
+  }
+}
+
+query bankInfo($bankInfoId: Int!) {
+  bankInfo(id: $bankInfoId) {
+    createdDate
+    id
+    name
+    phone
+    updatedDate
+  }
+}
+
+query getbankList($offset: Int = 0, $limit: Int = 30) {
+  getbankList(offset: $offset, limit: $limit) {
+    createdDate
+    id
+    name
+    phone
+    updatedDate
+  }
+}
+
+query userList($offset: Int, $limit: Int, $roles: [Int]) {
+  userList(offset: $offset, limit: $limit, roles: $roles) {
+    id
+    display
+    gender
+    dob
+    contact
+    ownerId
+    position
+    role {
+      id
+      name
+    }
+    startingAt
+    type
+    username
+    password
+    profile
+    baseSalary
+    createdDate
+    bankType
+    bankName
+    bankAcc
+    isActive
+  }
+}

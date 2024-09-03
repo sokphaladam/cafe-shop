@@ -77,7 +77,7 @@ export function MenuItems(user: User | null) {
         {
           label: 'Staff',
           icon: PersonIcon,
-          url: '#',
+          url: '/staff',
         },
         {
           label: 'Overtime',
@@ -97,22 +97,22 @@ export function MenuItems(user: User | null) {
         {
           label: 'Table',
           icon: TabletIcon,
-          url: '/setting/set',
+          url: '/set',
         },
         {
           label: 'Delivery',
           icon: DeliveryIcon,
-          url: '/setting/delivery',
+          url: '/delivery',
         },
         {
           label: 'Position',
           icon: StarIcon,
-          url: '#',
+          url: '/position',
         },
         {
           label: 'Payment Info',
           icon: CreditCardIcon,
-          url: '#',
+          url: '/payment',
         },
       ],
     },
@@ -153,6 +153,36 @@ export function MenuItems(user: User | null) {
             ],
           },
           {
+            title: 'Employee',
+            items: [
+              {
+                label: 'Attendance',
+                icon: AttachmentIcon,
+                url: '/employee/attendance',
+              },
+              {
+                label: 'Attendance (Admin)',
+                icon: AttachmentIcon,
+                url: '#',
+              },
+              {
+                label: 'Leave',
+                icon: FileIcon,
+                url: '#',
+              },
+              {
+                label: 'Staff',
+                icon: PersonIcon,
+                url: '/staff',
+              },
+              {
+                label: 'Overtime',
+                icon: PageClockIcon,
+                url: '#',
+              },
+            ],
+          },
+          {
             title: 'Setting',
             items: [
               {
@@ -163,12 +193,22 @@ export function MenuItems(user: User | null) {
               {
                 label: 'Table',
                 icon: TabletIcon,
-                url: '/setting/set',
+                url: '/set',
               },
               {
                 label: 'Delivery',
                 icon: DeliveryIcon,
-                url: '/setting/delivery',
+                url: '/delivery',
+              },
+              {
+                label: 'Position',
+                icon: StarIcon,
+                url: '/position',
+              },
+              {
+                label: 'Payment Info',
+                icon: CreditCardIcon,
+                url: '/payment',
               },
             ],
           },
@@ -202,12 +242,12 @@ export function MenuItems(user: User | null) {
               {
                 label: 'Table',
                 icon: TabletIcon,
-                url: '/setting/set',
+                url: '/set',
               },
               {
                 label: 'Delivery',
                 icon: DeliveryIcon,
-                url: '/setting/delivery',
+                url: '/delivery',
               },
             ],
           },
