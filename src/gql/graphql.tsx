@@ -34,6 +34,26 @@ export type AddonProduct = {
   value?: Maybe<Scalars['String']['output']>;
 };
 
+export type Attendance = {
+  __typename?: 'Attendance';
+  checkDate?: Maybe<Scalars['String']['output']>;
+  checkIn?: Maybe<Scalars['String']['output']>;
+  checkOut?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  overTimeIn?: Maybe<Scalars['String']['output']>;
+  overTimeOut?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<User>;
+};
+
+export type BankInfo = {
+  __typename?: 'BankInfo';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
+  updatedDate?: Maybe<Scalars['String']['output']>;
+};
+
 export type Book = {
   __typename?: 'Book';
   author?: Maybe<Scalars['String']['output']>;
@@ -79,6 +99,7 @@ export type ChangeOrderInput = {
   deliverPickupCode?: InputMaybe<Scalars['String']['input']>;
   deliverPickupId?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
+  invoice?: InputMaybe<Scalars['Int']['input']>;
   itemStatus?: InputMaybe<StatusOrderItem>;
   orderId: Scalars['Int']['input'];
   reason?: InputMaybe<Scalars['String']['input']>;
@@ -128,10 +149,13 @@ export type Mutation = {
   __typename?: 'Mutation';
   addOrderItem?: Maybe<Scalars['Boolean']['output']>;
   changeOrderStatus?: Maybe<Scalars['Boolean']['output']>;
+  checkAttendance?: Maybe<Scalars['Boolean']['output']>;
+  createBank?: Maybe<Scalars['Boolean']['output']>;
   createBrand?: Maybe<Scalars['Boolean']['output']>;
   createCategory?: Maybe<Scalars['Boolean']['output']>;
   createDelivery?: Maybe<Scalars['Boolean']['output']>;
   createOrder?: Maybe<Scalars['Boolean']['output']>;
+  createPosition?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
   createProductStock?: Maybe<Scalars['Boolean']['output']>;
   createUser?: Maybe<Scalars['Boolean']['output']>;
@@ -143,9 +167,11 @@ export type Mutation = {
   markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
   signatureOrder?: Maybe<Scalars['Boolean']['output']>;
   testSubscription?: Maybe<Scalars['Boolean']['output']>;
+  updateBank?: Maybe<Scalars['Boolean']['output']>;
   updateBrand?: Maybe<Scalars['Boolean']['output']>;
   updateCategory?: Maybe<Scalars['Boolean']['output']>;
   updateDelivery?: Maybe<Scalars['Boolean']['output']>;
+  updatePosition?: Maybe<Scalars['Boolean']['output']>;
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
   updateProductStock?: Maybe<Scalars['Boolean']['output']>;
   updateSetting?: Maybe<Scalars['Boolean']['output']>;
@@ -162,6 +188,18 @@ export type MutationAddOrderItemArgs = {
 
 export type MutationChangeOrderStatusArgs = {
   data?: InputMaybe<ChangeOrderInput>;
+};
+
+
+export type MutationCheckAttendanceArgs = {
+  date: Scalars['String']['input'];
+  userId: Scalars['Int']['input'];
+};
+
+
+export type MutationCreateBankArgs = {
+  name: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -182,6 +220,11 @@ export type MutationCreateDeliveryArgs = {
 
 export type MutationCreateOrderArgs = {
   data?: InputMaybe<OrderInput>;
+};
+
+
+export type MutationCreatePositionArgs = {
+  name: Scalars['String']['input'];
 };
 
 
@@ -244,6 +287,13 @@ export type MutationTestSubscriptionArgs = {
 };
 
 
+export type MutationUpdateBankArgs = {
+  id: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationUpdateBrandArgs = {
   data?: InputMaybe<BrandInput>;
   id: Scalars['Int']['input'];
@@ -261,6 +311,12 @@ export type MutationUpdateCategoryArgs = {
 export type MutationUpdateDeliveryArgs = {
   data?: InputMaybe<DeliveryInput>;
   id: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdatePositionArgs = {
+  id: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
 };
 
 
@@ -300,6 +356,7 @@ export type Order = {
   delivery?: Maybe<Delivery>;
   deliveryCode?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
+  invoice?: Maybe<Scalars['Int']['output']>;
   items?: Maybe<Array<Maybe<OrderItem>>>;
   log?: Maybe<Array<Maybe<OrderLog>>>;
   name?: Maybe<Scalars['String']['output']>;
@@ -346,6 +403,14 @@ export enum OrderViewBy {
   User = 'USER'
 }
 
+export type Position = {
+  __typename?: 'Position';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  updatedDate?: Maybe<Scalars['String']['output']>;
+};
+
 export type Product = {
   __typename?: 'Product';
   addons?: Maybe<Array<Maybe<AddonProduct>>>;
@@ -390,6 +455,7 @@ export type ProductStockInput = {
 
 export type Query = {
   __typename?: 'Query';
+  bankInfo?: Maybe<BankInfo>;
   books?: Maybe<Array<Maybe<Book>>>;
   brand?: Maybe<Brand>;
   brandList?: Maybe<Array<Maybe<Brand>>>;
@@ -397,18 +463,31 @@ export type Query = {
   categoryList?: Maybe<Scalars['JSON']['output']>;
   deliveryById?: Maybe<Delivery>;
   deliveryList?: Maybe<Array<Maybe<Delivery>>>;
+  getAttendanceAdmin?: Maybe<Scalars['JSON']['output']>;
+  getAttendanceStaff?: Maybe<Array<Maybe<Attendance>>>;
+  getAttendanceStaffToday?: Maybe<Attendance>;
+  getLeaveAdmin?: Maybe<Scalars['JSON']['output']>;
+  getPositionList?: Maybe<Array<Maybe<Position>>>;
+  getbankList?: Maybe<Array<Maybe<BankInfo>>>;
   me?: Maybe<User>;
   order?: Maybe<Order>;
   orderList?: Maybe<Array<Maybe<Order>>>;
+  position?: Maybe<Position>;
   product?: Maybe<Product>;
   productList?: Maybe<Array<Maybe<Product>>>;
   productStock?: Maybe<ProductStock>;
   productStockList?: Maybe<Array<Maybe<ProductStock>>>;
+  roleList?: Maybe<Array<Maybe<Role>>>;
   settingList?: Maybe<Array<Maybe<Setting>>>;
   tableSet?: Maybe<TableSet>;
   tableSetList?: Maybe<Array<Maybe<TableSet>>>;
   user?: Maybe<User>;
   userList?: Maybe<Array<Maybe<User>>>;
+};
+
+
+export type QueryBankInfoArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -439,6 +518,37 @@ export type QueryDeliveryListArgs = {
 };
 
 
+export type QueryGetAttendanceAdminArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetAttendanceStaffArgs = {
+  from?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  to?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetAttendanceStaffTodayArgs = {
+  date: Scalars['String']['input'];
+};
+
+
+export type QueryGetPositionListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGetbankListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryOrderArgs = {
   id?: InputMaybe<Scalars['Int']['input']>;
   token?: InputMaybe<Scalars['String']['input']>;
@@ -451,6 +561,11 @@ export type QueryOrderListArgs = {
   orderId?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<StatusOrder>>>;
   viewBy?: InputMaybe<OrderViewBy>;
+};
+
+
+export type QueryPositionArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -587,15 +702,18 @@ export type User = {
   contact?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
   display?: Maybe<Scalars['String']['output']>;
+  dob?: Maybe<Scalars['String']['output']>;
   gender?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
   isActive?: Maybe<Scalars['Boolean']['output']>;
   ownerId?: Maybe<Scalars['String']['output']>;
+  password?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Scalars['String']['output']>;
   profile?: Maybe<Scalars['String']['output']>;
   role?: Maybe<Role>;
   startingAt?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Scalars['String']['output']>;
+  username?: Maybe<Scalars['String']['output']>;
 };
 
 export type UserInput = {
@@ -606,14 +724,17 @@ export type UserInput = {
   contact?: InputMaybe<Scalars['String']['input']>;
   createdDate?: InputMaybe<Scalars['String']['input']>;
   display?: InputMaybe<Scalars['String']['input']>;
+  dob?: InputMaybe<Scalars['String']['input']>;
   gender?: InputMaybe<Scalars['String']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   ownerId?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
   position?: InputMaybe<Scalars['String']['input']>;
   profile?: InputMaybe<Scalars['String']['input']>;
   roleId?: InputMaybe<Scalars['Int']['input']>;
   startingAt?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LoginMutationVariables = Exact<{
@@ -768,6 +889,46 @@ export type UpdateUserMutationVariables = Exact<{
 
 export type UpdateUserMutation = { __typename?: 'Mutation', updateUser?: boolean | null };
 
+export type CreatePositionMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
+
+
+export type CreatePositionMutation = { __typename?: 'Mutation', createPosition?: boolean | null };
+
+export type UpdatePositionMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  updatePositionId: Scalars['Int']['input'];
+}>;
+
+
+export type UpdatePositionMutation = { __typename?: 'Mutation', updatePosition?: boolean | null };
+
+export type CreateBankMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CreateBankMutation = { __typename?: 'Mutation', createBank?: boolean | null };
+
+export type UpdateBankMutationVariables = Exact<{
+  updateBankId: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateBankMutation = { __typename?: 'Mutation', updateBank?: boolean | null };
+
+export type CheckAttendanceMutationVariables = Exact<{
+  userId: Scalars['Int']['input'];
+  date: Scalars['String']['input'];
+}>;
+
+
+export type CheckAttendanceMutation = { __typename?: 'Mutation', checkAttendance?: boolean | null };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -811,7 +972,7 @@ export type OrderListQueryVariables = Exact<{
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, deliveryCode?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, deliveryCode?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, invoice?: number | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -819,7 +980,7 @@ export type OrderQueryVariables = Exact<{
 }>;
 
 
-export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, deliveryCode?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, invoice?: number | null, deliveryCode?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
 
 export type SettingListQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -848,6 +1009,74 @@ export type DeliveryByIdQueryVariables = Exact<{
 
 
 export type DeliveryByIdQuery = { __typename?: 'Query', deliveryById?: { __typename?: 'Delivery', contact?: string | null, id?: number | null, name?: string | null } | null };
+
+export type GetPositionListQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetPositionListQuery = { __typename?: 'Query', getPositionList?: Array<{ __typename?: 'Position', createdDate?: string | null, id?: number | null, name?: string | null, updatedDate?: string | null } | null> | null };
+
+export type PositionQueryVariables = Exact<{
+  positionId: Scalars['Int']['input'];
+}>;
+
+
+export type PositionQuery = { __typename?: 'Query', position?: { __typename?: 'Position', createdDate?: string | null, id?: number | null, name?: string | null, updatedDate?: string | null } | null };
+
+export type BankInfoQueryVariables = Exact<{
+  bankInfoId: Scalars['Int']['input'];
+}>;
+
+
+export type BankInfoQuery = { __typename?: 'Query', bankInfo?: { __typename?: 'BankInfo', createdDate?: string | null, id?: number | null, name?: string | null, phone?: string | null, updatedDate?: string | null } | null };
+
+export type GetbankListQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetbankListQuery = { __typename?: 'Query', getbankList?: Array<{ __typename?: 'BankInfo', createdDate?: string | null, id?: number | null, name?: string | null, phone?: string | null, updatedDate?: string | null } | null> | null };
+
+export type UserQueryVariables = Exact<{
+  userId: Scalars['Int']['input'];
+}>;
+
+
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: number, display?: string | null, gender?: string | null, dob?: string | null, contact?: string | null, ownerId?: string | null, position?: string | null, startingAt?: string | null, type?: string | null, username?: string | null, password?: string | null, profile?: string | null, baseSalary?: string | null, createdDate?: string | null, bankType?: string | null, bankName?: string | null, bankAcc?: string | null, isActive?: boolean | null, role?: { __typename?: 'Role', id?: number | null, name?: string | null } | null } | null };
+
+export type UserListQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  roles?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>> | InputMaybe<Scalars['Int']['input']>>;
+}>;
+
+
+export type UserListQuery = { __typename?: 'Query', userList?: Array<{ __typename?: 'User', id: number, display?: string | null, gender?: string | null, dob?: string | null, contact?: string | null, ownerId?: string | null, position?: string | null, startingAt?: string | null, type?: string | null, username?: string | null, password?: string | null, profile?: string | null, baseSalary?: string | null, createdDate?: string | null, bankType?: string | null, bankName?: string | null, bankAcc?: string | null, isActive?: boolean | null, role?: { __typename?: 'Role', id?: number | null, name?: string | null } | null } | null> | null };
+
+export type RoleListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RoleListQuery = { __typename?: 'Query', roleList?: Array<{ __typename?: 'Role', id?: number | null, name?: string | null } | null> | null };
+
+export type GetAttendanceStaffTodayQueryVariables = Exact<{
+  date: Scalars['String']['input'];
+}>;
+
+
+export type GetAttendanceStaffTodayQuery = { __typename?: 'Query', getAttendanceStaffToday?: { __typename?: 'Attendance', id?: number | null, checkIn?: string | null, checkOut?: string | null, overTimeIn?: string | null, overTimeOut?: string | null, checkDate?: string | null, user?: { __typename?: 'User', id: number, display?: string | null } | null } | null };
+
+export type GetAttendanceStaffQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  from?: InputMaybe<Scalars['String']['input']>;
+  to?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetAttendanceStaffQuery = { __typename?: 'Query', getAttendanceStaff?: Array<{ __typename?: 'Attendance', id?: number | null, checkIn?: string | null, checkOut?: string | null, overTimeIn?: string | null, overTimeOut?: string | null, checkDate?: string | null, user?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null };
 
 export type SubscriptionLoadSubscriptionVariables = Exact<{
   channel?: InputMaybe<Scalars['String']['input']>;
@@ -1496,6 +1725,166 @@ export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
 export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
 export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
+export const CreatePositionDocument = gql`
+    mutation createPosition($name: String!) {
+  createPosition(name: $name)
+}
+    `;
+export type CreatePositionMutationFn = Apollo.MutationFunction<CreatePositionMutation, CreatePositionMutationVariables>;
+
+/**
+ * __useCreatePositionMutation__
+ *
+ * To run a mutation, you first call `useCreatePositionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePositionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPositionMutation, { data, loading, error }] = useCreatePositionMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreatePositionMutation(baseOptions?: Apollo.MutationHookOptions<CreatePositionMutation, CreatePositionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePositionMutation, CreatePositionMutationVariables>(CreatePositionDocument, options);
+      }
+export type CreatePositionMutationHookResult = ReturnType<typeof useCreatePositionMutation>;
+export type CreatePositionMutationResult = Apollo.MutationResult<CreatePositionMutation>;
+export type CreatePositionMutationOptions = Apollo.BaseMutationOptions<CreatePositionMutation, CreatePositionMutationVariables>;
+export const UpdatePositionDocument = gql`
+    mutation updatePosition($name: String!, $updatePositionId: Int!) {
+  updatePosition(name: $name, id: $updatePositionId)
+}
+    `;
+export type UpdatePositionMutationFn = Apollo.MutationFunction<UpdatePositionMutation, UpdatePositionMutationVariables>;
+
+/**
+ * __useUpdatePositionMutation__
+ *
+ * To run a mutation, you first call `useUpdatePositionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePositionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePositionMutation, { data, loading, error }] = useUpdatePositionMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      updatePositionId: // value for 'updatePositionId'
+ *   },
+ * });
+ */
+export function useUpdatePositionMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePositionMutation, UpdatePositionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePositionMutation, UpdatePositionMutationVariables>(UpdatePositionDocument, options);
+      }
+export type UpdatePositionMutationHookResult = ReturnType<typeof useUpdatePositionMutation>;
+export type UpdatePositionMutationResult = Apollo.MutationResult<UpdatePositionMutation>;
+export type UpdatePositionMutationOptions = Apollo.BaseMutationOptions<UpdatePositionMutation, UpdatePositionMutationVariables>;
+export const CreateBankDocument = gql`
+    mutation createBank($name: String!, $phone: String) {
+  createBank(name: $name, phone: $phone)
+}
+    `;
+export type CreateBankMutationFn = Apollo.MutationFunction<CreateBankMutation, CreateBankMutationVariables>;
+
+/**
+ * __useCreateBankMutation__
+ *
+ * To run a mutation, you first call `useCreateBankMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBankMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBankMutation, { data, loading, error }] = useCreateBankMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      phone: // value for 'phone'
+ *   },
+ * });
+ */
+export function useCreateBankMutation(baseOptions?: Apollo.MutationHookOptions<CreateBankMutation, CreateBankMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBankMutation, CreateBankMutationVariables>(CreateBankDocument, options);
+      }
+export type CreateBankMutationHookResult = ReturnType<typeof useCreateBankMutation>;
+export type CreateBankMutationResult = Apollo.MutationResult<CreateBankMutation>;
+export type CreateBankMutationOptions = Apollo.BaseMutationOptions<CreateBankMutation, CreateBankMutationVariables>;
+export const UpdateBankDocument = gql`
+    mutation updateBank($updateBankId: Int!, $name: String!, $phone: String) {
+  updateBank(id: $updateBankId, name: $name, phone: $phone)
+}
+    `;
+export type UpdateBankMutationFn = Apollo.MutationFunction<UpdateBankMutation, UpdateBankMutationVariables>;
+
+/**
+ * __useUpdateBankMutation__
+ *
+ * To run a mutation, you first call `useUpdateBankMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBankMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateBankMutation, { data, loading, error }] = useUpdateBankMutation({
+ *   variables: {
+ *      updateBankId: // value for 'updateBankId'
+ *      name: // value for 'name'
+ *      phone: // value for 'phone'
+ *   },
+ * });
+ */
+export function useUpdateBankMutation(baseOptions?: Apollo.MutationHookOptions<UpdateBankMutation, UpdateBankMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateBankMutation, UpdateBankMutationVariables>(UpdateBankDocument, options);
+      }
+export type UpdateBankMutationHookResult = ReturnType<typeof useUpdateBankMutation>;
+export type UpdateBankMutationResult = Apollo.MutationResult<UpdateBankMutation>;
+export type UpdateBankMutationOptions = Apollo.BaseMutationOptions<UpdateBankMutation, UpdateBankMutationVariables>;
+export const CheckAttendanceDocument = gql`
+    mutation checkAttendance($userId: Int!, $date: String!) {
+  checkAttendance(userId: $userId, date: $date)
+}
+    `;
+export type CheckAttendanceMutationFn = Apollo.MutationFunction<CheckAttendanceMutation, CheckAttendanceMutationVariables>;
+
+/**
+ * __useCheckAttendanceMutation__
+ *
+ * To run a mutation, you first call `useCheckAttendanceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCheckAttendanceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [checkAttendanceMutation, { data, loading, error }] = useCheckAttendanceMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useCheckAttendanceMutation(baseOptions?: Apollo.MutationHookOptions<CheckAttendanceMutation, CheckAttendanceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CheckAttendanceMutation, CheckAttendanceMutationVariables>(CheckAttendanceDocument, options);
+      }
+export type CheckAttendanceMutationHookResult = ReturnType<typeof useCheckAttendanceMutation>;
+export type CheckAttendanceMutationResult = Apollo.MutationResult<CheckAttendanceMutation>;
+export type CheckAttendanceMutationOptions = Apollo.BaseMutationOptions<CheckAttendanceMutation, CheckAttendanceMutationVariables>;
 export const MeDocument = gql`
     query me {
   me {
@@ -1819,6 +2208,7 @@ export const OrderListDocument = gql`
     uuid
     note
     vat
+    invoice
     log {
       date
       text
@@ -1881,6 +2271,7 @@ export const OrderDocument = gql`
     note
     code
     vat
+    invoice
     log {
       date
       text
@@ -2128,6 +2519,447 @@ export type DeliveryByIdQueryHookResult = ReturnType<typeof useDeliveryByIdQuery
 export type DeliveryByIdLazyQueryHookResult = ReturnType<typeof useDeliveryByIdLazyQuery>;
 export type DeliveryByIdSuspenseQueryHookResult = ReturnType<typeof useDeliveryByIdSuspenseQuery>;
 export type DeliveryByIdQueryResult = Apollo.QueryResult<DeliveryByIdQuery, DeliveryByIdQueryVariables>;
+export const GetPositionListDocument = gql`
+    query getPositionList($offset: Int = 0, $limit: Int = 30) {
+  getPositionList(offset: $offset, limit: $limit) {
+    createdDate
+    id
+    name
+    updatedDate
+  }
+}
+    `;
+
+/**
+ * __useGetPositionListQuery__
+ *
+ * To run a query within a React component, call `useGetPositionListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPositionListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPositionListQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetPositionListQuery(baseOptions?: Apollo.QueryHookOptions<GetPositionListQuery, GetPositionListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPositionListQuery, GetPositionListQueryVariables>(GetPositionListDocument, options);
+      }
+export function useGetPositionListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPositionListQuery, GetPositionListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPositionListQuery, GetPositionListQueryVariables>(GetPositionListDocument, options);
+        }
+export function useGetPositionListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetPositionListQuery, GetPositionListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetPositionListQuery, GetPositionListQueryVariables>(GetPositionListDocument, options);
+        }
+export type GetPositionListQueryHookResult = ReturnType<typeof useGetPositionListQuery>;
+export type GetPositionListLazyQueryHookResult = ReturnType<typeof useGetPositionListLazyQuery>;
+export type GetPositionListSuspenseQueryHookResult = ReturnType<typeof useGetPositionListSuspenseQuery>;
+export type GetPositionListQueryResult = Apollo.QueryResult<GetPositionListQuery, GetPositionListQueryVariables>;
+export const PositionDocument = gql`
+    query position($positionId: Int!) {
+  position(id: $positionId) {
+    createdDate
+    id
+    name
+    updatedDate
+  }
+}
+    `;
+
+/**
+ * __usePositionQuery__
+ *
+ * To run a query within a React component, call `usePositionQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePositionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePositionQuery({
+ *   variables: {
+ *      positionId: // value for 'positionId'
+ *   },
+ * });
+ */
+export function usePositionQuery(baseOptions: Apollo.QueryHookOptions<PositionQuery, PositionQueryVariables> & ({ variables: PositionQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PositionQuery, PositionQueryVariables>(PositionDocument, options);
+      }
+export function usePositionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PositionQuery, PositionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PositionQuery, PositionQueryVariables>(PositionDocument, options);
+        }
+export function usePositionSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PositionQuery, PositionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PositionQuery, PositionQueryVariables>(PositionDocument, options);
+        }
+export type PositionQueryHookResult = ReturnType<typeof usePositionQuery>;
+export type PositionLazyQueryHookResult = ReturnType<typeof usePositionLazyQuery>;
+export type PositionSuspenseQueryHookResult = ReturnType<typeof usePositionSuspenseQuery>;
+export type PositionQueryResult = Apollo.QueryResult<PositionQuery, PositionQueryVariables>;
+export const BankInfoDocument = gql`
+    query bankInfo($bankInfoId: Int!) {
+  bankInfo(id: $bankInfoId) {
+    createdDate
+    id
+    name
+    phone
+    updatedDate
+  }
+}
+    `;
+
+/**
+ * __useBankInfoQuery__
+ *
+ * To run a query within a React component, call `useBankInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBankInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBankInfoQuery({
+ *   variables: {
+ *      bankInfoId: // value for 'bankInfoId'
+ *   },
+ * });
+ */
+export function useBankInfoQuery(baseOptions: Apollo.QueryHookOptions<BankInfoQuery, BankInfoQueryVariables> & ({ variables: BankInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<BankInfoQuery, BankInfoQueryVariables>(BankInfoDocument, options);
+      }
+export function useBankInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<BankInfoQuery, BankInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<BankInfoQuery, BankInfoQueryVariables>(BankInfoDocument, options);
+        }
+export function useBankInfoSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BankInfoQuery, BankInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<BankInfoQuery, BankInfoQueryVariables>(BankInfoDocument, options);
+        }
+export type BankInfoQueryHookResult = ReturnType<typeof useBankInfoQuery>;
+export type BankInfoLazyQueryHookResult = ReturnType<typeof useBankInfoLazyQuery>;
+export type BankInfoSuspenseQueryHookResult = ReturnType<typeof useBankInfoSuspenseQuery>;
+export type BankInfoQueryResult = Apollo.QueryResult<BankInfoQuery, BankInfoQueryVariables>;
+export const GetbankListDocument = gql`
+    query getbankList($offset: Int = 0, $limit: Int = 30) {
+  getbankList(offset: $offset, limit: $limit) {
+    createdDate
+    id
+    name
+    phone
+    updatedDate
+  }
+}
+    `;
+
+/**
+ * __useGetbankListQuery__
+ *
+ * To run a query within a React component, call `useGetbankListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetbankListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetbankListQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetbankListQuery(baseOptions?: Apollo.QueryHookOptions<GetbankListQuery, GetbankListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetbankListQuery, GetbankListQueryVariables>(GetbankListDocument, options);
+      }
+export function useGetbankListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetbankListQuery, GetbankListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetbankListQuery, GetbankListQueryVariables>(GetbankListDocument, options);
+        }
+export function useGetbankListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetbankListQuery, GetbankListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetbankListQuery, GetbankListQueryVariables>(GetbankListDocument, options);
+        }
+export type GetbankListQueryHookResult = ReturnType<typeof useGetbankListQuery>;
+export type GetbankListLazyQueryHookResult = ReturnType<typeof useGetbankListLazyQuery>;
+export type GetbankListSuspenseQueryHookResult = ReturnType<typeof useGetbankListSuspenseQuery>;
+export type GetbankListQueryResult = Apollo.QueryResult<GetbankListQuery, GetbankListQueryVariables>;
+export const UserDocument = gql`
+    query user($userId: Int!) {
+  user(id: $userId) {
+    id
+    display
+    gender
+    dob
+    contact
+    ownerId
+    position
+    role {
+      id
+      name
+    }
+    startingAt
+    type
+    username
+    password
+    profile
+    baseSalary
+    createdDate
+    bankType
+    bankName
+    bankAcc
+    isActive
+  }
+}
+    `;
+
+/**
+ * __useUserQuery__
+ *
+ * To run a query within a React component, call `useUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useUserQuery(baseOptions: Apollo.QueryHookOptions<UserQuery, UserQueryVariables> & ({ variables: UserQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+      }
+export function useUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserQuery, UserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+        }
+export function useUserSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UserQuery, UserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+        }
+export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
+export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
+export type UserSuspenseQueryHookResult = ReturnType<typeof useUserSuspenseQuery>;
+export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
+export const UserListDocument = gql`
+    query userList($offset: Int, $limit: Int, $roles: [Int]) {
+  userList(offset: $offset, limit: $limit, roles: $roles) {
+    id
+    display
+    gender
+    dob
+    contact
+    ownerId
+    position
+    role {
+      id
+      name
+    }
+    startingAt
+    type
+    username
+    password
+    profile
+    baseSalary
+    createdDate
+    bankType
+    bankName
+    bankAcc
+    isActive
+  }
+}
+    `;
+
+/**
+ * __useUserListQuery__
+ *
+ * To run a query within a React component, call `useUserListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserListQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      roles: // value for 'roles'
+ *   },
+ * });
+ */
+export function useUserListQuery(baseOptions?: Apollo.QueryHookOptions<UserListQuery, UserListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserListQuery, UserListQueryVariables>(UserListDocument, options);
+      }
+export function useUserListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserListQuery, UserListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserListQuery, UserListQueryVariables>(UserListDocument, options);
+        }
+export function useUserListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UserListQuery, UserListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UserListQuery, UserListQueryVariables>(UserListDocument, options);
+        }
+export type UserListQueryHookResult = ReturnType<typeof useUserListQuery>;
+export type UserListLazyQueryHookResult = ReturnType<typeof useUserListLazyQuery>;
+export type UserListSuspenseQueryHookResult = ReturnType<typeof useUserListSuspenseQuery>;
+export type UserListQueryResult = Apollo.QueryResult<UserListQuery, UserListQueryVariables>;
+export const RoleListDocument = gql`
+    query roleList {
+  roleList {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useRoleListQuery__
+ *
+ * To run a query within a React component, call `useRoleListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRoleListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRoleListQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRoleListQuery(baseOptions?: Apollo.QueryHookOptions<RoleListQuery, RoleListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RoleListQuery, RoleListQueryVariables>(RoleListDocument, options);
+      }
+export function useRoleListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RoleListQuery, RoleListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RoleListQuery, RoleListQueryVariables>(RoleListDocument, options);
+        }
+export function useRoleListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<RoleListQuery, RoleListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<RoleListQuery, RoleListQueryVariables>(RoleListDocument, options);
+        }
+export type RoleListQueryHookResult = ReturnType<typeof useRoleListQuery>;
+export type RoleListLazyQueryHookResult = ReturnType<typeof useRoleListLazyQuery>;
+export type RoleListSuspenseQueryHookResult = ReturnType<typeof useRoleListSuspenseQuery>;
+export type RoleListQueryResult = Apollo.QueryResult<RoleListQuery, RoleListQueryVariables>;
+export const GetAttendanceStaffTodayDocument = gql`
+    query getAttendanceStaffToday($date: String!) {
+  getAttendanceStaffToday(date: $date) {
+    user {
+      id
+      display
+    }
+    id
+    checkIn
+    checkOut
+    overTimeIn
+    overTimeOut
+    checkDate
+  }
+}
+    `;
+
+/**
+ * __useGetAttendanceStaffTodayQuery__
+ *
+ * To run a query within a React component, call `useGetAttendanceStaffTodayQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAttendanceStaffTodayQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAttendanceStaffTodayQuery({
+ *   variables: {
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useGetAttendanceStaffTodayQuery(baseOptions: Apollo.QueryHookOptions<GetAttendanceStaffTodayQuery, GetAttendanceStaffTodayQueryVariables> & ({ variables: GetAttendanceStaffTodayQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAttendanceStaffTodayQuery, GetAttendanceStaffTodayQueryVariables>(GetAttendanceStaffTodayDocument, options);
+      }
+export function useGetAttendanceStaffTodayLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAttendanceStaffTodayQuery, GetAttendanceStaffTodayQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAttendanceStaffTodayQuery, GetAttendanceStaffTodayQueryVariables>(GetAttendanceStaffTodayDocument, options);
+        }
+export function useGetAttendanceStaffTodaySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAttendanceStaffTodayQuery, GetAttendanceStaffTodayQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAttendanceStaffTodayQuery, GetAttendanceStaffTodayQueryVariables>(GetAttendanceStaffTodayDocument, options);
+        }
+export type GetAttendanceStaffTodayQueryHookResult = ReturnType<typeof useGetAttendanceStaffTodayQuery>;
+export type GetAttendanceStaffTodayLazyQueryHookResult = ReturnType<typeof useGetAttendanceStaffTodayLazyQuery>;
+export type GetAttendanceStaffTodaySuspenseQueryHookResult = ReturnType<typeof useGetAttendanceStaffTodaySuspenseQuery>;
+export type GetAttendanceStaffTodayQueryResult = Apollo.QueryResult<GetAttendanceStaffTodayQuery, GetAttendanceStaffTodayQueryVariables>;
+export const GetAttendanceStaffDocument = gql`
+    query getAttendanceStaff($limit: Int, $offset: Int, $from: String, $to: String) {
+  getAttendanceStaff(limit: $limit, offset: $offset, from: $from, to: $to) {
+    id
+    user {
+      id
+      display
+    }
+    checkIn
+    checkOut
+    overTimeIn
+    overTimeOut
+    checkDate
+  }
+}
+    `;
+
+/**
+ * __useGetAttendanceStaffQuery__
+ *
+ * To run a query within a React component, call `useGetAttendanceStaffQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAttendanceStaffQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAttendanceStaffQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      offset: // value for 'offset'
+ *      from: // value for 'from'
+ *      to: // value for 'to'
+ *   },
+ * });
+ */
+export function useGetAttendanceStaffQuery(baseOptions?: Apollo.QueryHookOptions<GetAttendanceStaffQuery, GetAttendanceStaffQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAttendanceStaffQuery, GetAttendanceStaffQueryVariables>(GetAttendanceStaffDocument, options);
+      }
+export function useGetAttendanceStaffLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAttendanceStaffQuery, GetAttendanceStaffQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAttendanceStaffQuery, GetAttendanceStaffQueryVariables>(GetAttendanceStaffDocument, options);
+        }
+export function useGetAttendanceStaffSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAttendanceStaffQuery, GetAttendanceStaffQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAttendanceStaffQuery, GetAttendanceStaffQueryVariables>(GetAttendanceStaffDocument, options);
+        }
+export type GetAttendanceStaffQueryHookResult = ReturnType<typeof useGetAttendanceStaffQuery>;
+export type GetAttendanceStaffLazyQueryHookResult = ReturnType<typeof useGetAttendanceStaffLazyQuery>;
+export type GetAttendanceStaffSuspenseQueryHookResult = ReturnType<typeof useGetAttendanceStaffSuspenseQuery>;
+export type GetAttendanceStaffQueryResult = Apollo.QueryResult<GetAttendanceStaffQuery, GetAttendanceStaffQueryVariables>;
 export const SubscriptionLoadDocument = gql`
     subscription subscriptionLoad($channel: String) {
   newOrderPending(channel: $channel)

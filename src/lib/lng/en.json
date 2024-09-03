@@ -3,5 +3,6 @@
   "menu_inventory": "Inventory",
   "menu_product": "Products",
   "menu_category": "Categories",
-  "menu_customer_order": "Customer Order"
+  "menu_customer_order": "Customer Order",
+  "menu_order": "Orders"
 }

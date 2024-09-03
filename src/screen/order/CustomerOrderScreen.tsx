@@ -17,6 +17,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { VerifyCustomerOrderScreen } from './VerifyCustomerOrderScreen';
 import { useSetting } from '@/service/useSettingProvider';
+import { haversineDistance } from '@/lib/loacationDistance';
 
 export function CustomerOrderScreen() {
   const params = useSearchParams();
@@ -31,12 +32,13 @@ export function CustomerOrderScreen() {
   const ref = useRef<HTMLButtonElement | null>(null);
   const [oneTime, setOneTime] = useState(false);
   const [count, setCount] = useState(0);
-  const [verify, setVerify] = useState(false);
+  const [verify, setVerify] = useState(true);
+  const [allow, setAllow] = useState(false);
 
   const [generate] = useGenerateTokenOrderMutation();
 
   const { data, loading } = useProductListQuery({
-    skip: !params.get('token') || !params.get('otpCode'),
+    skip: !params.get('token'),
     fetchPolicy: 'cache-and-network',
     variables: {
       filter: {
@@ -44,6 +46,25 @@ export function CustomerOrderScreen() {
       },
     },
   });
+
+  useEffect(() => {
+    if (process.browser && setting.length > 0) {
+      const center = setting.find((f: any) => f?.option === 'LOCATION')?.value;
+      navigator.geolocation.getCurrentPosition((msg) => {
+        const str: any = center?.split(',');
+        const km = haversineDistance(
+          Number(str[0]),
+          Number(str[1]),
+          Number(msg.coords.latitude),
+          Number(msg.coords.longitude),
+        );
+
+        if (Number(km) < 0.08) {
+          setAllow(true);
+        }
+      });
+    }
+  }, [setting]);
 
   useEffect(() => {
     if (setting.length > 0) {
@@ -74,10 +95,20 @@ export function CustomerOrderScreen() {
     }
   }, [count, generate, info.name, info.set, oneTime, params, path, router]);
 
-  if (loading || !params.get('token')) {
+  const pwdwifi = setting.find((f) => f.option === 'GUEST_WIFI')?.value;
+
+  if (loading || !params.get('token') || !allow) {
     return (
       <>
         <Topbar isCart={false} />
+        <div className="w-full text-center">
+          <div>
+            Wifi: <b>MooD-WiFi</b>
+          </div>
+          <div>
+            Password: <b>{pwdwifi}</b>
+          </div>
+        </div>
       </>
     );
   }
@@ -104,6 +135,14 @@ export function CustomerOrderScreen() {
         ) : (
           <ProviderOrderContext>
             <Topbar isCart />
+            <div className="w-full text-center">
+              <div>
+                Wifi: <b>MooD-WiFi</b>
+              </div>
+              <div>
+                Password: <b>{pwdwifi}</b>
+              </div>
+            </div>
             <br />
             <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 max-sm:p-4">
               <div className="w-[70%] flex flex-col gap-4 max-sm:w-full">

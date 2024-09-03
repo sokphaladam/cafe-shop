@@ -8,6 +8,7 @@ import './style.css';
 import { useSetting } from '@/service/useSettingProvider';
 import { useReactToPrint } from 'react-to-print';
 import { config_app } from '@/lib/config_app';
+import { useUser } from '@/service/UserProvider';
 
 interface Props {
   order?: Order | null;
@@ -29,6 +30,7 @@ function formatKHR(value: number) {
 }
 
 export function PrintOrder(props: Props) {
+  const user = useUser();
   const contentToPrint = useRef(null);
   const setting = useSetting();
   const [open, setOpen] = useState(false);
@@ -82,36 +84,36 @@ export function PrintOrder(props: Props) {
             <div className="flex flex-row justify-between">
               <div className="flex flex-col items-start">
                 <p className="flex flex-row items-center justify-end">
-                  <div>Invoice</div>
+                  <div className="w-[45px] text-left">Invoice</div>
                   <div className="mx-1">:</div>
-                  <div className="text-end">#{props.order?.id}</div>
+                  <div className="text-end">#{String(props.order?.invoice).padStart(5, '0')}</div>
                 </p>
                 <p className="flex flex-row items-center justify-end">
-                  <div>Table</div>
+                  <div className="w-[45px] text-left">Table</div>
                   <div className="mx-1">:</div>
                   <div className="text-end">{props.order?.set}</div>
                 </p>
                 <p className="flex flex-row items-center justify-between">
-                  <div>Cashier</div>
-                  <div className="mx-2">:</div>
-                  <div className="text-end">{verify_date || ''}</div>
+                  <div className="w-[45px] text-left">Cashier</div>
+                  <div className="mx-1">:</div>
+                  <div className="text-end">{user?.display || ''}</div>
                 </p>
               </div>
               <div>
                 <p className="flex flex-row items-center justify-between">
-                  <div>In</div>
+                  <div className="w-[25px] text-left">In</div>
                   <div className="mx-2">:</div>
-                  <div className="text-right">{moment(new Date(created_date + '')).format('LTS')}</div>
+                  <div className="w-[90px] text-right">{moment(new Date(created_date + '')).format('LTS')}</div>
                 </p>
                 <p className="flex flex-row items-center justify-between">
-                  <div>Out</div>
+                  <div className="w-[25px] text-left">Out</div>
                   <div className="mx-2">:</div>
-                  <div className="text-end">{moment(new Date(last_date + '')).format('LTS')}</div>
+                  <div className="w-[90px] text-end">{moment(new Date(last_date + '')).format('LTS')}</div>
                 </p>
                 <p className="flex flex-row items-center justify-between">
-                  <div>Date</div>
+                  <div className="w-[25px] text-left">Date</div>
                   <div className="mx-2">:</div>
-                  <div className="text-end">{moment(new Date(created_date + '')).format('DD-MMM-YYYY')}</div>
+                  <div className="w-[90px] text-end">{moment(new Date(created_date + '')).format('DD-MMM-YYYY')}</div>
                 </p>
               </div>
             </div>
@@ -129,9 +131,9 @@ export function PrintOrder(props: Props) {
                     <tr>
                       <th>Item</th>
                       <th className="text-right">Qty</th>
-                      <th className="text-right">Price</th>
-                      <th className="text-right">Dis</th>
-                      <th className="text-right">Amount</th>
+                      <th className="text-left">Price</th>
+                      <th className="!text-center">Dis</th>
+                      <th className="!text-right">Amount</th>
                     </tr>
                   )}
                 </thead>
@@ -145,7 +147,7 @@ export function PrintOrder(props: Props) {
                           <td className="text-start">
                             {i + 1}. {x?.product?.title} ({x?.sku?.name})
                           </td>
-                          <td className="text-right">{x?.qty}</td>
+                          <td className="!text-center">{x?.qty}</td>
                           <td className="text-right">{x?.addons}</td>
                           <td className="text-right">{x?.remark}</td>
                         </tr>
@@ -156,10 +158,12 @@ export function PrintOrder(props: Props) {
                         <td className="text-start">
                           {i + 1}. {x?.product?.title}
                         </td>
-                        <td className="text-right">{x?.qty}</td>
-                        <td className="text-right">${x?.price?.toFixed(2)}</td>
-                        <td className="text-right">
-                          ${disPrice.toFixed(2)} ({x?.discount?.toFixed(2)}%)
+                        <td className="!text-center">{x?.qty}</td>
+                        <td className="text-left">${x?.price?.toFixed(2)}</td>
+                        <td className="text-left">
+                          {x?.discount
+                            ? `$${disPrice.toFixed(2)} (${x?.discount?.toFixed(2)}%)`
+                            : `${x?.discount?.toFixed(2)}%`}
                         </td>
                         <td className="text-right">${amount.toFixed(2)}</td>
                       </tr>
@@ -170,9 +174,9 @@ export function PrintOrder(props: Props) {
                       <td colSpan={2} className="text-right border-none">
                         <div className="flex flex-col justify-between">
                           <div className="h-8">Sub Total</div>
-                          <div className="h-8">
+                          {/* <div className="h-8">
                             VAT <span>({vat}%)</span>
-                          </div>
+                          </div> */}
                           <div className="h-8">TOTAL</div>
                         </div>
                       </td>
@@ -181,7 +185,7 @@ export function PrintOrder(props: Props) {
                           <div className="h-8">
                             {formatKHR(Math.round(Number(exchangeRate) * Number(props.subtotal)))}
                           </div>
-                          <div className="h-8"></div>
+                          {/* <div className="h-8"></div> */}
                           <div className="font-bold h-8" style={{ marginLeft: '20%' }}>
                             {formatKHR(Math.round(Number(exchangeRate) * Number(props.total)))}
                           </div>
@@ -190,7 +194,7 @@ export function PrintOrder(props: Props) {
                       <td className="text-right border-none">
                         <div className="flex flex-col justify-between">
                           <div className="h-8">${Number(props.subtotal).toFixed(2)}</div>
-                          <div className="h-8">${Number(props.vat).toFixed(2)}</div>
+                          {/* <div className="h-8">${Number(props.vat).toFixed(2)}</div> */}
                           <div className="h-8">${Number(props.total).toFixed(2)}</div>
                         </div>
                       </td>
@@ -200,7 +204,7 @@ export function PrintOrder(props: Props) {
               </table>
               <div></div>
             </div>
-            {!props.kitchen && <div className="text-center">Thank you please come again!</div>}
+            {!props.kitchen && <div className="text-center">Thank you, please come again!</div>}
           </div>
         </div>
       </Modal.Section>

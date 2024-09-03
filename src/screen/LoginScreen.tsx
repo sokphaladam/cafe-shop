@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useState } from 'react';
-import { setCookie } from "cookies-next";
+import { setCookie } from 'cookies-next';
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { Telegram } from '@/api/telegram';
 import moment from 'moment';
@@ -10,8 +10,7 @@ import { config_app } from '@/lib/config_app';
 import { useLoginMutation } from '@/gql/graphql';
 
 export function LoginScreen() {
-  const sleep = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   const { toasts, setToasts } = useCustomToast();
   const [msg, setMsg] = useState<any | null>(null);
   const [checkStatus, setCheckStatus] = useState(null);
@@ -21,20 +20,23 @@ export function LoginScreen() {
 
   useEffect(() => {
     const telegram = new Telegram();
-    telegram.getMe().then(res => {
+    telegram.getMe().then((res) => {
       setCheckStatus(res.ok);
     });
-  }, [])
+  }, []);
 
   const handleClick = useCallback(async () => {
-    setToasts([...toasts, {
-      content: 'Welcome!',
-      status: 'success'
-    }]);
+    setToasts([
+      ...toasts,
+      {
+        content: 'Welcome!',
+        status: 'success',
+      },
+    ]);
     const telegram = new Telegram();
     const str = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-    telegram.sendMessage(`<code>Staff login ${str}</code>`)
-    setCookie('tk_token', 'TK' + new Date().toTimeString())
+    telegram.sendMessage(`<code>Staff login ${str}</code>`);
+    setCookie('tk_token', 'TK' + new Date().toTimeString());
     await sleep(1);
     process.browser && window.location.reload();
   }, [setToasts, toasts]);
@@ -48,17 +50,17 @@ export function LoginScreen() {
     }).then((res) => {
       setMsg({
         success: !!res.data?.login,
-        message: res.data?.login ? "Login success" : 'Fail login'
+        message: res.data?.login ? 'Login success' : 'Fail login',
       });
       setToasts([
         ...toasts,
         {
-          content: res.data?.login ? "Login success" : 'Fail login',
-          status: res.data?.login ? "success" : 'error',
+          content: res.data?.login ? 'Login success' : 'Fail login',
+          status: res.data?.login ? 'success' : 'error',
         },
       ]);
       if (res.data?.login) {
-        setCookie("tk_token", res.data.login, {
+        setCookie('tk_token', res.data.login, {
           expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365),
         });
         setTimeout(() => process.browser && window.location.reload(), 500);
@@ -84,15 +86,15 @@ export function LoginScreen() {
         <Card>
           <Box padding={'0'}>
             <div className="m-10">
-              <div className='flex flex-row items-center'>
+              <div className="flex flex-row items-center">
                 <Image
                   alt=""
-                  src={config_app.public.assets.logo || "/affiliate.svg"}
+                  src={config_app.public.assets.logo || '/affiliate.svg'}
                   width={56}
                   height={45}
                   objectFit="container"
                 />
-                <b className='ml-2 text-[12pt] text-[#674F36]'>Mood Panel</b>
+                {/* <b className='ml-2 text-[12pt] text-[#674F36]'>Mood Panel</b> */}
               </div>
               <div className="mt-10">
                 <Text as="h4" variant="headingLg">
@@ -112,11 +114,11 @@ export function LoginScreen() {
                     type="text"
                     value={usernameInput}
                     onChange={setUsernameInput}
-                  // disabled={loading}
-                  // error={
-                  //   msg?.success === false &&
-                  //   msg.message === "Invalid phone number"
-                  // }
+                    // disabled={loading}
+                    // error={
+                    //   msg?.success === false &&
+                    //   msg.message === "Invalid phone number"
+                    // }
                   />
                 </div>
                 <div className="mt-3">
@@ -126,11 +128,11 @@ export function LoginScreen() {
                     type="password"
                     value={passwordInput}
                     onChange={setPasswordInput}
-                  // disabled={loading}
-                  // error={
-                  //   msg?.success === false &&
-                  //   msg.message === "Invalid password"
-                  // }
+                    // disabled={loading}
+                    // error={
+                    //   msg?.success === false &&
+                    //   msg.message === "Invalid password"
+                    // }
                   />
                 </div>
                 <div className="mt-5">
@@ -141,8 +143,8 @@ export function LoginScreen() {
                     // loading={loading}
                     // disabled={loading}
                     submit
-                    tone='success'
-                    variant='primary'
+                    tone="success"
+                    variant="primary"
                   >
                     Continue with phone number
                   </Button>
@@ -153,5 +155,5 @@ export function LoginScreen() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

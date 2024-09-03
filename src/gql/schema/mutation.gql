@@ -77,3 +77,23 @@ mutation createUser($data: UserInput) {
 mutation updateUser($id: Int!, $data: UserInput) {
   updateUser(id: $id, data: $data)
 }
+
+mutation createPosition($name: String!) {
+  createPosition(name: $name)
+}
+
+mutation updatePosition($name: String!, $updatePositionId: Int!) {
+  updatePosition(name: $name, id: $updatePositionId)
+}
+
+mutation createBank($name: String!, $phone: String) {
+  createBank(name: $name, phone: $phone)
+}
+
+mutation updateBank($updateBankId: Int!, $name: String!, $phone: String) {
+  updateBank(id: $updateBankId, name: $name, phone: $phone)
+}
+
+mutation checkAttendance($userId: Int!, $date: String!) {
+  checkAttendance(userId: $userId, date: $date)
+}

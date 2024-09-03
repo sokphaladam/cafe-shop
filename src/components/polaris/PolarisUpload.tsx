@@ -1,9 +1,9 @@
 import { useFirebase } from '@/hook/useFirebsae';
 import { Banner, DropZone, LegacyStack, List, Spinner, Text, Thumbnail } from '@shopify/polaris';
 import React, { useCallback, useState } from 'react';
-import { getDownloadURL } from "firebase/storage";
+import { getDownloadURL } from 'firebase/storage';
 
-export function PolarisUpload(props: { url: string, setUrl: (url: string) => void, onLoading: (v: boolean) => void }) {
+export function PolarisUpload(props: { url: string; setUrl: (url: string) => void; onLoading: (v: boolean) => void }) {
   const { file } = useFirebase();
   const [files, setFiles] = useState<any[]>(props.url ? [props.url] : []);
   const [loading, setLoading] = useState(false);
@@ -12,25 +12,29 @@ export function PolarisUpload(props: { url: string, setUrl: (url: string) => voi
 
   const handleDrop = useCallback(
     (_droppedFiles: File[], acceptedFiles: File[], rejectedFiles: File[]) => {
-
       if (acceptedFiles.length > 0) {
-        const task = file.upload(acceptedFiles[0])
-        task.on('state_changed', function (snap) {
-          console.log(snap.state)
-          setLoading(true);
-          props.onLoading(true)
-        }, function (err) {
-          console.log(err.message)
-          setLoading(false)
-          props.onLoading(false)
-        }, function () {
-          getDownloadURL(task.snapshot.ref).then(url => {
-            setFiles([url]);
-            props.setUrl(url);
-            setLoading(false)
-            props.onLoading(false)
-          })
-        })
+        const task = file.upload(acceptedFiles[0]);
+        task.on(
+          'state_changed',
+          function (snap) {
+            console.log(snap.state);
+            setLoading(true);
+            props.onLoading(true);
+          },
+          function (err) {
+            console.log(err.message);
+            setLoading(false);
+            props.onLoading(false);
+          },
+          function () {
+            getDownloadURL(task.snapshot.ref).then((url) => {
+              setFiles([url]);
+              props.setUrl(url);
+              setLoading(false);
+              props.onLoading(false);
+            });
+          },
+        );
       }
       // setFiles((files) => [acceptedFiles[0]]);
       setRejectedFiles(rejectedFiles);
@@ -40,14 +44,10 @@ export function PolarisUpload(props: { url: string, setUrl: (url: string) => voi
 
   const fileUpload = !files.length && <DropZone.FileUpload />;
   const uploadedFiles = files.length > 0 && (
-    <div className='flex flex-col justify-center items-center h-full'>
+    <div className="flex flex-col justify-center items-center h-full">
       {files.map((file, index) => (
         <LegacyStack alignment="center" key={index}>
-          <Thumbnail
-            size="large"
-            alt={file.name}
-            source={file}
-          />
+          <Thumbnail size="large" alt={file.name} source={file} />
         </LegacyStack>
       ))}
     </div>
@@ -57,9 +57,7 @@ export function PolarisUpload(props: { url: string, setUrl: (url: string) => voi
     <Banner title="The following images couldn’t be uploaded:" tone="critical">
       <List type="bullet">
         {rejectedFiles.map((file, index) => (
-          <List.Item key={index}>
-            {`"${file}" is not supported. File type must be .gif, .jpg, .png or .svg.`}
-          </List.Item>
+          <List.Item key={index}>{`"${file}" is not supported. File type must be .gif, .jpg, .png or .svg.`}</List.Item>
         ))}
       </List>
     </Banner>
@@ -69,10 +67,16 @@ export function PolarisUpload(props: { url: string, setUrl: (url: string) => voi
     <LegacyStack vertical>
       {errorMessage}
       <DropZone accept="image/*" type="image" onDrop={handleDrop} allowMultiple={false}>
-        {loading && <div className='flex flex-col justify-center items-center h-full'><LegacyStack alignment="center"><Spinner size='small' /></LegacyStack></div>}
+        {loading && (
+          <div className="flex flex-col justify-center items-center h-full">
+            <LegacyStack alignment="center">
+              <Spinner size="small" />
+            </LegacyStack>
+          </div>
+        )}
         {!loading && uploadedFiles}
         {fileUpload}
       </DropZone>
     </LegacyStack>
-  )
+  );
 }

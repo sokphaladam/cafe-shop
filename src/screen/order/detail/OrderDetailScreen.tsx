@@ -15,15 +15,32 @@ import {
   Thumbnail,
   Modal as Modals,
   TextField,
+  Icon,
 } from '@shopify/polaris';
-import { StatusOrder, useChangeOrderStatusMutation, useOrderQuery, useOrderSubscriptSubscription } from '@/gql/graphql';
-import { InfoIcon, CheckCircleIcon, DeliveryIcon, ClipboardCheckFilledIcon, XCircleIcon } from '@shopify/polaris-icons';
+import {
+  StatusOrder,
+  StatusOrderItem,
+  useChangeOrderStatusMutation,
+  useMarkOrderItemStatusMutation,
+  useOrderQuery,
+  useOrderSubscriptSubscription,
+} from '@/gql/graphql';
+import {
+  InfoIcon,
+  CheckCircleIcon,
+  DeliveryIcon,
+  ClipboardCheckFilledIcon,
+  XCircleIcon,
+  DeleteIcon,
+} from '@shopify/polaris-icons';
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { Modal } from '@/hook/modal';
 import { useSetting } from '@/service/useSettingProvider';
 import { PrintOrder } from '../components/PrintOrder';
 import { SignatureOrder } from '../components/SignatureOrder';
 import { DeliveryPickup } from '../components/DeliveryPickup';
+import { PrintOrderToKitchen } from '../components/PrintOrderToKitchen';
+import moment from 'moment';
 
 interface Props {
   id: number;
@@ -46,6 +63,16 @@ const toneIcon: any = {
 };
 
 export function OrderDetailScreen(props: Props) {
+  const local = process.browser
+    ? localStorage.getItem('invoice')
+      ? JSON.parse(localStorage.getItem('invoice') || '')
+      : { date: moment(new Date()).format('YYYY-MM-DD'), count: 1 }
+    : { date: moment(new Date()).format('YYYY-MM-DD'), count: 1 };
+  const [invoice, setInvoice] = useState(
+    new Date(local.date).getTime() === new Date(moment(new Date()).format('YYYY-MM-DD')).getTime()
+      ? local
+      : { date: moment(new Date()).format('YYYY-MM-DD'), count: 1 },
+  );
   const { setToasts, toasts } = useCustomToast();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(false);
@@ -62,6 +89,7 @@ export function OrderDetailScreen(props: Props) {
       orderId: Number(props.id),
     },
   });
+  const [mark] = useMarkOrderItemStatusMutation();
   const [change] = useChangeOrderStatusMutation({
     refetchQueries: ['order', 'orderList'],
   });
@@ -222,6 +250,7 @@ export function OrderDetailScreen(props: Props) {
                   status: StatusOrder.Checkout,
                   reason: reasonInput || '',
                   amount: amountInput ? String(amountInput) : String(totalAfterVat.toFixed(2)),
+                  invoice: Number(invoice.count),
                 },
               },
             })
@@ -231,6 +260,12 @@ export function OrderDetailScreen(props: Props) {
                   setReasonInput('');
                   setAmountInput('');
                   togglePaid();
+                  const inv = {
+                    date: moment(new Date()),
+                    count: Number(invoice.count) >= 50 ? 1 : Number(invoice.count) + 1,
+                  };
+                  localStorage.setItem('invoice', JSON.stringify(inv));
+                  setInvoice(inv);
                 } else {
                   setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }]);
                 }
@@ -279,52 +314,67 @@ export function OrderDetailScreen(props: Props) {
           <Card padding={'0'}>
             <Box padding={'300'}>
               <div className="flex flex-row justify-between items-baseline">
-                <div className="flex flex-row gap-4">
-                  <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} />
-                  <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} kitchen />
-                  <SignatureOrder order={data?.order || {}} size="micro" />
-                  {data?.order?.status === StatusOrder.Pending && (
-                    <Button
-                      onClick={() => handleUpdate(StatusOrder.Verify)}
-                      size="micro"
-                      tone="success"
-                      variant="primary"
-                    >
-                      Verify
-                    </Button>
-                  )}
-                  {data?.order?.status === StatusOrder.Verify && (
-                    <Button
-                      size="micro"
-                      tone="success"
-                      variant="primary"
-                      onClick={() => handleUpdate(StatusOrder.Delivery)}
-                    >
-                      Deliver
-                    </Button>
-                  )}
-                  {[StatusOrder.Delivery, StatusOrder.Checkout].includes(data?.order?.status as any) &&
-                    Number(data?.order?.paid || 0) <= 0 && (
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-row gap-4">
+                    <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} />
+                    {/* <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} kitchen /> */}
+                    <PrintOrderToKitchen order={data?.order} />
+                    <SignatureOrder order={data?.order || {}} size="micro" />
+                  </div>
+                  <div className="flex flex-row gap-4">
+                    {data?.order?.status === StatusOrder.Verify && (
+                      <Button
+                        onClick={() => handleUpdate(StatusOrder.Pending)}
+                        size="micro"
+                        tone="success"
+                        variant="primary"
+                      >
+                        Pending
+                      </Button>
+                    )}
+                    {data?.order?.status === StatusOrder.Pending && (
+                      <Button
+                        onClick={() => handleUpdate(StatusOrder.Verify)}
+                        size="micro"
+                        tone="success"
+                        variant="primary"
+                      >
+                        Verify
+                      </Button>
+                    )}
+                    {data?.order?.status === StatusOrder.Verify && (
                       <Button
                         size="micro"
                         tone="success"
                         variant="primary"
-                        onClick={() => handleUpdate(StatusOrder.Checkout)}
+                        onClick={() => handleUpdate(StatusOrder.Delivery)}
                       >
-                        Checkout
+                        Deliver
                       </Button>
                     )}
-                  {[StatusOrder.Checkout].includes(data?.order?.status as any) &&
-                    Number(data?.order?.paid || 0) <= 0 && (
-                      <Button
-                        size="micro"
-                        tone="critical"
-                        variant="primary"
-                        onClick={() => handleUpdate(StatusOrder.Cancelled)}
-                      >
-                        Cancel
-                      </Button>
-                    )}
+                    {[StatusOrder.Delivery, StatusOrder.Checkout].includes(data?.order?.status as any) &&
+                      Number(data?.order?.paid || 0) <= 0 && (
+                        <Button
+                          size="micro"
+                          tone="success"
+                          variant="primary"
+                          onClick={() => handleUpdate(StatusOrder.Checkout)}
+                        >
+                          Checkout
+                        </Button>
+                      )}
+                    {[StatusOrder.Checkout].includes(data?.order?.status as any) &&
+                      Number(data?.order?.paid || 0) <= 0 && (
+                        <Button
+                          size="micro"
+                          tone="critical"
+                          variant="primary"
+                          onClick={() => handleUpdate(StatusOrder.Cancelled)}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                  </div>
                 </div>
                 <div className="flex flex-col items-end">
                   <b>
@@ -332,7 +382,7 @@ export function OrderDetailScreen(props: Props) {
                   </b>
                   <b className="mb-2">
                     <small>
-                      SET: {data?.order?.set} (#{data?.order?.code})
+                      TABLE: {data?.order?.set} (#{data?.order?.code})
                     </small>
                   </b>
                   <Badge
@@ -362,11 +412,16 @@ export function OrderDetailScreen(props: Props) {
                           <Thumbnail alt="" source={item?.product?.images + ''} size="small" />
                           <div className="flex flex-col justify-between">
                             <Text as="p" variant="bodySm" truncate>
-                              {item?.product?.title}
+                              {item?.product?.title}{' '}
+                              <small>
+                                <strong>({item?.status})</strong>
+                              </small>
                             </Text>
-                            <Text as="strong" variant="bodySm" tone="base">
-                              x{item?.qty}
-                            </Text>
+                            <div className="flex flex-row">
+                              <Text as="strong" variant="bodySm" tone="base">
+                                x{item?.qty}
+                              </Text>
+                            </div>
                           </div>
                         </div>
                       </IndexTable.Cell>
@@ -380,6 +435,36 @@ export function OrderDetailScreen(props: Props) {
                           ${(priceAfterDis * Number(item?.qty)).toFixed(2)}
                         </Text>
                       </IndexTable.Cell>
+                      {item?.status === StatusOrderItem.Pending && (
+                        <IndexTable.Cell>
+                          <Button
+                            size="slim"
+                            variant="primary"
+                            tone="critical"
+                            onClick={() => {
+                              Modal.dialog({
+                                title: 'Confirmation',
+                                body: [<div key={1}>{'Are you sure to remove this item: ' + item.product?.title}</div>],
+                                buttons: [
+                                  {
+                                    title: 'Yes',
+                                    onPress: () => {
+                                      mark({
+                                        variables: {
+                                          markOrderItemStatusId: Number(item.id),
+                                          status: StatusOrderItem.Deleted,
+                                        },
+                                      });
+                                    },
+                                  },
+                                ],
+                              });
+                            }}
+                          >
+                            {(<Icon source={DeleteIcon} />) as any}
+                          </Button>
+                        </IndexTable.Cell>
+                      )}
                     </IndexTable.Row>
                   );
                 })}
@@ -390,9 +475,11 @@ export function OrderDetailScreen(props: Props) {
               <div className="flex flex-row justify-between items-start">
                 <div>
                   <div>
-                    <Text as="h4" variant="bodyMd" fontWeight="bold">
-                      Delivery Pickup
-                    </Text>
+                    {data?.order?.delivery && (
+                      <Text as="h4" variant="bodyMd" fontWeight="bold">
+                        Delivery Pickup
+                      </Text>
+                    )}
                   </div>
                   {data?.order?.delivery && (
                     <div className="mt-3">

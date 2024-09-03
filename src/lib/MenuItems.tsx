@@ -9,6 +9,11 @@ import {
   SettingsIcon,
   TabletIcon,
   AttachmentIcon,
+  FileIcon,
+  PersonIcon,
+  PageClockIcon,
+  StarIcon,
+  CreditCardIcon,
 } from '@shopify/polaris-icons';
 
 export function MenuItems(user: User | null) {
@@ -47,7 +52,37 @@ export function MenuItems(user: User | null) {
         {
           label: 'Customer Order',
           icon: CartFilledIcon,
-          url: '/orders/list',
+          url: '/order/list',
+        },
+      ],
+    },
+    {
+      title: 'Employee',
+      items: [
+        {
+          label: 'Attendance',
+          icon: AttachmentIcon,
+          url: '/employee/attendance',
+        },
+        {
+          label: 'Attendance (Admin)',
+          icon: AttachmentIcon,
+          url: '#',
+        },
+        {
+          label: 'Leave',
+          icon: FileIcon,
+          url: '#',
+        },
+        {
+          label: 'Staff',
+          icon: PersonIcon,
+          url: '/staff',
+        },
+        {
+          label: 'Overtime',
+          icon: PageClockIcon,
+          url: '#',
         },
       ],
     },
@@ -62,12 +97,22 @@ export function MenuItems(user: User | null) {
         {
           label: 'Table',
           icon: TabletIcon,
-          url: '/setting/set',
+          url: '/set',
         },
         {
           label: 'Delivery',
           icon: DeliveryIcon,
-          url: '/setting/delivery',
+          url: '/delivery',
+        },
+        {
+          label: 'Position',
+          icon: StarIcon,
+          url: '/position',
+        },
+        {
+          label: 'Payment Info',
+          icon: CreditCardIcon,
+          url: '/payment',
         },
       ],
     },
@@ -108,6 +153,36 @@ export function MenuItems(user: User | null) {
             ],
           },
           {
+            title: 'Employee',
+            items: [
+              {
+                label: 'Attendance',
+                icon: AttachmentIcon,
+                url: '/employee/attendance',
+              },
+              {
+                label: 'Attendance (Admin)',
+                icon: AttachmentIcon,
+                url: '#',
+              },
+              {
+                label: 'Leave',
+                icon: FileIcon,
+                url: '#',
+              },
+              {
+                label: 'Staff',
+                icon: PersonIcon,
+                url: '/staff',
+              },
+              {
+                label: 'Overtime',
+                icon: PageClockIcon,
+                url: '#',
+              },
+            ],
+          },
+          {
             title: 'Setting',
             items: [
               {
@@ -118,12 +193,22 @@ export function MenuItems(user: User | null) {
               {
                 label: 'Table',
                 icon: TabletIcon,
-                url: '/setting/set',
+                url: '/set',
               },
               {
                 label: 'Delivery',
                 icon: DeliveryIcon,
-                url: '/setting/delivery',
+                url: '/delivery',
+              },
+              {
+                label: 'Position',
+                icon: StarIcon,
+                url: '/position',
+              },
+              {
+                label: 'Payment Info',
+                icon: CreditCardIcon,
+                url: '/payment',
               },
             ],
           },
@@ -157,12 +242,12 @@ export function MenuItems(user: User | null) {
               {
                 label: 'Table',
                 icon: TabletIcon,
-                url: '/setting/set',
+                url: '/set',
               },
               {
                 label: 'Delivery',
                 icon: DeliveryIcon,
-                url: '/setting/delivery',
+                url: '/delivery',
               },
             ],
           },

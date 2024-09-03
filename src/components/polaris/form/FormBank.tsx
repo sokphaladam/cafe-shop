@@ -3,8 +3,11 @@
 import { useCustomToast } from '@/components/custom/CustomToast';
 import {
   DeliveryInput,
+  useBankInfoQuery,
+  useCreateBankMutation,
   useCreateDeliveryMutation,
   useDeliveryByIdQuery,
+  useUpdateBankMutation,
   useUpdateDeliveryMutation,
 } from '@/gql/graphql';
 import { InlineGrid, Modal, TextField } from '@shopify/polaris';
@@ -21,35 +24,38 @@ interface Props {
     | undefined;
 }
 
-export function FormDelivery(props: Props) {
+export function FormBank(props: Props) {
   const { toasts, setToasts } = useCustomToast();
   const [Id, setId] = useState(0);
-  const [info, setInfo] = useState<DeliveryInput>();
+  const [nameInput, setNameInput] = useState('');
+  const [phoneInput, setPhoneInput] = useState('');
 
-  useDeliveryByIdQuery({
+  useBankInfoQuery({
     skip: !props.id,
     fetchPolicy: 'no-cache',
     variables: {
-      deliveryByIdId: Number(props.id),
+      bankInfoId: Number(props.id),
     },
     onCompleted: (data) => {
-      if (data.deliveryById) {
-        setInfo(data.deliveryById);
-        setId(data.deliveryById?.id || 0);
+      if (data.bankInfo) {
+        setNameInput(data.bankInfo.name || '');
+        setPhoneInput(data.bankInfo.phone || '');
+        setId(data.bankInfo?.id || 0);
       }
     },
   });
 
-  const [create, propsCreate] = useCreateDeliveryMutation({
-    refetchQueries: ['deliveryList', 'deliveryById'],
+  const [create, propsCreate] = useCreateBankMutation({
+    refetchQueries: ['getbankList', 'bankInfo'],
   });
-  const [update, propsUpdate] = useUpdateDeliveryMutation({
-    refetchQueries: ['deliveryList', 'deliveryById'],
+  const [update, propsUpdate] = useUpdateBankMutation({
+    refetchQueries: ['getbankList', 'bankInfo'],
   });
 
   const toggleActive = useCallback(() => {
     props.setActive(!props.active);
-    setInfo({});
+    setNameInput('');
+    setPhoneInput('');
     setId(0);
   }, [props]);
 
@@ -57,15 +63,13 @@ export function FormDelivery(props: Props) {
     if (!props.id) {
       create({
         variables: {
-          data: {
-            name: info?.name,
-            contact: info?.contact,
-          },
+          name: nameInput.trim(),
+          phone: phoneInput.trim(),
         },
       })
         .then((res) => {
-          if (res.data?.createDelivery) {
-            setToasts([...toasts, { content: 'Create new delivery.', status: 'success' }]);
+          if (res.data?.createBank) {
+            setToasts([...toasts, { content: 'Create new bank.', status: 'success' }]);
             toggleActive();
           } else {
             setToasts([...toasts, { content: 'Oop! somthing was wrong.', status: 'error' }]);
@@ -77,16 +81,14 @@ export function FormDelivery(props: Props) {
     } else {
       update({
         variables: {
-          data: {
-            name: info?.name,
-            contact: info?.contact,
-          },
-          updateDeliveryId: Number(props.id),
+          name: nameInput.trim(),
+          phone: phoneInput.trim(),
+          updateBankId: Number(props.id),
         },
       })
         .then((res) => {
-          if (res.data?.updateDelivery) {
-            setToasts([...toasts, { content: 'Update delivery #' + props.id, status: 'success' }]);
+          if (res.data?.updateBank) {
+            setToasts([...toasts, { content: 'Update bank #' + props.id, status: 'success' }]);
             toggleActive();
           } else {
             setToasts([...toasts, { content: 'Oop! somthing was wrong.', status: 'error' }]);
@@ -96,7 +98,7 @@ export function FormDelivery(props: Props) {
           setToasts([...toasts, { content: 'Oop! somthing was wrong.', status: 'error' }]);
         });
     }
-  }, [props.id, create, info, setToasts, toasts, toggleActive, update]);
+  }, [props.id, create, nameInput, phoneInput, setToasts, toasts, toggleActive, update]);
 
   return (
     <Modal
@@ -122,25 +124,15 @@ export function FormDelivery(props: Props) {
           <TextField
             label="Name"
             placeholder="Enter delivery name..."
-            value={info?.name || ''}
-            onChange={(v) => {
-              setInfo({
-                ...info,
-                name: v,
-              });
-            }}
+            value={nameInput}
+            onChange={setNameInput}
             autoComplete="off"
           />
           <TextField
             label="Contact"
             placeholder="Enter phone number..."
-            value={info?.contact || ''}
-            onChange={(v) => {
-              setInfo({
-                ...info,
-                contact: v,
-              });
-            }}
+            value={phoneInput}
+            onChange={setPhoneInput}
             autoComplete="off"
           />
         </InlineGrid>
