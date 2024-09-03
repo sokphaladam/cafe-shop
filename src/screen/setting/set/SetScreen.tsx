@@ -93,7 +93,7 @@ export function SetScreen() {
                             <Text as="h3" variant="bodyLg" fontWeight="bold" tone={x?.order ? 'text-inverse' : 'base'}>
                               {x?.set}
                             </Text>
-                            {x?.order && (
+                            {/* {x?.order && (
                               <Text
                                 as="h3"
                                 variant="bodyLg"
@@ -102,7 +102,7 @@ export function SetScreen() {
                               >
                                 #{x?.order?.code}
                               </Text>
-                            )}
+                            )} */}
                             {(propsUpdate.loading || propsTable.loading) && <Spinner size="small" />}
                           </div>
                         </Box>

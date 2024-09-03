@@ -1,8 +1,9 @@
 'use client';
 import { useUserListQuery } from '@/gql/graphql';
 import { usePagination } from '@/hook/usePagination';
-import { Avatar, Box, Card, Frame, IndexTable, Layout, Loading } from '@shopify/polaris';
+import { ActionList, Avatar, Box, Card, Frame, IndexTable, Layout, Loading, Popover } from '@shopify/polaris';
 import React from 'react';
+import { UserListItem } from './components/UserListItem';
 
 export function UserListScreen() {
   const { limit, offset, setOffset } = usePagination();
@@ -10,7 +11,6 @@ export function UserListScreen() {
     variables: {
       limit,
       offset,
-      roles: [3, 4],
     },
   });
 
@@ -54,49 +54,7 @@ export function UserListScreen() {
             >
               {data &&
                 data?.userList?.map((user) => {
-                  return (
-                    <IndexTable.Row key={user?.id} id={user?.id + ''} position={user?.id || 0}>
-                      <IndexTable.Cell>
-                        <small>{user?.id}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <Avatar
-                          source={user?.profile || ''}
-                          initials={user?.display
-                            ?.split(' ')
-                            .map((s) => s.charAt(0).toUpperCase())
-                            .join('')}
-                        />
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>{user?.display}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>{user?.gender}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>{user?.dob}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>{user?.contact}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>{user?.startingAt}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>{user?.position}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>
-                          {user?.role?.name} ({user?.type ?? 'SYS'})
-                        </small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <small>{user?.isActive ? 'Yes' : 'No'}</small>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell></IndexTable.Cell>
-                    </IndexTable.Row>
-                  );
+                  return <UserListItem user={{ ...user, id: user?.id || 0 }} key={user?.id} />;
                 })}
             </IndexTable>
           </Box>

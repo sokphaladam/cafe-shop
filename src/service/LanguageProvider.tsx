@@ -20,6 +20,20 @@ export function useScriptLanguage() {
 }
 
 export function LanguageProvider(props: PropsWithChildren<unknown>) {
-  const [lng, setLng] = useState<'en' | 'km'>('en');
-  return <LanguageContext.Provider value={{ lng, setLng }}>{props.children}</LanguageContext.Provider>;
+  const local = process.browser ? (localStorage.getItem('lng') ? localStorage.getItem('lng') : 'en') : 'en';
+  const [lng, setLng] = useState<any>(local);
+
+  return (
+    <LanguageContext.Provider
+      value={{
+        lng,
+        setLng: (v: any) => {
+          setLng(v);
+          localStorage.setItem('lng', v);
+        },
+      }}
+    >
+      {props.children}
+    </LanguageContext.Provider>
+  );
 }

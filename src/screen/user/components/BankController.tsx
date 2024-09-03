@@ -3,7 +3,12 @@
 import { useGetbankListQuery } from '@/gql/graphql';
 import { Select } from '@shopify/polaris';
 
-export function BankController() {
+interface Props {
+  value: any;
+  onChange: any;
+}
+
+export function BankController(props: Props) {
   const { data, loading } = useGetbankListQuery({
     variables: {
       limit: 1000,
@@ -24,5 +29,7 @@ export function BankController() {
     });
   }
 
-  return <Select label="Bank Name" disabled={loading} options={options} />;
+  return (
+    <Select label="Bank Name" disabled={loading} options={options} value={props.value} onChange={props.onChange} />
+  );
 }

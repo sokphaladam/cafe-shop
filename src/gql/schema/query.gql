@@ -143,6 +143,7 @@ query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy, $status: [Statu
     uuid
     note
     vat
+    invoice
     log {
       date
       text
@@ -167,6 +168,7 @@ query order($token: String, $orderId: Int) {
     note
     code
     vat
+    invoice
     log {
       date
       text
@@ -281,6 +283,33 @@ query getbankList($offset: Int = 0, $limit: Int = 30) {
   }
 }
 
+query user($userId: Int!) {
+  user(id: $userId) {
+    id
+    display
+    gender
+    dob
+    contact
+    ownerId
+    position
+    role {
+      id
+      name
+    }
+    startingAt
+    type
+    username
+    password
+    profile
+    baseSalary
+    createdDate
+    bankType
+    bankName
+    bankAcc
+    isActive
+  }
+}
+
 query userList($offset: Int, $limit: Int, $roles: [Int]) {
   userList(offset: $offset, limit: $limit, roles: $roles) {
     id
@@ -305,5 +334,42 @@ query userList($offset: Int, $limit: Int, $roles: [Int]) {
     bankName
     bankAcc
     isActive
+  }
+}
+
+query roleList {
+  roleList {
+    id
+    name
+  }
+}
+
+query getAttendanceStaffToday($date: String!) {
+  getAttendanceStaffToday(date: $date) {
+    user {
+      id
+      display
+    }
+    id
+    checkIn
+    checkOut
+    overTimeIn
+    overTimeOut
+    checkDate
+  }
+}
+
+query getAttendanceStaff($limit: Int, $offset: Int, $from: String, $to: String) {
+  getAttendanceStaff(limit: $limit, offset: $offset, from: $from, to: $to) {
+    id
+    user {
+      id
+      display
+    }
+    checkIn
+    checkOut
+    overTimeIn
+    overTimeOut
+    checkDate
   }
 }

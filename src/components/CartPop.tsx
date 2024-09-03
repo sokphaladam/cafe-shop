@@ -136,7 +136,7 @@ export function CartPop() {
     //     setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }]);
     //   }
     // });
-  }, [change, orderId, setToasts, show, toasts]);
+  }, [change, orderId, setToasts, toasts]);
 
   if (!orderId) {
     return <></>;

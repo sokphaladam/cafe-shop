@@ -56,7 +56,7 @@ export function TopbarMarkup(props: Props) {
     <TopBar.UserMenu
       actions={userMenuActions}
       name={user?.display || ''}
-      detail={''}
+      detail={user?.role?.name + ''}
       initials={(user?.display || '')
         .split(' ')
         .map((x) => x.charAt(0).toUpperCase())
@@ -70,7 +70,7 @@ export function TopbarMarkup(props: Props) {
     <TopBar.Menu
       activatorContent={
         <span>
-          <Text as="span">EN</Text>
+          <Text as="span">{lng.toUpperCase()}</Text>
         </span>
       }
       open={isSecondaryMenuOpen}

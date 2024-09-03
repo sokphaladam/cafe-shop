@@ -95,6 +95,7 @@ export function OrderListItem({ item }: Props) {
       break;
     case StatusOrder.Verify:
       menus = [
+        { content: 'Pending', onAction: () => handleUpdate(StatusOrder.Pending) },
         { content: 'Delivery', onAction: () => handleUpdate(StatusOrder.Delivery) },
         { content: 'Cancel', onAction: () => handleUpdate(StatusOrder.Cancelled) },
       ];

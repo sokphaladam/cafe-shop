@@ -93,3 +93,7 @@ mutation createBank($name: String!, $phone: String) {
 mutation updateBank($updateBankId: Int!, $name: String!, $phone: String) {
   updateBank(id: $updateBankId, name: $name, phone: $phone)
 }
+
+mutation checkAttendance($userId: Int!, $date: String!) {
+  checkAttendance(userId: $userId, date: $date)
+}

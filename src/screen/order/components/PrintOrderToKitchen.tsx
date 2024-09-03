@@ -92,6 +92,8 @@ export function PrintOrderToKitchen(props: Props) {
     }
   };
 
+  const last_date = props.order ? props.order?.log?.find((f) => f?.text === 'Last Updated')?.date : '';
+
   return (
     <div>
       <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/SheetJS/js-codepage/dist/cptable.js"></script>
@@ -104,22 +106,29 @@ export function PrintOrderToKitchen(props: Props) {
         {props.order?.items?.map((x, i) => {
           return (
             <div key={x?.id} className="pagebreak" style={{ pageBreakAfter: 'always' }}>
+              <b>Table #{props.order?.set}</b>
+              <br />
+              <small>{last_date}</small>
               <table id="print_table">
                 <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th className="text-right">Qty</th>
-                    <th className="text-right">Addons</th>
-                    <th className="text-right">Note</th>
-                  </tr>
                   <tr>
                     <td className="text-start">
                       {i + 1}. {x?.product?.title} ({x?.sku?.name})
                     </td>
-                    <td className="!text-center">{x?.qty}</td>
-                    <td className="text-right">{x?.addons}</td>
-                    <td className="text-right">{x?.remark}</td>
+                    <td className="!text-right">X{x?.qty}</td>
                   </tr>
+                  {x?.addons && (
+                    <tr>
+                      <td className="text-start">Addons</td>
+                      <td className="!text-right">{x?.addons}</td>
+                    </tr>
+                  )}
+                  {x?.remark && (
+                    <tr>
+                      <td className="text-start">Remark</td>
+                      <td className="!text-right">{x?.remark}</td>
+                    </tr>
+                  )}
                 </thead>
               </table>
             </div>
