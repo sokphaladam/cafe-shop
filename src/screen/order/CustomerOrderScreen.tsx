@@ -33,7 +33,7 @@ export function CustomerOrderScreen() {
   const [oneTime, setOneTime] = useState(false);
   const [count, setCount] = useState(0);
   const [verify, setVerify] = useState(true);
-  const [allow, setAllow] = useState(true);
+  const [allow, setAllow] = useState(false);
 
   const [generate] = useGenerateTokenOrderMutation();
 
