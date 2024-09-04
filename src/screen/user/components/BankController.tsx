@@ -6,6 +6,7 @@ import { Select } from '@shopify/polaris';
 interface Props {
   value: any;
   onChange: any;
+  hidelabel?: boolean;
 }
 
 export function BankController(props: Props) {
@@ -30,6 +31,13 @@ export function BankController(props: Props) {
   }
 
   return (
-    <Select label="Bank Name" disabled={loading} options={options} value={props.value} onChange={props.onChange} />
+    <Select
+      label="Bank Name"
+      labelHidden={props.hidelabel}
+      disabled={loading}
+      options={options}
+      value={props.value}
+      onChange={props.onChange}
+    />
   );
 }
