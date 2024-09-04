@@ -59,6 +59,8 @@ export function CustomerOrderScreen() {
           Number(msg.coords.longitude),
         );
 
+        console.log(km);
+
         if (Number(km) < 0.08) {
           setAllow(true);
         }
