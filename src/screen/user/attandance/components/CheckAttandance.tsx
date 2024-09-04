@@ -17,8 +17,8 @@ export function CheckAttandance() {
       date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
     },
   });
-  const [attandance] = useCheckAttendanceMutation({
-    refetchQueries: ['getAttendanceStaffToday'],
+  const [attendance] = useCheckAttendanceMutation({
+    refetchQueries: ['getAttendanceStaffToday', 'getAttendanceStaff'],
   });
 
   useEffect(() => {
@@ -42,25 +42,25 @@ export function CheckAttandance() {
 
   const handleCheckIn = useCallback(() => {
     const d = new Date();
-    attandance({
+    attendance({
       variables: {
         userId: Number(user?.id),
         date: moment(d).format('YYYY-MM-DD HH:mm:ss'),
       },
     });
-  }, [attandance]);
+  }, [attendance, user]);
 
   const handleCheckOut = useCallback(() => {
     const d = new Date();
-    attandance({
+    attendance({
       variables: {
         userId: Number(user?.id),
         date: moment(d).format('YYYY-MM-DD HH:mm:ss'),
       },
     });
-  }, [attandance]);
+  }, [attendance, user]);
 
-  if (setting.length <= 0) {
+  if (setting.length <= 0 && !user?.id) {
     return <></>;
   }
 
@@ -72,7 +72,6 @@ export function CheckAttandance() {
   if (loading) {
     return <></>;
   }
-  console.log(data?.getAttendanceStaffToday);
 
   return (
     <Card>

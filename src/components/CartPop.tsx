@@ -23,7 +23,8 @@ import { Modal as Modals } from '@/hook/modal';
 export function CartPop() {
   const params = useSearchParams();
   const { setToasts, toasts } = useCustomToast();
-  const { items, setItems, orderId, status, vat: vatPer } = useOrderContext();
+  const setting = useSetting();
+  const { items, setItems, orderId, status, vat: vatPer, refetch } = useOrderContext();
   const [show, setShow] = useState(false);
   const [count, setCount] = useState(1);
   const { width } = useWindowSize();
@@ -113,6 +114,8 @@ export function CartPop() {
               .then((res) => {
                 if (res.data?.changeOrderStatus) {
                   setToasts([...toasts, { content: 'Your order was sended.', status: 'success' }]);
+                  setShow(false);
+                  refetch();
                 } else {
                   setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }]);
                 }
@@ -148,15 +151,26 @@ export function CartPop() {
     return (a = a + amount);
   }, 0);
 
-  const vat = (total * Number(vatPer || 0)) / 100;
-  const totalAfterVat = total + vat;
+  const vatSetting = setting.find((f) => f.option === 'TAX')?.value;
+
+  // const vat = (total * Number(vatPer || 0)) / 100;
+  // const totalAfterVat = total + vat;
 
   const loading = loadingMark || loadingPlus || loadingChange || loadingSub;
-  const edited = [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery].includes(status);
+  const edited =
+    [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery].includes(status) &&
+    (items?.filter((f) => !f.isPrint).length || 0) > 0;
 
   return (
     <React.Fragment>
-      <Modal open={show} onClose={() => setShow(!show)} title="Checkout">
+      <Modal
+        open={show}
+        onClose={() => {
+          setShow(!show);
+          refetch();
+        }}
+        title="Checkout"
+      >
         <Modal.Section>
           {items?.map((x, i) => {
             const sku = x.sku.find((s: any) => s.id === x.sku_id);
@@ -171,8 +185,12 @@ export function CartPop() {
                       <b>
                         ${sku ? sku.price : ''} ({sku.name})
                       </b>
-                      <br />
-                      {x.addon_value.join(',')}
+                      {x.addon_value && (
+                        <>
+                          <br />
+                          {x.addon_value.join(',')}
+                        </>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -227,9 +245,11 @@ export function CartPop() {
                   </div>
                 </div>
                 <br />
-                <div className="bg-amber-200 p-1">
-                  <b>Special Request:</b> {x.remark}
-                </div>
+                {x.remark && (
+                  <div className="bg-amber-200 p-1">
+                    <b>Special Request:</b> {x.remark}
+                  </div>
+                )}
                 <Divider />
               </div>
             );
@@ -242,14 +262,11 @@ export function CartPop() {
               <div className="w-[100px] text-right">${Number(total || 0).toFixed(2)}</div>
             </h6>
             <h6 className="text-xs my-1 mb-2 font-bold text-gray-600 flex flex-row items-center">
-              <div className="w-[75px]">Vat.:</div>
-              <div className="w-[100px] text-right">
-                ${vat.toFixed(2)} ({vatPer}%)
-              </div>
+              <div className="w-[100px] text-right">Include. ({vatSetting}%)</div>
             </h6>
             <h4 className="text-lg font-bold flex flex-row items-center">
               <div className="w-[75px]">Total: </div>
-              <span className=" text-emerald-700 w-[100px] text-right">${Number(totalAfterVat || 0).toFixed(2)}</span>
+              <span className=" text-emerald-700 w-[100px] text-right">${Number(total || 0).toFixed(2)}</span>
             </h4>
           </div>
         </Modal.Section>

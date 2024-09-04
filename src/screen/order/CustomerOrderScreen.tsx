@@ -33,7 +33,7 @@ export function CustomerOrderScreen() {
   const [oneTime, setOneTime] = useState(false);
   const [count, setCount] = useState(0);
   const [verify, setVerify] = useState(true);
-  const [allow, setAllow] = useState(false);
+  const [allow, setAllow] = useState(true);
 
   const [generate] = useGenerateTokenOrderMutation();
 
@@ -132,13 +132,13 @@ export function CustomerOrderScreen() {
         <button ref={ref} onClick={handleGenerate} style={{ position: 'fixed', top: -9999, display: 'none' }}>
           generate click
         </button>
-        {!!allow && (
-          <>
-            {!verify ? (
-              <VerifyCustomerOrderScreen onVerify={setVerify} />
-            ) : (
-              <ProviderOrderContext>
-                <Topbar isCart />
+        {!verify ? (
+          <VerifyCustomerOrderScreen onVerify={setVerify} />
+        ) : (
+          <ProviderOrderContext>
+            <Topbar isCart={allow} />
+            {!!allow && (
+              <>
                 <div className="w-full text-center">
                   <div>
                     Wifi: <b>MooD-WiFi</b>
@@ -164,11 +164,11 @@ export function CustomerOrderScreen() {
                         );
                       })}
                   </div>
-                  <LayoutCart />
+                  {/* <LayoutCart /> */}
                 </div>
-              </ProviderOrderContext>
+              </>
             )}
-          </>
+          </ProviderOrderContext>
         )}
       </div>
     </Suspense>

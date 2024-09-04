@@ -96,6 +96,7 @@ export type CategoryInput = {
 
 export type ChangeOrderInput = {
   amount?: InputMaybe<Scalars['String']['input']>;
+  bankType?: InputMaybe<Scalars['String']['input']>;
   deliverPickupCode?: InputMaybe<Scalars['String']['input']>;
   deliverPickupId?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
@@ -278,6 +279,7 @@ export type MutationMarkOrderItemStatusArgs = {
 export type MutationSignatureOrderArgs = {
   id: Scalars['Int']['input'];
   password: Scalars['String']['input'];
+  userId: Scalars['Int']['input'];
   username: Scalars['String']['input'];
 };
 
@@ -352,6 +354,7 @@ export type MutationVerifyOtpOrderArgs = {
 export type Order = {
   __typename?: 'Order';
   address?: Maybe<Scalars['String']['output']>;
+  bankType?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
   delivery?: Maybe<Delivery>;
   deliveryCode?: Maybe<Scalars['String']['output']>;
@@ -840,6 +843,7 @@ export type SignatureOrderMutationVariables = Exact<{
   signatureOrderId: Scalars['Int']['input'];
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
+  userId: Scalars['Int']['input'];
 }>;
 
 
@@ -933,7 +937,7 @@ export type CheckAttendanceMutation = { __typename?: 'Mutation', checkAttendance
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, display?: string | null, contact?: string | null, gender?: string | null, createdDate?: string | null, isActive?: boolean | null, ownerId?: string | null, startingAt?: string | null, bankName?: string | null, bankAcc?: string | null, bankType?: string | null, position?: string | null, baseSalary?: string | null, type?: string | null, profile?: string | null, role?: { __typename?: 'Role', name?: string | null, id?: number | null } | null } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, display?: string | null, contact?: string | null, gender?: string | null, createdDate?: string | null, isActive?: boolean | null, ownerId?: string | null, startingAt?: string | null, bankName?: string | null, bankAcc?: string | null, bankType?: string | null, position?: string | null, baseSalary?: string | null, type?: string | null, profile?: string | null, username?: string | null, role?: { __typename?: 'Role', name?: string | null, id?: number | null } | null } | null };
 
 export type ProductListQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -973,7 +977,7 @@ export type OrderListQueryVariables = Exact<{
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, deliveryCode?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, invoice?: number | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, deliveryCode?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, bankType?: string | null, invoice?: number | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -981,7 +985,7 @@ export type OrderQueryVariables = Exact<{
 }>;
 
 
-export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, invoice?: number | null, deliveryCode?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, isPrint?: boolean | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, invoice?: number | null, bankType?: string | null, deliveryCode?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, isPrint?: boolean | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
 
 export type SettingListQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1505,8 +1509,13 @@ export type VerifyOtpOrderMutationHookResult = ReturnType<typeof useVerifyOtpOrd
 export type VerifyOtpOrderMutationResult = Apollo.MutationResult<VerifyOtpOrderMutation>;
 export type VerifyOtpOrderMutationOptions = Apollo.BaseMutationOptions<VerifyOtpOrderMutation, VerifyOtpOrderMutationVariables>;
 export const SignatureOrderDocument = gql`
-    mutation signatureOrder($signatureOrderId: Int!, $password: String!, $username: String!) {
-  signatureOrder(id: $signatureOrderId, password: $password, username: $username)
+    mutation signatureOrder($signatureOrderId: Int!, $password: String!, $username: String!, $userId: Int!) {
+  signatureOrder(
+    id: $signatureOrderId
+    password: $password
+    username: $username
+    userId: $userId
+  )
 }
     `;
 export type SignatureOrderMutationFn = Apollo.MutationFunction<SignatureOrderMutation, SignatureOrderMutationVariables>;
@@ -1527,6 +1536,7 @@ export type SignatureOrderMutationFn = Apollo.MutationFunction<SignatureOrderMut
  *      signatureOrderId: // value for 'signatureOrderId'
  *      password: // value for 'password'
  *      username: // value for 'username'
+ *      userId: // value for 'userId'
  *   },
  * });
  */
@@ -1908,6 +1918,7 @@ export const MeDocument = gql`
     baseSalary
     type
     profile
+    username
   }
 }
     `;
@@ -2209,6 +2220,7 @@ export const OrderListDocument = gql`
     uuid
     note
     vat
+    bankType
     invoice
     log {
       date
@@ -2273,6 +2285,7 @@ export const OrderDocument = gql`
     code
     vat
     invoice
+    bankType
     log {
       date
       text

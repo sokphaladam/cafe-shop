@@ -1,7 +1,9 @@
 'use client';
 
 import { useCustomToast } from '@/components/custom/CustomToast';
+import { PolarisUser } from '@/components/polaris/PolarisUser';
 import { Order, useSignatureOrderMutation } from '@/gql/graphql';
+import { useUser } from '@/service/UserProvider';
 import { Button, InlineGrid, InlineStack, Modal, TextField } from '@shopify/polaris';
 import { useCallback, useState } from 'react';
 
@@ -12,7 +14,9 @@ interface Props {
 
 export function SignatureOrder(props: Props) {
   const [open, setOpen] = useState(false);
+  const user = useUser();
   const { setToasts, toasts } = useCustomToast();
+  const [userId, setUserId] = useState(0);
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [usernameInputError, setUsernameInputError] = useState('');
@@ -25,12 +29,13 @@ export function SignatureOrder(props: Props) {
   const toggleOpen = useCallback(() => setOpen(!open), [open]);
 
   const handleSignature = useCallback(() => {
-    if (!!usernameInput.trim() && !!passwordInput.trim()) {
+    if (!!passwordInput.trim() && !!user?.username) {
       signature({
         variables: {
-          username: usernameInput,
+          username: user?.username,
           password: passwordInput,
           signatureOrderId: Number(props.order?.id),
+          userId: Number(userId),
         },
       })
         .then((res) => {
@@ -53,7 +58,7 @@ export function SignatureOrder(props: Props) {
           setToasts([...toasts, { content: 'Oop! somthing was wrong please try!', status: 'error' }]);
         });
     }
-  }, [passwordInput, props.order?.id, setToasts, signature, toasts, toggleOpen, usernameInput]);
+  }, [passwordInput, props.order?.id, setToasts, signature, toasts, toggleOpen, user?.username]);
 
   const isSignature = (props.order?.log?.filter((f) => f?.text?.toLowerCase() === 'signature').length || 0) > 0;
 
@@ -77,13 +82,14 @@ export function SignatureOrder(props: Props) {
       activator={activator}
       primaryAction={{
         content: 'Send',
-        disabled: !usernameInput.trim() || !passwordInput.trim(),
+        disabled: !user?.username && !passwordInput.trim(),
         onAction: handleSignature,
       }}
     >
       <Modal.Section>
         <InlineGrid columns={2} gap={'400'}>
-          <TextField
+          <PolarisUser id={userId} onChange={setUserId} title="User signature" />
+          {/* <TextField
             value={usernameInput}
             onBlur={() =>
               !usernameInput.trim() ? setUsernameInputError('Plase input username') : setUsernameInputError('')
@@ -94,7 +100,7 @@ export function SignatureOrder(props: Props) {
             focused
             autoComplete="off"
             label="Username"
-          />
+          /> */}
           <TextField
             value={passwordInput}
             onBlur={() =>

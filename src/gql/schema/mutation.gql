@@ -50,8 +50,8 @@ mutation verifyOtpOrder($token: String!, $code: String!) {
   verifyOtpOrder(token: $token, code: $code)
 }
 
-mutation signatureOrder($signatureOrderId: Int!, $password: String!, $username: String!) {
-  signatureOrder(id: $signatureOrderId, password: $password, username: $username)
+mutation signatureOrder($signatureOrderId: Int!, $password: String!, $username: String!, $userId: Int!) {
+  signatureOrder(id: $signatureOrderId, password: $password, username: $username, userId: $userId)
 }
 
 mutation updateSetting($option: String, $value: String) {

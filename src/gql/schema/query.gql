@@ -19,6 +19,7 @@ query me {
     baseSalary
     type
     profile
+    username
   }
 }
 
@@ -143,6 +144,7 @@ query orderList($offset: Int, $limit: Int, $viewBy: OrderViewBy, $status: [Statu
     uuid
     note
     vat
+    bankType
     invoice
     log {
       date
@@ -169,6 +171,7 @@ query order($token: String, $orderId: Int) {
     code
     vat
     invoice
+    bankType
     log {
       date
       text
