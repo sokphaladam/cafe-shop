@@ -28,7 +28,7 @@ export function Topbar({ isCart }: { isCart: boolean }) {
           src={config_app.public.assets.logo}
           alt=""
           className="w-14 h-auto left-0 absolute object-contain"
-          {...logPressEvent}
+          // {...logPressEvent}
         />
         <div className="flex flex-row">{isCart && <CartPop />}</div>
       </div>
