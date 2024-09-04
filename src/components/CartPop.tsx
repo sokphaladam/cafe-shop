@@ -152,7 +152,7 @@ export function CartPop() {
   const totalAfterVat = total + vat;
 
   const loading = loadingMark || loadingPlus || loadingChange || loadingSub;
-  const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
+  const edited = [StatusOrder.Pending].includes(status);
 
   return (
     <React.Fragment>
@@ -252,16 +252,18 @@ export function CartPop() {
             </h4>
           </div>
         </Modal.Section>
-        <Modal.Section>
-          <div
-            onClick={() => (loading || items?.length === 0 ? {} : handlePlaceOrder())}
-            className={`${
-              loading || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'
-            } text-white p-2 w-full text-center rounded-lg`}
-          >
-            Send Order to Kitchen
-          </div>
-        </Modal.Section>
+        {!!edited && (
+          <Modal.Section>
+            <div
+              onClick={() => (loading || items?.length === 0 ? {} : handlePlaceOrder())}
+              className={`${
+                loading || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'
+              } text-white p-2 w-full text-center rounded-lg`}
+            >
+              Send Order to Kitchen
+            </div>
+          </Modal.Section>
+        )}
       </Modal>
       <div
         className="w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative"
