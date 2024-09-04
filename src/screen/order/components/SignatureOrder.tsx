@@ -58,7 +58,7 @@ export function SignatureOrder(props: Props) {
           setToasts([...toasts, { content: 'Oop! somthing was wrong please try!', status: 'error' }]);
         });
     }
-  }, [passwordInput, props.order?.id, setToasts, signature, toasts, toggleOpen, user?.username]);
+  }, [passwordInput, props.order?.id, setToasts, signature, toasts, toggleOpen, user?.username, userId]);
 
   const isSignature = (props.order?.log?.filter((f) => f?.text?.toLowerCase() === 'signature').length || 0) > 0;
 

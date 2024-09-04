@@ -114,7 +114,6 @@ export function CartPop() {
               .then((res) => {
                 if (res.data?.changeOrderStatus) {
                   setToasts([...toasts, { content: 'Your order was sended.', status: 'success' }]);
-                  setShow(false);
                   refetch();
                 } else {
                   setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }]);
@@ -139,7 +138,7 @@ export function CartPop() {
     //     setToasts([...toasts, { content: `Your order was sended.`, status: 'success' }]);
     //   }
     // });
-  }, [change, orderId, setToasts, toasts]);
+  }, [change, orderId, refetch, setToasts, toasts]);
 
   if (!orderId) {
     return <></>;
