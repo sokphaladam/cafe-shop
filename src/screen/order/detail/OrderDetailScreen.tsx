@@ -41,6 +41,7 @@ import { SignatureOrder } from '../components/SignatureOrder';
 import { DeliveryPickup } from '../components/DeliveryPickup';
 import { PrintOrderToKitchen } from '../components/PrintOrderToKitchen';
 import moment from 'moment';
+import { BankController } from '@/screen/user/components/BankController';
 
 interface Props {
   id: number;
@@ -239,10 +240,6 @@ export function OrderDetailScreen(props: Props) {
           content: 'Checkout',
           destructive: true,
           onAction: () => {
-            // if (!amountInput) {
-            //   setToasts([...toasts, { content: 'Please input the amount of customer are paid for order!', status: 'error' }])
-            //   return;
-            // }
             change({
               variables: {
                 data: {
@@ -276,15 +273,20 @@ export function OrderDetailScreen(props: Props) {
           },
         }}
         footer={
-          <div className="font-bold">
-            Exchange Rate: <span className="pl-2">$1 = ៛{exchangeRate?.value}</span>
-            <br />
-            Total: <span className="pl-2">${totalAfterVat.toFixed(2)}</span>
-            <br />
-            Paid: <span className="pl-2">${Number(amountInput || totalAfterVat).toFixed(2)}</span>
-            <br />
-            Return to customer:{' '}
-            <span className="pl-2">${(Number(amountInput || totalAfterVat) - Number(totalAfterVat)).toFixed(2)}</span>
+          <div className="flex flex-row gap-4 items-center">
+            <div className="font-bold">
+              Exchange Rate: <span className="pl-2">$1 = ៛{exchangeRate?.value}</span>
+              <br />
+              Total: <span className="pl-2">${totalAfterVat.toFixed(2)}</span>
+              <br />
+              Paid: <span className="pl-2">${Number(amountInput || totalAfterVat).toFixed(2)}</span>
+              <br />
+              Return to customer:{' '}
+              <span className="pl-2">${(Number(amountInput || totalAfterVat) - Number(totalAfterVat)).toFixed(2)}</span>
+            </div>
+            <div>
+              <BankController hidelabel value={'CASH'} onChange={(v: any) => {}} />
+            </div>
           </div>
         }
       >
