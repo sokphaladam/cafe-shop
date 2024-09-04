@@ -171,7 +171,9 @@ export function LayoutCart() {
     return <div></div>;
   }
 
-  const edited = [StatusOrder.Pending].includes(status);
+  const edited =
+    [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery].includes(status) &&
+    (items?.filter((f) => !f.isPrint).length || 0) > 0;
 
   return (
     <div className={`w-[30%] bg-white rounded-lg sticky top-[11%]`} style={{ height: window.innerHeight / 1.2 }}>
@@ -222,7 +224,7 @@ export function LayoutCart() {
                 <div>
                   <ButtonGroup variant="segmented">
                     <Button
-                      disabled={!edited || x.status === StatusOrderItem.Completed}
+                      disabled={!edited || x.status === StatusOrderItem.Completed || x.isPrint}
                       size="micro"
                       onClick={() => {
                         const dummy = [...items];
@@ -251,7 +253,7 @@ export function LayoutCart() {
                       {x.qty}
                     </Button>
                     <Button
-                      disabled={!edited || x.status === StatusOrderItem.Completed}
+                      disabled={!edited || x.status === StatusOrderItem.Completed || x.isPrint}
                       size="micro"
                       onClick={() => {
                         const dummy = [...items];

@@ -173,29 +173,27 @@ export function PrintOrder(props: Props) {
                     <tr>
                       <td colSpan={2} className="text-right border-none">
                         <div className="flex flex-col justify-between">
-                          <div className="h-8">Sub Total</div>
-                          {/* <div className="h-8">
-                            VAT <span>({vat}%)</span>
-                          </div> */}
+                          {/* <div className="h-8">Sub Total</div> */}
                           <div className="h-8">TOTAL</div>
+                          <div className="h-8">VAT (Include.)</div>
                         </div>
                       </td>
                       <td colSpan={2} suppressHydrationWarning className="text-right border-none">
                         <div className="flex flex-col justify-between">
-                          <div className="h-8">
+                          {/* <div className="h-8">
                             {formatKHR(Math.round(Number(exchangeRate) * Number(props.subtotal)))}
-                          </div>
-                          {/* <div className="h-8"></div> */}
+                          </div> */}
                           <div className="font-bold h-8" style={{ marginLeft: '20%' }}>
                             {formatKHR(Math.round(Number(exchangeRate) * Number(props.total)))}
                           </div>
+                          <div className="h-8"></div>
                         </div>
                       </td>
                       <td className="text-right border-none">
                         <div className="flex flex-col justify-between">
-                          <div className="h-8">${Number(props.subtotal).toFixed(2)}</div>
-                          {/* <div className="h-8">${Number(props.vat).toFixed(2)}</div> */}
+                          {/* <div className="h-8">${Number(props.subtotal).toFixed(2)}</div> */}
                           <div className="h-8">${Number(props.total).toFixed(2)}</div>
+                          <div className="h-8">$({vat}%)</div>
                         </div>
                       </td>
                     </tr>

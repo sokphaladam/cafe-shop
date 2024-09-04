@@ -84,6 +84,7 @@ export function OrderDetailScreen(props: Props) {
   const toggelOpen = useCallback(() => setOpen(!open), [open]);
   const toggleActive = useCallback(() => setActive(!active), [active]);
   const togglePaid = useCallback(() => setPaid(!paid), [paid]);
+  const [bank, setBank] = useState('CASH');
 
   const { data, loading, refetch } = useOrderQuery({
     variables: {
@@ -167,18 +168,23 @@ export function OrderDetailScreen(props: Props) {
     return (a = a + amount);
   }, 0);
 
-  const vatPer = data?.order?.vat || '0';
+  const vatPer = setting.find((f) => f.option === 'TAX')?.value;
   const exchangeRate = setting.find((f) => f.option === 'EXCHANGE_RATE');
-  const vat = (total * Number(vatPer || 0)) / 100;
-
-  const totalAfterVat = total + vat;
+  const lastUpdate = data?.order?.log?.find((f) => f?.text === 'Last Updated')?.date;
 
   return (
     <Page
       title={`Order Detail #${props.id}`}
       subtitle={
         data?.order?.status === StatusOrder.Checkout && Number(data?.order?.paid || 0)
-          ? ((<Badge tone="success-strong">{(<small>PAID</small>) as any}</Badge>) as any)
+          ? ((
+              <div className="flex flex-row gap-2">
+                <Badge tone="success-strong">{(<small>PAID</small>) as any}</Badge>
+                {data.order.bankType && (
+                  <Badge tone="info-strong">{(<small>{data.order.bankType}</small>) as any}</Badge>
+                )}
+              </div>
+            ) as any)
           : ''
       }
     >
@@ -195,6 +201,12 @@ export function OrderDetailScreen(props: Props) {
               setToasts([...toasts, { content: 'Please input the reason!', status: 'error' }]);
               return;
             }
+
+            if (!bank) {
+              setToasts([...toasts, { content: 'Please choose type payment one!', status: 'error' }]);
+              return;
+            }
+
             change({
               variables: {
                 data: {
@@ -236,6 +248,12 @@ export function OrderDetailScreen(props: Props) {
         open={paid}
         onClose={togglePaid}
         title={`Checkout Order #${data?.order?.id}`}
+        secondaryActions={[
+          {
+            content: (<BankController hidelabel value={bank} onChange={setBank} />) as any,
+            plain: true,
+          },
+        ]}
         primaryAction={{
           content: 'Checkout',
           destructive: true,
@@ -246,8 +264,9 @@ export function OrderDetailScreen(props: Props) {
                   orderId: Number(data?.order?.id),
                   status: StatusOrder.Checkout,
                   reason: reasonInput || '',
-                  amount: amountInput ? String(amountInput) : String(totalAfterVat.toFixed(2)),
+                  amount: amountInput ? String(amountInput) : String(total.toFixed(2)),
                   invoice: Number(invoice.count),
+                  bankType: bank,
                 },
               },
             })
@@ -277,15 +296,12 @@ export function OrderDetailScreen(props: Props) {
             <div className="font-bold">
               Exchange Rate: <span className="pl-2">$1 = ៛{exchangeRate?.value}</span>
               <br />
-              Total: <span className="pl-2">${totalAfterVat.toFixed(2)}</span>
+              Total: <span className="pl-2">${(total || 0).toFixed(2)}</span>
               <br />
-              Paid: <span className="pl-2">${Number(amountInput || totalAfterVat).toFixed(2)}</span>
+              Paid: <span className="pl-2">${Number(amountInput || total).toFixed(2)}</span>
               <br />
               Return to customer:{' '}
-              <span className="pl-2">${(Number(amountInput || totalAfterVat) - Number(totalAfterVat)).toFixed(2)}</span>
-            </div>
-            <div>
-              <BankController hidelabel value={'CASH'} onChange={(v: any) => {}} />
+              <span className="pl-2">${(Number(amountInput || total) - Number(total)).toFixed(2)}</span>
             </div>
           </div>
         }
@@ -294,7 +310,7 @@ export function OrderDetailScreen(props: Props) {
           <TextField
             type="number"
             autoComplete="off"
-            value={amountInput || totalAfterVat.toFixed(2)}
+            value={amountInput || (total || 0).toFixed(2)}
             onChange={setAmountInput}
             label="Amount cutomer paid"
             placeholder="Please input amount of customer are paid for order here"
@@ -318,7 +334,7 @@ export function OrderDetailScreen(props: Props) {
               <div className="flex flex-row justify-between items-baseline">
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-row gap-4">
-                    <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} />
+                    <PrintOrder order={data?.order} subtotal={total} vat={vatPer + ''} total={total} />
                     {/* <PrintOrder order={data?.order} subtotal={total} vat={vat + ''} total={totalAfterVat} kitchen /> */}
                     <PrintOrderToKitchen order={data?.order} />
                     <SignatureOrder order={data?.order || {}} size="micro" />
@@ -424,6 +440,11 @@ export function OrderDetailScreen(props: Props) {
                                 x{item?.qty}
                               </Text>
                             </div>
+                            <div>
+                              <small className="text-pink-700">
+                                From last updated ({moment(new Date(lastUpdate as any)).fromNow(true)})
+                              </small>
+                            </div>
                           </div>
                         </div>
                       </IndexTable.Cell>
@@ -437,36 +458,48 @@ export function OrderDetailScreen(props: Props) {
                           ${(priceAfterDis * Number(item?.qty)).toFixed(2)}
                         </Text>
                       </IndexTable.Cell>
-                      {item?.status === StatusOrderItem.Pending && (
-                        <IndexTable.Cell>
-                          <Button
-                            size="slim"
-                            variant="primary"
-                            tone="critical"
-                            onClick={() => {
-                              Modal.dialog({
-                                title: 'Confirmation',
-                                body: [<div key={1}>{'Are you sure to remove this item: ' + item.product?.title}</div>],
-                                buttons: [
-                                  {
-                                    title: 'Yes',
-                                    onPress: () => {
-                                      mark({
-                                        variables: {
-                                          markOrderItemStatusId: Number(item.id),
-                                          status: StatusOrderItem.Deleted,
+                      {item?.status === StatusOrderItem.Pending ||
+                        (item?.status === StatusOrderItem.Making && (
+                          <IndexTable.Cell>
+                            <div className="flex flex-col items-center">
+                              <Button
+                                size="slim"
+                                variant="primary"
+                                tone="critical"
+                                onClick={() => {
+                                  Modal.dialog({
+                                    title: 'Confirmation',
+                                    body: [
+                                      <div key={1}>{'Are you sure to remove this item: ' + item.product?.title}</div>,
+                                    ],
+                                    buttons: [
+                                      {
+                                        title: 'Yes',
+                                        onPress: () => {
+                                          mark({
+                                            variables: {
+                                              markOrderItemStatusId: Number(item.id),
+                                              status: StatusOrderItem.Deleted,
+                                            },
+                                          });
                                         },
-                                      });
-                                    },
-                                  },
-                                ],
-                              });
-                            }}
-                          >
-                            {(<Icon source={DeleteIcon} />) as any}
-                          </Button>
-                        </IndexTable.Cell>
-                      )}
+                                      },
+                                    ],
+                                  });
+                                }}
+                              >
+                                {(<Icon source={DeleteIcon} />) as any}
+                              </Button>
+                              {item.isPrint ? (
+                                <div>
+                                  <small className="text-pink-700">Already to kitchen</small>
+                                </div>
+                              ) : (
+                                <></>
+                              )}
+                            </div>
+                          </IndexTable.Cell>
+                        ))}
                     </IndexTable.Row>
                   );
                 })}
@@ -540,7 +573,7 @@ export function OrderDetailScreen(props: Props) {
                     {data && (
                       <div className="mr-1">
                         <Text as="strong" variant="bodySm" alignment="end">
-                          ${vat.toFixed(2)} ({vatPer || 0}%)
+                          ({vatPer || 0}%)
                         </Text>
                       </div>
                     )}
@@ -557,7 +590,7 @@ export function OrderDetailScreen(props: Props) {
                   <IndexTable.Cell>
                     <div className="mr-1">
                       <Text as="strong" variant="bodySm" alignment="end" tone="critical" fontWeight="bold">
-                        ${totalAfterVat.toFixed(2)}
+                        ${(total || 0).toFixed(2)}
                       </Text>
                     </div>
                   </IndexTable.Cell>
