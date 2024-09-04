@@ -97,6 +97,7 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
                 remark: x?.remark,
                 price: x?.price,
                 discount: x?.discount,
+                isPrint: x?.isPrint,
               };
             })
           : carts,

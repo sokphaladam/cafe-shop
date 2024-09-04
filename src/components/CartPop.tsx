@@ -152,7 +152,7 @@ export function CartPop() {
   const totalAfterVat = total + vat;
 
   const loading = loadingMark || loadingPlus || loadingChange || loadingSub;
-  const edited = [StatusOrder.Pending].includes(status);
+  const edited = [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery].includes(status);
 
   return (
     <React.Fragment>
@@ -179,7 +179,7 @@ export function CartPop() {
                     <ButtonGroup variant="segmented">
                       <Button
                         size="micro"
-                        disabled={!edited || x.status === StatusOrderItem.Completed || loading}
+                        disabled={!edited || x.status === StatusOrderItem.Completed || loading || x.isPrint}
                         onClick={() => {
                           const dummy = [...items];
                           if (dummy[i].qty === 1) {
@@ -208,7 +208,7 @@ export function CartPop() {
                       </Button>
                       <Button
                         size="micro"
-                        disabled={!edited || x.status === StatusOrderItem.Completed || loading}
+                        disabled={!edited || x.status === StatusOrderItem.Completed || loading || x.isPrint}
                         onClick={() => {
                           const dummy = [...items];
                           dummy[i].qty = dummy[i].qty + 1;
@@ -223,6 +223,7 @@ export function CartPop() {
                         +
                       </Button>
                     </ButtonGroup>
+                    <small className="text-red-400">{x.isPrint ? 'Already to kitchen' : ''}</small>
                   </div>
                 </div>
                 <br />

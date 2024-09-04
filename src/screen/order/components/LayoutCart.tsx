@@ -171,7 +171,7 @@ export function LayoutCart() {
     return <div></div>;
   }
 
-  const edited = [StatusOrder.Pending].includes(status);
+  const edited = [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery].includes(status);
 
   return (
     <div className={`w-[30%] bg-white rounded-lg sticky top-[11%]`} style={{ height: window.innerHeight / 1.2 }}>
