@@ -113,7 +113,7 @@ export function CartPop() {
             })
               .then((res) => {
                 if (res.data?.changeOrderStatus) {
-                  setToasts([...toasts, { content: 'Your order was sended.', status: 'success' }]);
+                  setToasts([...toasts, { content: 'Your order was sent.', status: 'success' }]);
                   refetch();
                 } else {
                   setToasts([...toasts, { content: 'Oop! somthing was wrong!', status: 'error' }]);
@@ -174,7 +174,12 @@ export function CartPop() {
           {items?.map((x, i) => {
             const sku = x.sku.find((s: any) => s.id === x.sku_id);
             return (
-              <div key={i} className={`${x.status === StatusOrderItem.Completed ? 'bg-emerald-400' : ''} p-4`}>
+              <div
+                key={i}
+                className={`${
+                  x.status === StatusOrderItem.Completed ? 'bg-emerald-400' : x.isPrint ? 'bg-gray-300 opacity-50' : ''
+                } p-4`}
+              >
                 <div className="flex flex-row justify-between items-center">
                   <div className="flex flex-row">
                     <Thumbnail source={x.images || ''} alt="" size="medium" />
@@ -285,7 +290,8 @@ export function CartPop() {
       <div
         className="w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative"
         onClick={() => {
-          if ((items || []).length > 0 && (width || 0) <= 640) {
+          //  && (width || 0) <= 640
+          if ((items || []).length > 0) {
             setShow(!show);
           }
         }}
