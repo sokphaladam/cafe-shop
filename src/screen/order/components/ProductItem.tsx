@@ -2,7 +2,7 @@
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
 import { CartItemInput, Product, StatusOrder, useAddOrderItemMutation } from '@/gql/graphql';
-import { Button, ChoiceList, Divider, Modal, RadioButton, TextField, Thumbnail } from '@shopify/polaris';
+import { Button, ButtonGroup, ChoiceList, Divider, Modal, RadioButton, TextField, Thumbnail } from '@shopify/polaris';
 import React, { useCallback, useState } from 'react';
 
 interface Props {
@@ -14,8 +14,17 @@ export function ProductItem(props: Props) {
   const { toasts, setToasts } = useCustomToast();
   const { items, setItems, orderId, refetch, status } = useOrderContext();
   const [open, setOpen] = useState(false);
-  const [addons, setAddons] = useState<any[]>(props.product.addons?.map(() => '') || []);
-  const [sku, setSku] = useState<number>(0);
+  const [addons, setAddons] = useState<any[]>(
+    props.product.addons?.map((ad) => {
+      return {
+        ...ad,
+        qty: 0,
+      };
+    }) || [],
+  );
+  const [sku, setSku] = useState<number>(
+    (props.product.sku?.length || 0) > 0 ? (props.product.sku || [])[0]?.id || 0 : 0,
+  );
   const [remark, setRemark] = useState('');
 
   const [addCart] = useAddOrderItemMutation({
@@ -36,6 +45,7 @@ export function ProductItem(props: Props) {
     }
 
     const skuQuery = items?.find((f) => f.sku_id === sku && !f.isPrint);
+    const addonPrice = addons.filter((x) => x.qty > 0).reduce((a, b) => (a = a + Number(b.qty) * Number(b.value)), 0);
 
     // else {
     //   data.push({
@@ -53,14 +63,15 @@ export function ProductItem(props: Props) {
     const input: CartItemInput = {
       skuId: sku,
       productId: props.product.id,
-      addons: addons.join(','),
+      addons: addons
+        .filter((x) => x.qty > 0)
+        .map((x) => `${x.name}(x${x.qty})`)
+        .join(','),
       discount: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.discount) : 0,
-      price: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.price) : 0,
+      price: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.price) + addonPrice : 0,
       qty: index >= 0 && !!skuQuery ? data[index].qty + 1 : 1,
       remark: remark,
     };
-
-    console.log(input);
 
     addCart({
       variables: {
@@ -87,6 +98,8 @@ export function ProductItem(props: Props) {
   }, [addCart, addons, items, open, orderId, props.product, refetch, remark, setToasts, sku, toasts]);
 
   const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
+  const addon = addons.filter((x) => x.qty > 0).reduce((a, b) => (a = a + Number(b.qty) * Number(b.value)), 0);
+
   return (
     <React.Fragment>
       <Modal open={open} onClose={() => setOpen(!open)} title titleHidden>
@@ -96,7 +109,7 @@ export function ProductItem(props: Props) {
             <div className="text-lg font-bold">{props.product.title}</div>
             <div>{props.product.description}</div>
             <br />
-            <div className="text-red-500 font-bold">${(props.product.sku || [])[0]?.price}</div>
+            <div className="text-red-500 font-bold">${Number((props.product.sku || [])[0]?.price) + addon}</div>
             <br />
             <Divider />
             <br />
@@ -115,14 +128,42 @@ export function ProductItem(props: Props) {
             </div>
             {(props.product.addons || []).length > 0 && (
               <div>
-                {props.product.addons?.map((x, i) => {
+                {addons.map((x, i) => {
                   return (
                     <div key={i} className="border-solid border-[0.5px] rounded-md mb-2 p-2">
                       <div className="flex flex-row justify-between items-center">
-                        <div>{x?.name}</div>
-                        <div>{x?.isRequired ? 'Required' : 'Optional'}</div>
+                        <div>
+                          {x?.name} (${x?.value})
+                        </div>
+                        <div className="text-right flex flex-col gap-2">
+                          <div>
+                            <ButtonGroup variant="segmented">
+                              <Button
+                                onClick={() => {
+                                  const dummy = [...addons];
+                                  dummy[i].qty = dummy[i].qty > 0 ? dummy[i].qty - 1 : 0;
+                                  setAddons(dummy);
+                                }}
+                                disabled={x.qty === 0}
+                              >
+                                -
+                              </Button>
+                              <Button disabled>{String(x.qty || 0)}</Button>
+                              <Button
+                                onClick={() => {
+                                  const dummy = [...addons];
+                                  dummy[i].qty = dummy[i].qty + 1;
+                                  setAddons(dummy);
+                                }}
+                              >
+                                +
+                              </Button>
+                            </ButtonGroup>
+                          </div>
+                          {x?.isRequired ? 'Required' : 'Optional'}
+                        </div>
                       </div>
-                      <ChoiceList
+                      {/* <ChoiceList
                         key={x?.id}
                         title={x?.name}
                         titleHidden
@@ -133,7 +174,7 @@ export function ProductItem(props: Props) {
                           dummy[i] = v[0];
                           setAddons(dummy);
                         }}
-                      />
+                      /> */}
                     </div>
                   );
                 })}
