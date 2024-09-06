@@ -33,7 +33,7 @@ export function CustomerOrderScreen() {
   const [oneTime, setOneTime] = useState(false);
   const [count, setCount] = useState(0);
   const [verify, setVerify] = useState(true);
-  const [allow, setAllow] = useState(false);
+  const [allow, setAllow] = useState(true);
 
   const [generate] = useGenerateTokenOrderMutation();
 
@@ -103,14 +103,7 @@ export function CustomerOrderScreen() {
     return (
       <>
         <Topbar isCart={false} />
-        {/* <div className="w-full text-center">
-          <div>
-            Wifi: <b>MooD-WiFi</b>
-          </div>
-          <div>
-            Password: <b>{pwdwifi}</b>
-          </div>
-        </div> */}
+        <div>Loading ...</div>
       </>
     );
   }

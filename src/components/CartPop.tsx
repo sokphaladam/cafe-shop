@@ -187,7 +187,7 @@ export function CartPop() {
                       <b>{x.title}</b>
                       <br />
                       <b>
-                        ${sku ? sku.price : ''} ({sku.name})
+                        ${sku ? x.price : ''} ({sku.name})
                       </b>
                       {x.addon_value && (
                         <>
