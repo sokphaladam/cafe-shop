@@ -6,6 +6,7 @@ import { Topbar } from '@/components/Topbar';
 import { ProviderOrderContext, useOrderContext } from '@/context/OrderContext';
 import {
   Type_Product,
+  useCategoryListQuery,
   useGenerateTokenOrderMutation,
   useOrderLazyQuery,
   useOrderQuery,
@@ -18,8 +19,13 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { VerifyCustomerOrderScreen } from './VerifyCustomerOrderScreen';
 import { useSetting } from '@/service/useSettingProvider';
 import { haversineDistance } from '@/lib/loacationDistance';
+import { Icon, Spinner, TextField } from '@shopify/polaris';
+import { CustomerOrderCategory } from './components/CustomerOrderCategoy';
+import { SearchIcon } from '@shopify/polaris-icons';
+import { DisplayOrder } from './components/DisplayOrder';
 
 export function CustomerOrderScreen() {
+  const mooddev = process.browser ? sessionStorage.getItem('mooddev') : 'F';
   const params = useSearchParams();
   const router = useRouter();
   const path = usePathname();
@@ -33,7 +39,9 @@ export function CustomerOrderScreen() {
   const [oneTime, setOneTime] = useState(false);
   const [count, setCount] = useState(0);
   const [verify, setVerify] = useState(true);
-  const [allow, setAllow] = useState(true);
+  const [allow, setAllow] = useState(mooddev === 'T' ? true : false);
+  const [category, setCategory] = useState(null);
+  const [searchInput, setSearchInput] = useState('');
 
   const [generate] = useGenerateTokenOrderMutation();
 
@@ -41,6 +49,8 @@ export function CustomerOrderScreen() {
     skip: !params.get('token'),
     fetchPolicy: 'cache-and-network',
     variables: {
+      limit: 10000,
+      offset: 0,
       filter: {
         type: [Type_Product.Production],
       },
@@ -101,10 +111,14 @@ export function CustomerOrderScreen() {
 
   if (loading || !params.get('token')) {
     return (
-      <>
+      <div>
         <Topbar isCart={false} />
-        <div>Loading ...</div>
-      </>
+        <div className="bg-slate-400 opacity-50 w-full h-full fixed top-0 bottom-0 left-0 right-0 z-[99999]">
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
+            <Spinner />
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -132,30 +146,51 @@ export function CustomerOrderScreen() {
             <Topbar isCart={allow} />
             {!!allow && (
               <>
-                {/* <div className="w-full text-center">
-                  <div>
-                    Wifi: <b>MooD-WiFi</b>
-                  </div>
-                  <div>
-                    Password: <b>{pwdwifi}</b>
-                  </div>
-                </div>
-                <br /> */}
-                <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 max-sm:p-4">
+                <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 ">
                   <div className="w-[70%] flex flex-col gap-4 max-sm:w-full">
-                    {groups &&
-                      Object.keys(groups).map((g) => {
-                        return (
-                          <div key={g}>
-                            <div className="text-xl my-2 font-semibold">{g}</div>
-                            <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-                              {groups[g].map((x: any, i: any) => {
-                                return <ProductItem key={i} product={x} keyItem={info.name} />;
-                              })}
+                    <div className="bg-white">
+                      <DisplayOrder />
+                      <div className="p-1">
+                        <TextField
+                          autoComplete="off"
+                          value={searchInput}
+                          label
+                          labelHidden
+                          suffix={<Icon source={SearchIcon} />}
+                          size="slim"
+                          placeholder="Search keyword..."
+                          // monospaced
+                          onFocus={() => setCategory(null)}
+                          onChange={(v) => {
+                            setSearchInput(v);
+                          }}
+                        />
+                      </div>
+                      <CustomerOrderCategory productGroup={groups} onSelected={setCategory} selected={category} />
+                    </div>
+                    <div className="max-sm:px-4">
+                      {groups &&
+                        (category === null
+                          ? Object.keys(groups)
+                          : Object.keys(groups).filter((f) => f === (category as any).name)
+                        ).map((g) => {
+                          return (
+                            <div key={g}>
+                              {!searchInput && <div className="text-xl my-2 font-semibold">{g}</div>}
+                              <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+                                {(searchInput
+                                  ? groups[g].filter((f: any) =>
+                                      String(f.title).toLowerCase().match(searchInput.toLowerCase()),
+                                    )
+                                  : groups[g]
+                                ).map((x: any, i: any) => {
+                                  return <ProductItem key={i} product={x} keyItem={info.name} />;
+                                })}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                    </div>
                   </div>
                   {/* <LayoutCart /> */}
                 </div>
