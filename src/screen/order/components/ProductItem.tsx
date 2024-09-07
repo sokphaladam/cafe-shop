@@ -54,7 +54,12 @@ export function ProductItem(props: Props) {
     }
 
     const skuQuery = items?.find((f) => f.sku_id === sku && !f.isPrint);
-    const addonPrice = addons.filter((x) => x.qty > 0).reduce((a, b) => (a = a + Number(b.qty) * Number(b.value)), 0);
+    const addonPrice = addons
+      .filter((x) => x.qty > 0)
+      .reduce(
+        (a, b) => (a = a + Number(b.qty || '0') * (isNaN(Number(b.value || '0')) ? 0 : Number(b.value || '0'))),
+        0,
+      );
 
     const input: CartItemInput = {
       skuId: sku,
@@ -87,7 +92,9 @@ export function ProductItem(props: Props) {
   }, [addCart, addons, items, open, orderId, props.product, refetch, remark, setToasts, sku, toasts]);
 
   const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
-  const addon = addons.filter((x) => x.qty > 0).reduce((a, b) => (a = a + Number(b.qty) * Number(b.value)), 0);
+  const addon = addons
+    .filter((x) => x.qty > 0)
+    .reduce((a, b) => (a = a + Number(b.qty || '0') * (isNaN(Number(b.value || '0')) ? 0 : Number(b.value || '0'))), 0);
 
   return (
     <React.Fragment>
