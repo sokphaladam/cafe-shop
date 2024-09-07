@@ -9,6 +9,7 @@ interface Props {
   refetch?: any;
   status?: any;
   vat?: any;
+  order?: any;
 }
 
 const OrderContext = React.createContext<Props>({});
@@ -106,6 +107,7 @@ export function ProviderOrderContext({ children }: PropsWithChildren<unknown>) {
         refetch: refetch,
         status: data ? data.order?.status : undefined,
         vat,
+        order: data?.order,
       }}
     >
       {children}

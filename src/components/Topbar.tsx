@@ -8,8 +8,11 @@ import { config_app } from '@/lib/config_app';
 export function Topbar({ isCart }: { isCart: boolean }) {
   const { push } = useRouter();
   const handleLogPress = () => {
-    console.log('long press');
-    push('/login');
+    const prom = prompt('');
+    if (prom === 'mooddev' && process.browser) {
+      sessionStorage.setItem('mooddev', 'T');
+      window.location.reload();
+    }
   };
 
   const handleClick = () => {};
@@ -28,7 +31,7 @@ export function Topbar({ isCart }: { isCart: boolean }) {
           src={config_app.public.assets.logo}
           alt=""
           className="w-14 h-auto left-0 absolute object-contain"
-          // {...logPressEvent}
+          {...logPressEvent}
         />
         <div className="flex flex-row">{isCart && <CartPop />}</div>
       </div>

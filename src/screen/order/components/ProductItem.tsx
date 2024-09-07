@@ -37,7 +37,16 @@ export function ProductItem(props: Props) {
     }
 
     const data = [...(items || [])];
-    const index = data.findIndex((f) => f.id === props.product.id);
+    const addonValue = addons
+      .filter((x) => x.qty > 0)
+      .map((x) => `${x.name}(x${x.qty})`)
+      .join(',');
+    const index = data.findIndex(
+      (f) =>
+        f.id === props.product.id &&
+        f.addon_value.join(',').trim() === addonValue.trim() &&
+        f.remark.trim() === remark.trim(),
+    );
     const skuIndex = props.product.sku?.findIndex((f: any) => Number(f?.id) === sku);
 
     if (index >= 0) {
@@ -45,34 +54,22 @@ export function ProductItem(props: Props) {
     }
 
     const skuQuery = items?.find((f) => f.sku_id === sku && !f.isPrint);
-    const addonPrice = addons.filter((x) => x.qty > 0).reduce((a, b) => (a = a + Number(b.qty) * Number(b.value)), 0);
-
-    // else {
-    //   data.push({
-    //     ...props.product,
-    //     id: props.product.id,
-    //     addon_value: addons,
-    //     sku_id: sku,
-    //     remark,
-    //     qty: 1,
-    //   })
-
-    //   setItems && setItems(data)
-    // }
+    const addonPrice = addons
+      .filter((x) => x.qty > 0)
+      .reduce(
+        (a, b) => (a = a + Number(b.qty || '0') * (isNaN(Number(b.value || '0')) ? 0 : Number(b.value || '0'))),
+        0,
+      );
 
     const input: CartItemInput = {
       skuId: sku,
       productId: props.product.id,
-      addons: addons
-        .filter((x) => x.qty > 0)
-        .map((x) => `${x.name}(x${x.qty})`)
-        .join(','),
+      addons: addonValue,
       discount: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.discount) : 0,
       price: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.price) + addonPrice : 0,
       qty: index >= 0 && !!skuQuery ? data[index].qty + 1 : 1,
       remark: remark,
     };
-
     addCart({
       variables: {
         orderId: Number(orderId),
@@ -91,14 +88,13 @@ export function ProductItem(props: Props) {
       }
     });
 
-    // setItems && setItems(data);
-    // process.browser && localStorage.setItem(props.keyItem, JSON.stringify(data));
-
     setOpen(!open);
   }, [addCart, addons, items, open, orderId, props.product, refetch, remark, setToasts, sku, toasts]);
 
   const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
-  const addon = addons.filter((x) => x.qty > 0).reduce((a, b) => (a = a + Number(b.qty) * Number(b.value)), 0);
+  const addon = addons
+    .filter((x) => x.qty > 0)
+    .reduce((a, b) => (a = a + Number(b.qty || '0') * (isNaN(Number(b.value || '0')) ? 0 : Number(b.value || '0'))), 0);
 
   return (
     <React.Fragment>

@@ -29,3 +29,36 @@
     page-break-before: always;
   }
 }
+
+.Action_slider_Wrap {
+  background-color: #fff;
+  overflow-y: hidden;
+}
+.Action_slider {
+  display: flex;
+  overflow-x: scroll;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  border-bottom: 0.6px solid #f1f1f1;
+  background-color: #fff;
+}
+.Action_slider li {
+  list-style: none;
+  scroll-behavior: smooth;
+  flex-shrink: 0;
+  text-align: center;
+  scroll-snap-align: center;
+}
+.Action_slider::-webkit-scrollbar {
+  display: none;
+}
+.text_limit_2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
