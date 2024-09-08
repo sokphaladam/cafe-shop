@@ -16,12 +16,12 @@ export function PolarisUpload(props: { url: string; setUrl: (url: string) => voi
         const task = file.upload(acceptedFiles[0]);
         task.on(
           'state_changed',
-          function (snap) {
+          function (snap: any) {
             console.log(snap.state);
             setLoading(true);
             props.onLoading(true);
           },
-          function (err) {
+          function (err: any) {
             console.log(err.message);
             setLoading(false);
             props.onLoading(false);

@@ -67,7 +67,7 @@ export function ProductItem(props: Props) {
       addons: addonValue,
       discount: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.discount) : 0,
       price: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.price) + addonPrice : 0,
-      qty: index >= 0 && !!skuQuery ? data[index].qty + 1 : 1,
+      qty: 1,
       remark: remark,
     };
     addCart({

@@ -160,6 +160,8 @@ export function CartPop() {
     [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery].includes(status) &&
     (items?.filter((f) => !f.isPrint).length || 0) > 0;
 
+  const orderItems = items?.filter((f) => f.status === 'PENDING').length || 0;
+
   return (
     <React.Fragment>
       <Modal
@@ -201,7 +203,13 @@ export function CartPop() {
                     <ButtonGroup variant="segmented">
                       <Button
                         size="micro"
-                        disabled={!edited || x.status === StatusOrderItem.Completed || loading || x.isPrint}
+                        disabled={
+                          !edited ||
+                          x.status === StatusOrderItem.Completed ||
+                          loading ||
+                          !!x.isPrint ||
+                          x.status !== 'PENDING'
+                        }
                         onClick={() => {
                           const dummy = [...items];
                           if (dummy[i].qty === 1) {
@@ -230,7 +238,13 @@ export function CartPop() {
                       </Button>
                       <Button
                         size="micro"
-                        disabled={!edited || x.status === StatusOrderItem.Completed || loading || x.isPrint}
+                        disabled={
+                          !edited ||
+                          x.status === StatusOrderItem.Completed ||
+                          loading ||
+                          !!x.isPrint ||
+                          x.status !== 'PENDING'
+                        }
                         onClick={() => {
                           const dummy = [...items];
                           dummy[i].qty = dummy[i].qty + 1;
@@ -277,9 +291,11 @@ export function CartPop() {
         {!!edited && (
           <Modal.Section>
             <div
-              onClick={() => (loading || items?.length === 0 ? {} : handlePlaceOrder())}
+              onClick={() => (loading || items?.length === 0 || orderItems <= 0 ? {} : handlePlaceOrder())}
               className={`${
-                loading || items?.length === 0 ? 'bg-gray-500' : 'bg-emerald-700 hover:bg-emerald-600'
+                loading || items?.length === 0 || orderItems <= 0
+                  ? 'bg-gray-500'
+                  : 'bg-emerald-700 hover:bg-emerald-600'
               } text-white p-2 w-full text-center rounded-lg`}
             >
               Send Order to Kitchen
