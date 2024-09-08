@@ -21,6 +21,7 @@
     "framer-motion": "^11.3.28",
     "fs": "0.0.1-security",
     "graphql-ws": "^5.16.0",
+    "html-to-image": "^1.11.11",
     "jsprintmanager": "^7.0.1",
     "moment": "^2.30.1",
     "next": "14.2.5",

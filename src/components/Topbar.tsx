@@ -4,6 +4,7 @@ import { CartPop } from './CartPop';
 import useLongPress from '@/hook/useLongPress';
 import { useRouter } from 'next/navigation';
 import { config_app } from '@/lib/config_app';
+import { GeneratePrint } from './GeneratePrint';
 
 export function Topbar({ isCart }: { isCart: boolean }) {
   const { push } = useRouter();
@@ -33,7 +34,10 @@ export function Topbar({ isCart }: { isCart: boolean }) {
           className="w-14 h-auto left-0 absolute object-contain"
           {...logPressEvent}
         />
-        <div className="flex flex-row">{isCart && <CartPop />}</div>
+        <div className="flex flex-row">
+          {/* <GeneratePrint /> */}
+          {isCart && <CartPop />}
+        </div>
       </div>
     </div>
   );

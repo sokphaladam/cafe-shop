@@ -44,6 +44,7 @@ export function CustomerOrderCategory(props: Props) {
       };
       mediaScrollRef?.current?.addEventListener('scroll', onScroll);
       return () => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         mediaScrollRef?.current?.removeEventListener('scroll', onScroll);
       };
     }
@@ -64,7 +65,7 @@ export function CustomerOrderCategory(props: Props) {
             All
           </li>
           {category.map((c: any) => {
-            const count = props.productGroup[c.name].length;
+            const count = props.productGroup ? (props.productGroup[c.name] || []).length : 0;
             return (
               <li
                 key={c.id}

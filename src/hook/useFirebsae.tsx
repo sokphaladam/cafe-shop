@@ -1,19 +1,13 @@
-import firebase_app from "@/lib/firebaseConfig";
-import {
-  deleteObject,
-  getStorage,
-  list,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
+import firebase_app from '@/lib/firebaseConfig';
+import { deleteObject, getStorage, list, ref, uploadBytes, uploadBytesResumable, uploadString } from 'firebase/storage';
 
 class FireStorageFile {
-  refStr = "images/";
-  storage = getStorage(firebase_app, "gs://files-98ece.appspot.com");
+  refStr = 'images/';
+  storage = getStorage(firebase_app, 'gs://files-98ece.appspot.com');
 
   upload(file: File) {
-    const storageRef = ref(this.storage, this.refStr + file.name);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    const storageRef = ref(this.storage, file.name);
+    const uploadTask = uploadBytesResumable(storageRef, file as File);
     return uploadTask;
   }
 
