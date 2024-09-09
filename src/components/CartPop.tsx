@@ -24,7 +24,7 @@ export function CartPop() {
   const params = useSearchParams();
   const { setToasts, toasts } = useCustomToast();
   const setting = useSetting();
-  const { items, setItems, orderId, status, vat: vatPer, refetch } = useOrderContext();
+  const { items, setItems, orderId, status, vat: vatPer, refetch, order } = useOrderContext();
   const [show, setShow] = useState(false);
   const [count, setCount] = useState(1);
   const { width } = useWindowSize();
@@ -151,6 +151,7 @@ export function CartPop() {
   }, 0);
 
   const vatSetting = setting.find((f) => f.option === 'TAX')?.value;
+  const discount = (total * Number(order.discount || 0)) / 100;
 
   // const vat = (total * Number(vatPer || 0)) / 100;
   // const totalAfterVat = total + vat;
@@ -279,12 +280,18 @@ export function CartPop() {
               <div className="w-[75px]">Amount:</div>
               <div className="w-[100px] text-right">${Number(total || 0).toFixed(2)}</div>
             </h6>
+            <h6 className="text-xs font-bold text-gray-600 flex flex-row items-center">
+              <div className="w-[75px]">Discount:</div>
+              <div className="w-[100px] text-right">${Number(discount || 0).toFixed(2)}</div>
+            </h6>
             <h6 className="text-xs my-1 mb-2 font-bold text-gray-600 flex flex-row items-center">
               <div className="w-[100px] text-right">Include. ({vatSetting}%)</div>
             </h6>
             <h4 className="text-lg font-bold flex flex-row items-center">
               <div className="w-[75px]">Total: </div>
-              <span className=" text-emerald-700 w-[100px] text-right">${Number(total || 0).toFixed(2)}</span>
+              <span className=" text-emerald-700 w-[100px] text-right">
+                ${(Number(total || 0) - discount).toFixed(2)}
+              </span>
             </h4>
           </div>
         </Modal.Section>

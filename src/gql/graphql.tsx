@@ -96,15 +96,29 @@ export type CategoryInput = {
 
 export type ChangeOrderInput = {
   amount?: InputMaybe<Scalars['String']['input']>;
+  bankId?: InputMaybe<Scalars['Int']['input']>;
   bankType?: InputMaybe<Scalars['String']['input']>;
+  currency?: InputMaybe<Scalars['String']['input']>;
   deliverPickupCode?: InputMaybe<Scalars['String']['input']>;
   deliverPickupId?: InputMaybe<Scalars['Int']['input']>;
+  discount?: InputMaybe<Scalars['Float']['input']>;
   id?: InputMaybe<Scalars['Int']['input']>;
   invoice?: InputMaybe<Scalars['Int']['input']>;
   itemStatus?: InputMaybe<StatusOrderItem>;
   orderId: Scalars['Int']['input'];
   reason?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<StatusOrder>;
+};
+
+export type CurrencyShift = {
+  __typename?: 'CurrencyShift';
+  khr?: Maybe<Scalars['Float']['output']>;
+  usd?: Maybe<Scalars['Float']['output']>;
+};
+
+export type CurrencyShiftInput = {
+  khr?: InputMaybe<Scalars['Float']['input']>;
+  usd?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type Delivery = {
@@ -148,6 +162,7 @@ export type IntegrateInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addDiscountOrder?: Maybe<Scalars['Boolean']['output']>;
   addOrderItem?: Maybe<Scalars['Boolean']['output']>;
   changeOrderStatus?: Maybe<Scalars['Boolean']['output']>;
   checkAttendance?: Maybe<Scalars['Boolean']['output']>;
@@ -159,6 +174,7 @@ export type Mutation = {
   createPosition?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
   createProductStock?: Maybe<Scalars['Boolean']['output']>;
+  createShift?: Maybe<Scalars['Boolean']['output']>;
   createUser?: Maybe<Scalars['Boolean']['output']>;
   decreaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
   generateTableSet?: Maybe<Scalars['Boolean']['output']>;
@@ -166,6 +182,7 @@ export type Mutation = {
   increaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<Scalars['String']['output']>;
   markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
+  peopleInOrder?: Maybe<Scalars['Boolean']['output']>;
   signatureOrder?: Maybe<Scalars['Boolean']['output']>;
   testSubscription?: Maybe<Scalars['Boolean']['output']>;
   updateBank?: Maybe<Scalars['Boolean']['output']>;
@@ -176,8 +193,15 @@ export type Mutation = {
   updateProduct?: Maybe<Scalars['Boolean']['output']>;
   updateProductStock?: Maybe<Scalars['Boolean']['output']>;
   updateSetting?: Maybe<Scalars['Boolean']['output']>;
+  updateShift?: Maybe<Scalars['Boolean']['output']>;
   updateUser?: Maybe<Scalars['Boolean']['output']>;
   verifyOtpOrder?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type MutationAddDiscountOrderArgs = {
+  discount: Scalars['Float']['input'];
+  id: Scalars['Int']['input'];
 };
 
 
@@ -239,6 +263,11 @@ export type MutationCreateProductStockArgs = {
 };
 
 
+export type MutationCreateShiftArgs = {
+  data?: InputMaybe<ShiftInput>;
+};
+
+
 export type MutationCreateUserArgs = {
   data?: InputMaybe<UserInput>;
 };
@@ -273,6 +302,12 @@ export type MutationLoginArgs = {
 export type MutationMarkOrderItemStatusArgs = {
   id: Scalars['Int']['input'];
   status?: InputMaybe<StatusOrderItem>;
+};
+
+
+export type MutationPeopleInOrderArgs = {
+  count: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
 };
 
 
@@ -340,6 +375,13 @@ export type MutationUpdateSettingArgs = {
 };
 
 
+export type MutationUpdateShiftArgs = {
+  data?: InputMaybe<ShiftInput>;
+  expected?: InputMaybe<Scalars['Boolean']['input']>;
+  id: Scalars['Int']['input'];
+};
+
+
 export type MutationUpdateUserArgs = {
   data?: InputMaybe<UserInput>;
   id: Scalars['Int']['input'];
@@ -358,6 +400,7 @@ export type Order = {
   code?: Maybe<Scalars['String']['output']>;
   delivery?: Maybe<Delivery>;
   deliveryCode?: Maybe<Scalars['String']['output']>;
+  discount?: Maybe<Scalars['Float']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   invoice?: Maybe<Scalars['Int']['output']>;
   items?: Maybe<Array<Maybe<OrderItem>>>;
@@ -365,6 +408,7 @@ export type Order = {
   name?: Maybe<Scalars['String']['output']>;
   note?: Maybe<Scalars['String']['output']>;
   paid?: Maybe<Scalars['String']['output']>;
+  person?: Maybe<Scalars['Int']['output']>;
   set?: Maybe<Scalars['String']['output']>;
   status?: Maybe<StatusOrder>;
   total?: Maybe<Scalars['String']['output']>;
@@ -483,6 +527,8 @@ export type Query = {
   productStockList?: Maybe<Array<Maybe<ProductStock>>>;
   roleList?: Maybe<Array<Maybe<Role>>>;
   settingList?: Maybe<Array<Maybe<Setting>>>;
+  shiftById?: Maybe<Shift>;
+  shiftList?: Maybe<Array<Maybe<Shift>>>;
   tableSet?: Maybe<TableSet>;
   tableSetList?: Maybe<Array<Maybe<TableSet>>>;
   user?: Maybe<User>;
@@ -560,10 +606,12 @@ export type QueryOrderArgs = {
 
 
 export type QueryOrderListArgs = {
+  fromDate?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderId?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<StatusOrder>>>;
+  toDate?: InputMaybe<Scalars['String']['input']>;
   viewBy?: InputMaybe<OrderViewBy>;
 };
 
@@ -597,6 +645,22 @@ export type QueryProductStockListArgs = {
 };
 
 
+export type QueryShiftByIdArgs = {
+  date?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  userId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryShiftListArgs = {
+  fromDate?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  toDate?: InputMaybe<Scalars['String']['input']>;
+  users?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+};
+
+
 export type QueryTableSetArgs = {
   id: Scalars['Int']['input'];
 };
@@ -616,7 +680,9 @@ export type QueryUserArgs = {
 export type QueryUserListArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  position?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   roles?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Role = {
@@ -647,6 +713,32 @@ export type Setting = {
   option?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Scalars['String']['output']>;
   value?: Maybe<Scalars['String']['output']>;
+};
+
+export type Shift = {
+  __typename?: 'Shift';
+  bank?: Maybe<Scalars['JSON']['output']>;
+  bill?: Maybe<Scalars['Int']['output']>;
+  card?: Maybe<Scalars['Int']['output']>;
+  close?: Maybe<Scalars['String']['output']>;
+  closeCurrency?: Maybe<CurrencyShift>;
+  deposit?: Maybe<Scalars['String']['output']>;
+  expectedCurrency?: Maybe<CurrencyShift>;
+  id?: Maybe<Scalars['Int']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  open?: Maybe<Scalars['String']['output']>;
+  openCurrency?: Maybe<CurrencyShift>;
+  user?: Maybe<User>;
+};
+
+export type ShiftInput = {
+  close?: InputMaybe<Scalars['String']['input']>;
+  closeCurrency?: InputMaybe<CurrencyShiftInput>;
+  deposit?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  open?: InputMaybe<Scalars['String']['input']>;
+  openCurrency?: InputMaybe<CurrencyShiftInput>;
+  userId: Scalars['Int']['input'];
 };
 
 export enum StatusOrder {
@@ -977,7 +1069,7 @@ export type OrderListQueryVariables = Exact<{
 }>;
 
 
-export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, deliveryCode?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, bankType?: string | null, invoice?: number | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
+export type OrderListQuery = { __typename?: 'Query', orderList?: Array<{ __typename?: 'Order', id?: number | null, code?: string | null, deliveryCode?: string | null, discount?: number | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, vat?: string | null, bankType?: string | null, invoice?: number | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, price?: number | null, qty?: number | null, discount?: number | null, addons?: string | null, remark?: string | null, status?: StatusOrderItem | null, product?: { __typename?: 'Product', id?: number | null, images?: string | null, title?: string | null, code?: string | null } | null, sku?: { __typename?: 'SKU', name?: string | null } | null } | null> | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null } | null> | null };
 
 export type OrderQueryVariables = Exact<{
   token?: InputMaybe<Scalars['String']['input']>;
@@ -985,7 +1077,7 @@ export type OrderQueryVariables = Exact<{
 }>;
 
 
-export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, invoice?: number | null, bankType?: string | null, deliveryCode?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, isPrint?: boolean | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
+export type OrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', id?: number | null, address?: string | null, status?: StatusOrder | null, discount?: number | null, name?: string | null, paid?: string | null, set?: string | null, total?: string | null, uuid?: string | null, note?: string | null, code?: string | null, vat?: string | null, invoice?: number | null, bankType?: string | null, deliveryCode?: string | null, log?: Array<{ __typename?: 'OrderLog', date?: string | null, text?: string | null, by?: { __typename?: 'User', id: number, display?: string | null } | null } | null> | null, delivery?: { __typename?: 'Delivery', id?: number | null, name?: string | null, contact?: string | null } | null, items?: Array<{ __typename?: 'OrderItem', id?: number | null, qty?: number | null, price?: number | null, discount?: number | null, status?: StatusOrderItem | null, addons?: string | null, remark?: string | null, isPrint?: boolean | null, sku?: { __typename?: 'SKU', price?: number | null, discount?: number | null, id?: number | null, unit?: string | null, name?: string | null } | null, product?: { __typename?: 'Product', title?: string | null, images?: string | null, code?: string | null, description?: string | null, id?: number | null } | null } | null> | null } | null };
 
 export type SettingListQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2189,6 +2281,7 @@ export const OrderListDocument = gql`
     id
     code
     deliveryCode
+    discount
     delivery {
       id
       name
@@ -2276,6 +2369,7 @@ export const OrderDocument = gql`
     id
     address
     status
+    discount
     name
     paid
     set
