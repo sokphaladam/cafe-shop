@@ -5,6 +5,7 @@ import { ProductList } from '@/components/ProductList';
 import { Topbar } from '@/components/Topbar';
 import { ProviderOrderContext, useOrderContext } from '@/context/OrderContext';
 import {
+  Product,
   Type_Product,
   useCategoryListQuery,
   useGenerateTokenOrderMutation,
@@ -183,8 +184,18 @@ export function CustomerOrderScreen() {
                                       String(f.title).toLowerCase().match(searchInput.toLowerCase()),
                                     )
                                   : groups[g]
-                                ).map((x: any, i: any) => {
-                                  return <ProductItem key={i} product={x} keyItem={info.name} />;
+                                ).map((x: Product, i: any) => {
+                                  return x.sku?.map((sku, indexSku) => {
+                                    return (
+                                      <ProductItem
+                                        key={indexSku}
+                                        product={x}
+                                        keyItem={info.name}
+                                        defaultSku={sku || {}}
+                                      />
+                                    );
+                                  });
+                                  // return <ProductItem key={i} product={x} keyItem={info.name} />;
                                 })}
                               </div>
                             </div>

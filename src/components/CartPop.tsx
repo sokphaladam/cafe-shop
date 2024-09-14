@@ -3,7 +3,18 @@ import { Telegram } from '@/api/telegram';
 import { useOrderContext } from '@/context/OrderContext';
 import React, { useCallback, useState } from 'react';
 import { useCustomToast } from './custom/CustomToast';
-import { Button, ButtonGroup, Divider, Icon, Modal, Thumbnail } from '@shopify/polaris';
+import {
+  Button,
+  ButtonGroup,
+  Divider,
+  Icon,
+  IndexFilters,
+  Modal,
+  TabProps,
+  Tabs,
+  Thumbnail,
+  useSetIndexFiltersMode,
+} from '@shopify/polaris';
 import { CartFilledIcon, CartIcon } from '@shopify/polaris-icons';
 import { useWindowSize } from '@/hook/useWindowSize';
 import {
@@ -20,7 +31,19 @@ import { useSearchParams } from 'next/navigation';
 import { useSetting } from '@/service/useSettingProvider';
 import { Modal as Modals } from '@/hook/modal';
 
+const tabs: TabProps[] = [
+  {
+    content: 'New Order',
+    id: '0',
+  },
+  {
+    content: 'Order History',
+    id: '1',
+  },
+];
+
 export function CartPop() {
+  const [select, setSelect] = useState(0);
   const params = useSearchParams();
   const { setToasts, toasts } = useCustomToast();
   const setting = useSetting();
@@ -28,6 +51,7 @@ export function CartPop() {
   const [show, setShow] = useState(false);
   const [count, setCount] = useState(1);
   const { width } = useWindowSize();
+  const { mode, setMode } = useSetIndexFiltersMode();
   const [plus, { loading: loadingPlus }] = useIncreaseOrderItemMutation({
     refetchQueries: ['order'],
   });
@@ -152,15 +176,13 @@ export function CartPop() {
 
   const vatSetting = setting.find((f) => f.option === 'TAX')?.value;
 
-  // const vat = (total * Number(vatPer || 0)) / 100;
-  // const totalAfterVat = total + vat;
-
   const loading = loadingMark || loadingPlus || loadingChange || loadingSub;
   const edited =
     [StatusOrder.Pending, StatusOrder.Verify, StatusOrder.Delivery].includes(status) &&
     (items?.filter((f) => !f.isPrint).length || 0) > 0;
 
   const orderItems = items?.filter((f) => f.status === 'PENDING').length || 0;
+  const orderHistory = items?.filter((f) => f.status !== 'PENDING').length || 0;
 
   return (
     <React.Fragment>
@@ -170,108 +192,127 @@ export function CartPop() {
           setShow(!show);
           refetch();
         }}
-        title="Checkout"
+        title={'Checkout'}
       >
-        <Modal.Section>
-          {items?.map((x, i) => {
-            const sku = x.sku.find((s: any) => s.id === x.sku_id);
-            return (
-              <div
-                key={i}
-                className={`${
-                  x.status === StatusOrderItem.Completed ? 'bg-emerald-400' : x.isPrint ? 'bg-gray-300 opacity-50' : ''
-                } p-4`}
-              >
-                <div className="flex flex-row justify-between items-center">
-                  <div className="flex flex-row">
-                    <Thumbnail source={x.images || ''} alt="" size="medium" />
-                    <div className="ml-2">
-                      <b>{x.title}</b>
-                      <br />
-                      <b>
-                        ${sku ? x.price : ''} ({sku.name})
-                      </b>
-                      {x.addon_value && (
-                        <>
-                          <br />
-                          {x.addon_value.join(',')}
-                        </>
-                      )}
+        <Modal.Section flush>
+          <Tabs
+            tabs={tabs.map((x) => {
+              return { ...x, content: `${x.content} ${x.id === '0' ? `(${orderItems})` : `(${orderHistory})`}` };
+            })}
+            selected={select}
+            onSelect={setSelect}
+          />
+        </Modal.Section>
+        <Modal.Section flush>
+          {items
+            ?.filter((f) =>
+              select === 1
+                ? !![StatusOrderItem.Completed, StatusOrderItem.Making].includes(f.status)
+                : ![StatusOrderItem.Completed, StatusOrderItem.Making].includes(f.status),
+            )
+            .map((x, i) => {
+              const sku = x.sku.find((s: any) => s.id === x.sku_id);
+              return (
+                <div
+                  key={i}
+                  className={`${
+                    x.status === StatusOrderItem.Completed
+                      ? 'bg-emerald-200'
+                      : x.isPrint
+                      ? 'bg-gray-300 opacity-50'
+                      : ''
+                  } p-4`}
+                >
+                  <div className="flex flex-row justify-between items-center">
+                    <div className="flex flex-row">
+                      <Thumbnail source={x.images || ''} alt="" size="medium" />
+                      <div className="ml-2">
+                        <b>{x.title}</b>
+                        <br />
+                        <b>
+                          ${sku ? x.price : ''} ({sku.name})
+                        </b>
+                        {x.addon_value && (
+                          <>
+                            <br />
+                            {x.addon_value.join(',')}
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <ButtonGroup variant="segmented">
-                      <Button
-                        size="micro"
-                        disabled={
-                          !edited ||
-                          x.status === StatusOrderItem.Completed ||
-                          loading ||
-                          !!x.isPrint ||
-                          x.status !== 'PENDING'
-                        }
-                        onClick={() => {
-                          const dummy = [...items];
-                          if (dummy[i].qty === 1) {
-                            setItems && setItems(items.filter((_, index) => index !== i));
-                            mark({
+                    <div>
+                      <ButtonGroup variant="segmented">
+                        <Button
+                          size="micro"
+                          disabled={
+                            !edited ||
+                            x.status === StatusOrderItem.Completed ||
+                            loading ||
+                            !!x.isPrint ||
+                            x.status !== 'PENDING'
+                          }
+                          onClick={() => {
+                            const dummy = [...items];
+                            if (dummy[i].qty === 1) {
+                              setItems && setItems(items.filter((_, index) => index !== i));
+                              mark({
+                                variables: {
+                                  markOrderItemStatusId: Number(x.orderItemid),
+                                  status: StatusOrderItem.Deleted,
+                                },
+                              });
+                              return;
+                            }
+                            dummy[i].qty = dummy[i].qty - 1;
+                            setItems && setItems(dummy);
+                            sub({
                               variables: {
-                                markOrderItemStatusId: Number(x.orderItemid),
-                                status: StatusOrderItem.Deleted,
+                                decreaseOrderItemId: Number(x.orderItemid),
                               },
                             });
-                            return;
+                          }}
+                        >
+                          -
+                        </Button>
+                        <Button disabled size="micro">
+                          {x.qty}
+                        </Button>
+                        <Button
+                          size="micro"
+                          disabled={
+                            !edited ||
+                            x.status === StatusOrderItem.Completed ||
+                            loading ||
+                            !!x.isPrint ||
+                            x.status !== 'PENDING'
                           }
-                          dummy[i].qty = dummy[i].qty - 1;
-                          setItems && setItems(dummy);
-                          sub({
-                            variables: {
-                              decreaseOrderItemId: Number(x.orderItemid),
-                            },
-                          });
-                        }}
-                      >
-                        -
-                      </Button>
-                      <Button disabled size="micro">
-                        {x.qty}
-                      </Button>
-                      <Button
-                        size="micro"
-                        disabled={
-                          !edited ||
-                          x.status === StatusOrderItem.Completed ||
-                          loading ||
-                          !!x.isPrint ||
-                          x.status !== 'PENDING'
-                        }
-                        onClick={() => {
-                          const dummy = [...items];
-                          dummy[i].qty = dummy[i].qty + 1;
-                          setItems && setItems(dummy);
-                          plus({
-                            variables: {
-                              increaseOrderItemId: Number(x.orderItemid),
-                            },
-                          });
-                        }}
-                      >
-                        +
-                      </Button>
-                    </ButtonGroup>
-                    <small className="text-red-400">{x.isPrint ? 'Already to kitchen' : ''}</small>
+                          onClick={() => {
+                            const dummy = [...items];
+                            dummy[i].qty = dummy[i].qty + 1;
+                            setItems && setItems(dummy);
+                            plus({
+                              variables: {
+                                increaseOrderItemId: Number(x.orderItemid),
+                              },
+                            });
+                          }}
+                        >
+                          +
+                        </Button>
+                      </ButtonGroup>
+                      <small className="text-red-400">{x.isPrint ? 'Already to kitchen' : ''}</small>
+                    </div>
                   </div>
+                  <br />
+                  {x.remark && (
+                    <div className="bg-amber-200 p-1">
+                      <b>Special Request:</b> {x.remark}
+                    </div>
+                  )}
+                  <Divider />
                 </div>
-                <br />
-                {x.remark && (
-                  <div className="bg-amber-200 p-1">
-                    <b>Special Request:</b> {x.remark}
-                  </div>
-                )}
-                <Divider />
-              </div>
-            );
-          })}
+              );
+            })}
         </Modal.Section>
         <Modal.Section>
           <div className="text-star w-full flex flex-col items-end">
