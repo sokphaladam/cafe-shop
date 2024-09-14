@@ -2,6 +2,7 @@
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
 import { CartItemInput, Product, Sku, StatusOrder, useAddOrderItemMutation } from '@/gql/graphql';
+import { config_app } from '@/lib/config_app';
 import { Button, ButtonGroup, ChoiceList, Divider, Modal, RadioButton, TextField, Thumbnail } from '@shopify/polaris';
 import React, { useCallback, useState } from 'react';
 
@@ -105,7 +106,15 @@ export function ProductItem(props: Props) {
 
   return (
     <React.Fragment>
-      <Modal open={open} onClose={() => setOpen(!open)} title titleHidden>
+      <Modal
+        open={open}
+        onClose={() => setOpen(!open)}
+        title={
+          <div>
+            <img src={config_app.public.assets.logo} alt="" className="w-14 h-auto object-contain" />
+          </div>
+        }
+      >
         <Modal.Section flush>
           <img
             src={skuSelect?.image ? skuSelect?.image || '' : props.product.images || ''}
@@ -113,10 +122,12 @@ export function ProductItem(props: Props) {
             className="w-full max-h-[275px] object-contain"
           />
           <div className="p-4">
-            <div className="text-lg font-bold">{props.product.title}</div>
+            <div className="text-lg font-bold">
+              {props.product.title} ({skuSelect?.name})
+            </div>
             <div>{props.product.description}</div>
             <br />
-            <div className="text-red-500 font-bold">${Number(skuSelect?.price) + addon}</div>
+            <div className="text-red-500 font-bold">${Number(Number(skuSelect?.price) + addon).toFixed(2)}</div>
             <br />
             <Divider />
             <br />
@@ -193,7 +204,7 @@ export function ProductItem(props: Props) {
               label="Special instructions"
               multiline={3}
               autoComplete="off"
-              placeholder={`Special requests are subject to the restaurant's approval. Tell us here!`}
+              placeholder={`Tell us here!`}
             />
           </div>
         </Modal.Section>
@@ -208,14 +219,17 @@ export function ProductItem(props: Props) {
       <div
         onClick={() => {
           !!edited && setOpen(true);
+          if (props.defaultSku) {
+            setSku(props.defaultSku.id || 0);
+          }
         }}
         className="bg-white rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer hover:scale-105 hover:bg-gray-50 transition-all"
       >
         <div className="max-w-[250px] max-sm:w-[210px] max-lg:w-[180px]">
           <b className="text-lg">
-            {props.product.title} ({skuSelect?.name})
+            {props.product.title} ({props.defaultSku?.name})
           </b>
-          <div className="text-red-500 font-bold my-2">${skuSelect?.price}</div>
+          <div className="text-red-500 font-bold my-2">${Number(props.defaultSku?.price).toFixed(2)}</div>
           <div className="max-h-[30px] truncate">{props.product.description}</div>
         </div>
         <div className="w-[75px]">
