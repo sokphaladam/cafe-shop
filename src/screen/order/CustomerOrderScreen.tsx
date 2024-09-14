@@ -146,29 +146,59 @@ export function CustomerOrderScreen() {
           <ProviderOrderContext>
             <Topbar isCart={allow} />
             {!!allow && (
+              <div className="bg-white">
+                <DisplayOrder />
+              </div>
+            )}
+            {!!allow && (
+              <div className="bg-white sticky z-[51] top-[39px]">
+                <div>
+                  <div className="p-1 py-2">
+                    <TextField
+                      autoComplete="off"
+                      value={searchInput}
+                      label
+                      labelHidden
+                      suffix={<Icon source={SearchIcon} />}
+                      size="slim"
+                      placeholder="Search keyword..."
+                      // monospaced
+                      onFocus={() => setCategory(null)}
+                      onChange={(v) => {
+                        setSearchInput(v);
+                      }}
+                    />
+                  </div>
+                  <CustomerOrderCategory productGroup={groups} onSelected={setCategory} selected={category} />
+                </div>
+              </div>
+            )}
+            {!!allow && (
               <>
                 <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 ">
-                  <div className="w-[70%] flex flex-col gap-4 max-sm:w-full">
-                    <div className="bg-white">
+                  <div className="w-[100%] flex flex-col gap-4 max-sm:w-full p-2">
+                    {/* <div className="bg-white">
                       <DisplayOrder />
-                      <div className="p-1">
-                        <TextField
-                          autoComplete="off"
-                          value={searchInput}
-                          label
-                          labelHidden
-                          suffix={<Icon source={SearchIcon} />}
-                          size="slim"
-                          placeholder="Search keyword..."
-                          // monospaced
-                          onFocus={() => setCategory(null)}
-                          onChange={(v) => {
-                            setSearchInput(v);
-                          }}
-                        />
+                      <div>
+                        <div className="p-1">
+                          <TextField
+                            autoComplete="off"
+                            value={searchInput}
+                            label
+                            labelHidden
+                            suffix={<Icon source={SearchIcon} />}
+                            size="slim"
+                            placeholder="Search keyword..."
+                            // monospaced
+                            onFocus={() => setCategory(null)}
+                            onChange={(v) => {
+                              setSearchInput(v);
+                            }}
+                          />
+                        </div>
+                        <CustomerOrderCategory productGroup={groups} onSelected={setCategory} selected={category} />
                       </div>
-                      <CustomerOrderCategory productGroup={groups} onSelected={setCategory} selected={category} />
-                    </div>
+                    </div> */}
                     <div className="max-sm:px-4">
                       {groups &&
                         (category === null

@@ -228,11 +228,11 @@ export function CartPop() {
                     <div className="flex flex-row">
                       <Thumbnail source={x.images || ''} alt="" size="medium" />
                       <div className="ml-2">
-                        <b>{x.title}</b>
-                        <br />
                         <b>
-                          ${sku ? x.price : ''} ({sku.name})
+                          {x.title} ({sku.name})
                         </b>
+                        <br />
+                        <b className="text-rose-600">${sku ? Number(x.price).toFixed(2) : ''}</b>
                         {x.addon_value && (
                           <>
                             <br />
