@@ -40,6 +40,7 @@ query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProdu
       price
       discount
       unit
+      image
     }
     code
     images
@@ -70,6 +71,7 @@ query product($productId: Int!) {
       price
       discount
       unit
+      image
     }
     code
     images

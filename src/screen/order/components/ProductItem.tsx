@@ -1,13 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
-import { CartItemInput, Product, StatusOrder, useAddOrderItemMutation } from '@/gql/graphql';
+import { CartItemInput, Product, Sku, StatusOrder, useAddOrderItemMutation } from '@/gql/graphql';
 import { Button, ButtonGroup, ChoiceList, Divider, Modal, RadioButton, TextField, Thumbnail } from '@shopify/polaris';
 import React, { useCallback, useState } from 'react';
 
 interface Props {
   product: Product;
   keyItem: string;
+  defaultSku?: Sku;
 }
 
 export function ProductItem(props: Props) {
@@ -23,7 +24,11 @@ export function ProductItem(props: Props) {
     }) || [],
   );
   const [sku, setSku] = useState<number>(
-    (props.product.sku?.length || 0) > 0 ? (props.product.sku || [])[0]?.id || 0 : 0,
+    props.defaultSku
+      ? props.defaultSku.id || 0
+      : (props.product.sku?.length || 0) > 0
+      ? (props.product.sku || [])[0]?.id || 0
+      : 0,
   );
   const [remark, setRemark] = useState('');
 
@@ -96,16 +101,22 @@ export function ProductItem(props: Props) {
     .filter((x) => x.qty > 0)
     .reduce((a, b) => (a = a + Number(b.qty || '0') * (isNaN(Number(b.value || '0')) ? 0 : Number(b.value || '0'))), 0);
 
+  const skuSelect = props.product.sku?.find((f) => f?.id === sku);
+
   return (
     <React.Fragment>
       <Modal open={open} onClose={() => setOpen(!open)} title titleHidden>
         <Modal.Section flush>
-          <img src={props.product.images || ''} alt="" className="w-full max-h-[275px] object-contain" />
+          <img
+            src={skuSelect?.image ? skuSelect?.image || '' : props.product.images || ''}
+            alt=""
+            className="w-full max-h-[275px] object-contain"
+          />
           <div className="p-4">
             <div className="text-lg font-bold">{props.product.title}</div>
             <div>{props.product.description}</div>
             <br />
-            <div className="text-red-500 font-bold">${Number((props.product.sku || [])[0]?.price) + addon}</div>
+            <div className="text-red-500 font-bold">${Number(skuSelect?.price) + addon}</div>
             <br />
             <Divider />
             <br />
@@ -201,12 +212,18 @@ export function ProductItem(props: Props) {
         className="bg-white rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer hover:scale-105 hover:bg-gray-50 transition-all"
       >
         <div className="max-w-[250px] max-sm:w-[210px] max-lg:w-[180px]">
-          <b className="text-lg">{props.product.title}</b>
-          <div className="text-red-500 font-bold my-2">${(props.product.sku || [])[0]?.price}</div>
+          <b className="text-lg">
+            {props.product.title} ({skuSelect?.name})
+          </b>
+          <div className="text-red-500 font-bold my-2">${skuSelect?.price}</div>
           <div className="max-h-[30px] truncate">{props.product.description}</div>
         </div>
         <div className="w-[75px]">
-          <Thumbnail alt="" source={props.product.images || ''} size="large" />
+          <Thumbnail
+            alt=""
+            source={props.defaultSku?.image ? props.defaultSku.image + '' : props.product.images || ''}
+            size="large"
+          />
         </div>
       </div>
     </React.Fragment>
