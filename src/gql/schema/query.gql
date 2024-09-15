@@ -41,9 +41,11 @@ query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProdu
       discount
       unit
       image
+      status
     }
     code
     images
+    status
     addons {
       value
       name
@@ -57,6 +59,7 @@ query product($productId: Int!) {
   product(id: $productId) {
     id
     title
+    status
     description
     type
     stockAlter
@@ -72,6 +75,7 @@ query product($productId: Int!) {
       discount
       unit
       image
+      status
     }
     code
     images
