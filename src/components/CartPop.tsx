@@ -243,7 +243,7 @@ export function CartPop() {
                     </div>
                     <div>
                       <ButtonGroup variant="segmented">
-                        <Button
+                        {/* <Button
                           size="micro"
                           disabled={
                             !edited ||
@@ -274,11 +274,11 @@ export function CartPop() {
                           }}
                         >
                           -
-                        </Button>
+                        </Button> */}
                         <Button disabled size="micro">
                           {x.qty}
                         </Button>
-                        <Button
+                        {/* <Button
                           size="micro"
                           disabled={
                             !edited ||
@@ -299,7 +299,7 @@ export function CartPop() {
                           }}
                         >
                           +
-                        </Button>
+                        </Button> */}
                       </ButtonGroup>
                       <small className="text-red-400">{x.isPrint ? 'Already to kitchen' : ''}</small>
                     </div>
@@ -336,7 +336,7 @@ export function CartPop() {
             </h4>
           </div>
         </Modal.Section>
-        {!!edited && (
+        {/* {!!edited && (
           <Modal.Section>
             <div
               onClick={() => (loading || items?.length === 0 || orderItems <= 0 ? {} : handlePlaceOrder())}
@@ -349,7 +349,7 @@ export function CartPop() {
               Send Order to Kitchen
             </div>
           </Modal.Section>
-        )}
+        )} */}
       </Modal>
       <div
         className="w-[25px] cursor-pointer h-[25px] flex flex-row self-center relative"
