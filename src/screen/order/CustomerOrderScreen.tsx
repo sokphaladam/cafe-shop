@@ -40,7 +40,7 @@ export function CustomerOrderScreen() {
   const [oneTime, setOneTime] = useState(false);
   const [count, setCount] = useState(0);
   const [verify, setVerify] = useState(true);
-  const [allow, setAllow] = useState(mooddev === 'T' ? true : false);
+  const [allow, setAllow] = useState(mooddev === 'T' ? true : true);
   const [category, setCategory] = useState(null);
   const [searchInput, setSearchInput] = useState('');
 
@@ -69,8 +69,6 @@ export function CustomerOrderScreen() {
           Number(msg.coords.latitude),
           Number(msg.coords.longitude),
         );
-
-        console.log(km);
 
         if (Number(km) < 0.1) {
           setAllow(true);
@@ -208,7 +206,27 @@ export function CustomerOrderScreen() {
                           return (
                             <div key={g}>
                               {!searchInput && <div className="text-xl my-2 font-semibold">{g}</div>}
-                              <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+                              <div className="grid grid-cols-3 gap-4 max-sm:grid-cols-2">
+                                {(searchInput
+                                  ? groups[g].filter((f: any) =>
+                                      String(f.title).toLowerCase().match(searchInput.toLowerCase()),
+                                    )
+                                  : groups[g]
+                                ).map((x: Product, i: any) => {
+                                  return x.sku?.map((sku, indexSku) => {
+                                    return (
+                                      <ProductItem
+                                        key={indexSku}
+                                        product={x}
+                                        keyItem={info.name}
+                                        defaultSku={sku || {}}
+                                        display="CARD"
+                                      />
+                                    );
+                                  });
+                                })}
+                              </div>
+                              {/* <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                                 {(searchInput
                                   ? groups[g].filter((f: any) =>
                                       String(f.title).toLowerCase().match(searchInput.toLowerCase()),
@@ -227,7 +245,7 @@ export function CustomerOrderScreen() {
                                   });
                                   // return <ProductItem key={i} product={x} keyItem={info.name} />;
                                 })}
-                              </div>
+                              </div> */}
                             </div>
                           );
                         })}

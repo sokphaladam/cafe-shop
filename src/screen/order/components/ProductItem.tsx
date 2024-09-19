@@ -15,12 +15,14 @@ import {
   Thumbnail,
 } from '@shopify/polaris';
 import { CartAbandonedFilledIcon } from '@shopify/polaris-icons';
+import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
 
 interface Props {
   product: Product;
   keyItem: string;
   defaultSku?: Sku;
+  display?: 'CARD' | 'LIST';
 }
 
 export function ProductItem(props: Props) {
@@ -220,67 +222,126 @@ export function ProductItem(props: Props) {
             />
           </div>
         </Modal.Section>
-        <Modal.Section>
+        {/* <Modal.Section>
           <div className="flex flex-row items-center">
             <Button fullWidth tone="success" variant="primary" onClick={handleAddtoCart}>
               Add to cart
             </Button>
           </div>
-        </Modal.Section>
+        </Modal.Section> */}
       </Modal>
-      <div
-        onClick={() => {
-          if (
-            props.product.status === Status_Product.Available &&
-            props.defaultSku?.status === Status_Product.Available
-          ) {
-            !!edited && setOpen(true);
-            if (props.defaultSku) {
-              setSku(props.defaultSku.id || 0);
+      {props.display === 'CARD' ? (
+        <div
+          onClick={() => {
+            if (
+              props.product.status === Status_Product.Available &&
+              props.defaultSku?.status === Status_Product.Available
+            ) {
+              !!edited && setOpen(true);
+              if (props.defaultSku) {
+                setSku(props.defaultSku.id || 0);
+              }
             }
-          }
-        }}
-        className={`${
-          props.product.status === Status_Product.Available || props.defaultSku?.status === Status_Product.Available
-            ? 'bg-white'
-            : 'bg-gray-100'
-        } rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer ${
-          props.product.status === Status_Product.Available || props.defaultSku?.status === Status_Product.Available
-            ? `hover:scale-105 hover:bg-gray-50`
-            : ''
-        } transition-all`}
-      >
-        <div className="max-w-[250px] max-sm:w-[210px] max-lg:w-[180px]">
-          <b
-            className={`text-lg ${
-              props.product.status === Status_Product.OutOfStock ||
-              props.defaultSku?.status === Status_Product.OutOfStock
-                ? 'text-gray-400'
-                : ''
-            }`}
-          >
-            {props.product.title} ({props.defaultSku?.name})
-          </b>
-          <div className="text-red-500 font-bold my-2">${Number(props.defaultSku?.price).toFixed(2)}</div>
-          {(props.product.status === Status_Product.OutOfStock ||
-            props.defaultSku?.status === Status_Product.OutOfStock) && (
-            <div className="flex flex-row items-center gap-1">
-              <div>
-                <Icon source={CartAbandonedFilledIcon} tone="critical" />
+          }}
+          className={`${
+            props.product.status === Status_Product.Available && props.defaultSku?.status === Status_Product.Available
+              ? 'bg-white'
+              : 'bg-gray-50'
+          } rounded-lg overflow-hidden justify-between items-center cursor-pointer ${
+            props.product.status === Status_Product.Available && props.defaultSku?.status === Status_Product.Available
+              ? `hover:scale-105 hover:bg-gray-50`
+              : ''
+          } transition-all`}
+        >
+          <div className="w-full h-[150] flex flex-row justify-center items-center">
+            <Image
+              src={props.defaultSku?.image ? props.defaultSku.image + '' : props.product.images || ''}
+              alt=""
+              width={180}
+              height={180}
+              className="object-contain"
+              style={{ width: 'fit-contain', height: 180 }}
+            />
+          </div>
+          <div className="py-2 px-4">
+            <b
+              className={`text-lg ${
+                props.product.status === Status_Product.OutOfStock ||
+                props.defaultSku?.status === Status_Product.OutOfStock
+                  ? 'text-gray-400'
+                  : ''
+              }`}
+            >
+              {props.product.title} ({props.defaultSku?.name})
+            </b>
+            <div className="text-red-500 font-bold my-2">${Number(props.defaultSku?.price).toFixed(2)}</div>
+            {(props.product.status === Status_Product.OutOfStock ||
+              props.defaultSku?.status === Status_Product.OutOfStock) && (
+              <div className="flex flex-row items-center gap-1">
+                <div>
+                  <Icon source={CartAbandonedFilledIcon} tone="critical" />
+                </div>
+                <small className="text-red-500">(Out Of Stock)</small>
               </div>
-              <small className="text-red-500">(Out Of Stock)</small>
-            </div>
-          )}
-          <div className="max-h-[30px] truncate">{props.product.description}</div>
+            )}
+            <div className="max-h-[30px] truncate">{props.product.description}</div>
+          </div>
         </div>
-        <div className="w-[75px]">
-          <Thumbnail
-            alt=""
-            source={props.defaultSku?.image ? props.defaultSku.image + '' : props.product.images || ''}
-            size="large"
-          />
+      ) : (
+        <div
+          onClick={() => {
+            if (
+              props.product.status === Status_Product.Available &&
+              props.defaultSku?.status === Status_Product.Available
+            ) {
+              !!edited && setOpen(true);
+              if (props.defaultSku) {
+                setSku(props.defaultSku.id || 0);
+              }
+            }
+          }}
+          className={`${
+            props.product.status === Status_Product.Available || props.defaultSku?.status === Status_Product.Available
+              ? 'bg-white'
+              : 'bg-gray-100'
+          } rounded-lg py-2 px-4 flex flex-row justify-between items-center cursor-pointer ${
+            props.product.status === Status_Product.Available || props.defaultSku?.status === Status_Product.Available
+              ? `hover:scale-105 hover:bg-gray-50`
+              : ''
+          } transition-all`}
+        >
+          <div className="max-w-[250px] max-sm:w-[210px] max-lg:w-[180px]">
+            <b
+              className={`text-lg ${
+                props.product.status === Status_Product.OutOfStock ||
+                props.defaultSku?.status === Status_Product.OutOfStock
+                  ? 'text-gray-400'
+                  : ''
+              }`}
+            >
+              {props.product.title} ({props.defaultSku?.name})
+            </b>
+            <div className="text-red-500 font-bold my-2">${Number(props.defaultSku?.price).toFixed(2)}</div>
+            {(props.product.status === Status_Product.OutOfStock ||
+              props.defaultSku?.status === Status_Product.OutOfStock) && (
+              <div className="flex flex-row items-center gap-1">
+                <div>
+                  <Icon source={CartAbandonedFilledIcon} tone="critical" />
+                </div>
+                <small className="text-red-500">(Out Of Stock)</small>
+              </div>
+            )}
+            <div className="max-h-[30px] truncate">{props.product.description}</div>
+          </div>
+          <div className="w-[75px]">
+            <Thumbnail
+              alt=""
+              source={props.defaultSku?.image ? props.defaultSku.image + '' : props.product.images || ''}
+              size="large"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </React.Fragment>
   );
 }

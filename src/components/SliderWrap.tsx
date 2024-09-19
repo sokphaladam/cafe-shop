@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './ui/style.css';
 
@@ -115,7 +116,7 @@ export function SliderWrap(props: React.PropsWithChildren<Props>) {
       }, speed);
       return () => clearInterval(interval);
     }
-  }, [index, props?.auto]);
+  }, [dataLenght, index, props, speed]);
 
   useEffect(() => {
     if (props.indexSelect) {
@@ -123,7 +124,7 @@ export function SliderWrap(props: React.PropsWithChildren<Props>) {
       const newIndex = (dataLenght + props.indexSelect) % dataLenght;
       scrollToIndex(newIndex);
     }
-  }, [props.indexSelect]);
+  }, [dataLenght, props]);
 
   if (props?.disable) {
     return <>{props.children}</>;

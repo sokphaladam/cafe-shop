@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import { Page } from '@shopify/polaris';
 import React, { useCallback, useEffect, useState } from 'react';
