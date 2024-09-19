@@ -243,7 +243,7 @@ export function CartPop() {
                     </div>
                     <div>
                       <ButtonGroup variant="segmented">
-                        <Button
+                        {/* <Button
                           size="micro"
                           disabled={
                             !edited ||
@@ -274,11 +274,11 @@ export function CartPop() {
                           }}
                         >
                           -
-                        </Button>
+                        </Button> */}
                         <Button disabled size="micro">
                           {x.qty}
                         </Button>
-                        <Button
+                        {/* <Button
                           size="micro"
                           disabled={
                             !edited ||
@@ -299,7 +299,7 @@ export function CartPop() {
                           }}
                         >
                           +
-                        </Button>
+                        </Button> */}
                       </ButtonGroup>
                       <small className="text-red-400">{x.isPrint ? 'Already to kitchen' : ''}</small>
                     </div>
