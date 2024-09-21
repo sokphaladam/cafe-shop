@@ -203,6 +203,7 @@ query order($token: String, $orderId: Int) {
         id
         unit
         name
+        image
       }
       product {
         title

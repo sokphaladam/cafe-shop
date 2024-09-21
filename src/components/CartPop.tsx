@@ -193,7 +193,7 @@ export function CartPop() {
           setShow(!show);
           refetch();
         }}
-        title={'Checkout'}
+        title={`Your order`}
       >
         <Modal.Section flush>
           <Tabs
@@ -217,16 +217,12 @@ export function CartPop() {
                 <div
                   key={i}
                   className={`${
-                    x.status === StatusOrderItem.Completed
-                      ? 'bg-emerald-200'
-                      : x.isPrint
-                      ? 'bg-gray-300 opacity-50'
-                      : ''
+                    x.status === StatusOrderItem.Completed ? 'bg-emerald-200' : x.isPrint ? 'bg-gray-200' : ''
                   } p-4`}
                 >
                   <div className="flex flex-row justify-between items-center">
                     <div className="flex flex-row">
-                      <Thumbnail source={x.images || ''} alt="" size="medium" />
+                      <Thumbnail source={sku.image || x.images || ''} alt="" size="medium" />
                       <div className="ml-2">
                         <b>
                           {x.title} ({sku.name})
@@ -241,7 +237,7 @@ export function CartPop() {
                         )}
                       </div>
                     </div>
-                    <div>
+                    <div className="flex flex-col items-center">
                       <ButtonGroup variant="segmented">
                         {/* <Button
                           size="micro"
@@ -276,7 +272,7 @@ export function CartPop() {
                           -
                         </Button> */}
                         <Button disabled size="micro">
-                          {x.qty}
+                          {(<div className="text-black">{x.qty}</div>) as any}
                         </Button>
                         {/* <Button
                           size="micro"
