@@ -1,7 +1,7 @@
 'use client';
 
 import { SliderWrap } from '@/components/SliderWrap';
-import { useCategoryListQuery } from '@/gql/graphql';
+import { Status_Product, useCategoryListQuery } from '@/gql/graphql';
 import { isMobile } from '@/hook/isMobile';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -11,6 +11,7 @@ interface Props {
   productGroup: any[];
   onSelected?: (e: any) => void;
   selected?: any;
+  isOutStock?: boolean;
 }
 
 export function CustomerOrderCategory(props: Props) {
@@ -68,7 +69,23 @@ export function CustomerOrderCategory(props: Props) {
             .filter((f: any) => props.productGroup[f.name] && props.productGroup[f.name].length > 0)
             .map((c: any) => {
               const count = props.productGroup
-                ? (props.productGroup[c.name] || []).reduce((a: any, b: any) => (a = a + b.sku.length), 0)
+                ? (props.productGroup[c.name] || [])
+                    .filter((f: any) =>
+                      !props.isOutStock
+                        ? [Status_Product.Available].includes(f.status)
+                        : [Status_Product.Available, Status_Product.OutOfStock].includes(f.status),
+                    )
+                    .reduce(
+                      (a: any, b: any) =>
+                        (a =
+                          a +
+                          b.sku.filter((f: any) => {
+                            return !props.isOutStock
+                              ? [Status_Product.Available].includes(f.status)
+                              : [Status_Product.Available, Status_Product.OutOfStock].includes(f.status);
+                          }).length),
+                      0,
+                    )
                 : 0;
               return (
                 <li

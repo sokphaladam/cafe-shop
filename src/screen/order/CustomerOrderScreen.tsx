@@ -6,6 +6,7 @@ import { Topbar } from '@/components/Topbar';
 import { ProviderOrderContext, useOrderContext } from '@/context/OrderContext';
 import {
   Product,
+  Status_Product,
   Type_Product,
   useCategoryListQuery,
   useGenerateTokenOrderMutation,
@@ -20,7 +21,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { VerifyCustomerOrderScreen } from './VerifyCustomerOrderScreen';
 import { useSetting } from '@/service/useSettingProvider';
 import { haversineDistance } from '@/lib/loacationDistance';
-import { Icon, Spinner, TextField } from '@shopify/polaris';
+import { Button, Icon, Spinner, TextField } from '@shopify/polaris';
 import { CustomerOrderCategory } from './components/CustomerOrderCategoy';
 import { SearchIcon } from '@shopify/polaris-icons';
 import { DisplayOrder } from './components/DisplayOrder';
@@ -43,6 +44,7 @@ export function CustomerOrderScreen() {
   const [allow, setAllow] = useState(mooddev === 'T' ? true : true);
   const [category, setCategory] = useState(null);
   const [searchInput, setSearchInput] = useState('');
+  const [enable, setEnable] = useState(true);
 
   const [generate] = useGenerateTokenOrderMutation();
 
@@ -58,24 +60,24 @@ export function CustomerOrderScreen() {
     },
   });
 
-  useEffect(() => {
-    if (process.browser && setting.length > 0) {
-      const center = setting.find((f: any) => f?.option === 'LOCATION')?.value;
-      navigator.geolocation.getCurrentPosition((msg) => {
-        const str: any = center?.split(',');
-        const km = haversineDistance(
-          Number(str[0]),
-          Number(str[1]),
-          Number(msg.coords.latitude),
-          Number(msg.coords.longitude),
-        );
+  // useEffect(() => {
+  //   if (process.browser && setting.length > 0) {
+  //     const center = setting.find((f: any) => f?.option === 'LOCATION')?.value;
+  //     navigator.geolocation.getCurrentPosition((msg) => {
+  //       const str: any = center?.split(',');
+  //       const km = haversineDistance(
+  //         Number(str[0]),
+  //         Number(str[1]),
+  //         Number(msg.coords.latitude),
+  //         Number(msg.coords.longitude),
+  //       );
 
-        if (Number(km) < 0.1) {
-          setAllow(true);
-        }
-      });
-    }
-  }, [setting]);
+  //       if (Number(km) < 0.1) {
+  //         setAllow(true);
+  //       }
+  //     });
+  //   }
+  // }, [setting]);
 
   useEffect(() => {
     if (setting.length > 0) {
@@ -159,15 +161,29 @@ export function CustomerOrderScreen() {
                       labelHidden
                       suffix={<Icon source={SearchIcon} />}
                       size="slim"
-                      placeholder="Search keyword..."
+                      placeholder="Search your Mood..."
                       // monospaced
                       onFocus={() => setCategory(null)}
                       onChange={(v) => {
                         setSearchInput(v);
                       }}
+                      connectedRight={
+                        <Button
+                          tone={enable ? 'success' : 'critical'}
+                          variant="primary"
+                          onClick={() => setEnable(!enable)}
+                        >
+                          {enable ? 'Enabled' : 'Disabled'}
+                        </Button>
+                      }
                     />
                   </div>
-                  <CustomerOrderCategory productGroup={groups} onSelected={setCategory} selected={category} />
+                  <CustomerOrderCategory
+                    productGroup={groups}
+                    onSelected={setCategory}
+                    selected={category}
+                    isOutStock={enable}
+                  />
                 </div>
               </div>
             )}
@@ -214,6 +230,24 @@ export function CustomerOrderScreen() {
                                   : groups[g]
                                 ).map((x: Product, i: any) => {
                                   return x.sku?.map((sku, indexSku) => {
+                                    if (!enable) {
+                                      if (
+                                        sku?.status === Status_Product.OutOfStock ||
+                                        x.status === Status_Product.OutOfStock
+                                      ) {
+                                        return;
+                                      }
+
+                                      return (
+                                        <ProductItem
+                                          key={indexSku}
+                                          product={x}
+                                          keyItem={info.name}
+                                          defaultSku={sku || {}}
+                                          display="CARD"
+                                        />
+                                      );
+                                    }
                                     return (
                                       <ProductItem
                                         key={indexSku}
