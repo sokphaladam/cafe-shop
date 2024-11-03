@@ -57,6 +57,7 @@ export function CustomerOrderScreen() {
       filter: {
         type: [Type_Product.Production],
       },
+      schedule: true,
     },
   });
 
