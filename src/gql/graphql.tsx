@@ -43,6 +43,7 @@ export type Attendance = {
   leave?: Maybe<Leave>;
   overTimeIn?: Maybe<Scalars['String']['output']>;
   overTimeOut?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
   user?: Maybe<User>;
 };
 
@@ -153,6 +154,20 @@ export enum Gender {
   Other = 'OTHER'
 }
 
+export type Holiday = {
+  __typename?: 'Holiday';
+  date?: Maybe<Scalars['String']['output']>;
+  extra?: Maybe<Scalars['Int']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type HolidayInput = {
+  date?: InputMaybe<Scalars['String']['input']>;
+  extra?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Integrate = {
   __typename?: 'Integrate';
   id?: Maybe<Scalars['Int']['output']>;
@@ -209,12 +224,15 @@ export type Mutation = {
   addOrderItem?: Maybe<Scalars['Boolean']['output']>;
   changeOrderStatus?: Maybe<Scalars['Boolean']['output']>;
   checkAttendance?: Maybe<Scalars['Boolean']['output']>;
+  checkProductCode?: Maybe<Scalars['Boolean']['output']>;
   createBank?: Maybe<Scalars['Boolean']['output']>;
   createBrand?: Maybe<Scalars['Boolean']['output']>;
   createCategory?: Maybe<Scalars['Boolean']['output']>;
   createDelivery?: Maybe<Scalars['Boolean']['output']>;
+  createHoliday?: Maybe<Scalars['Boolean']['output']>;
   createLeave?: Maybe<Scalars['Boolean']['output']>;
   createOrder?: Maybe<Scalars['Boolean']['output']>;
+  createOrderSchedule?: Maybe<Scalars['Boolean']['output']>;
   createOverTime?: Maybe<Scalars['Boolean']['output']>;
   createPosition?: Maybe<Scalars['Boolean']['output']>;
   createProduct?: Maybe<Scalars['Boolean']['output']>;
@@ -222,6 +240,7 @@ export type Mutation = {
   createShift?: Maybe<Scalars['Boolean']['output']>;
   createUser?: Maybe<Scalars['Boolean']['output']>;
   decreaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
+  deleteOrderSchedule?: Maybe<Scalars['Boolean']['output']>;
   generateTableSet?: Maybe<Scalars['Boolean']['output']>;
   generateTokenOrder?: Maybe<Scalars['String']['output']>;
   increaseOrderItem?: Maybe<Scalars['Boolean']['output']>;
@@ -230,14 +249,17 @@ export type Mutation = {
   peopleInOrder?: Maybe<Scalars['Boolean']['output']>;
   setTypePaymentOrder?: Maybe<Scalars['Boolean']['output']>;
   signatureOrder?: Maybe<Scalars['Boolean']['output']>;
+  swapOrderTable?: Maybe<Scalars['Boolean']['output']>;
   testSubscription?: Maybe<Scalars['Boolean']['output']>;
   updateBank?: Maybe<Scalars['Boolean']['output']>;
   updateBrand?: Maybe<Scalars['Boolean']['output']>;
   updateCategory?: Maybe<Scalars['Boolean']['output']>;
   updateCategoryIndex?: Maybe<Scalars['Boolean']['output']>;
   updateDelivery?: Maybe<Scalars['Boolean']['output']>;
+  updateHoliday?: Maybe<Scalars['Boolean']['output']>;
   updateLeave?: Maybe<Scalars['Boolean']['output']>;
   updateLeaveStatus?: Maybe<Scalars['Boolean']['output']>;
+  updateOrderSchedule?: Maybe<Scalars['Boolean']['output']>;
   updateOverTime?: Maybe<Scalars['Boolean']['output']>;
   updateOverTimeStatus?: Maybe<Scalars['Boolean']['output']>;
   updatePosition?: Maybe<Scalars['Boolean']['output']>;
@@ -274,6 +296,11 @@ export type MutationCheckAttendanceArgs = {
 };
 
 
+export type MutationCheckProductCodeArgs = {
+  code: Scalars['String']['input'];
+};
+
+
 export type MutationCreateBankArgs = {
   name: Scalars['String']['input'];
   phone?: InputMaybe<Scalars['String']['input']>;
@@ -295,6 +322,11 @@ export type MutationCreateDeliveryArgs = {
 };
 
 
+export type MutationCreateHolidayArgs = {
+  data?: InputMaybe<HolidayInput>;
+};
+
+
 export type MutationCreateLeaveArgs = {
   data?: InputMaybe<LeaveInput>;
   userId: Scalars['Int']['input'];
@@ -303,6 +335,11 @@ export type MutationCreateLeaveArgs = {
 
 export type MutationCreateOrderArgs = {
   data?: InputMaybe<OrderInput>;
+};
+
+
+export type MutationCreateOrderScheduleArgs = {
+  data?: InputMaybe<OrderScheduleInput>;
 };
 
 
@@ -338,6 +375,11 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDecreaseOrderItemArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteOrderScheduleArgs = {
   id: Scalars['Int']['input'];
 };
 
@@ -391,6 +433,12 @@ export type MutationSignatureOrderArgs = {
 };
 
 
+export type MutationSwapOrderTableArgs = {
+  orderId: Scalars['Int']['input'];
+  table?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationTestSubscriptionArgs = {
   str?: InputMaybe<Scalars['String']['input']>;
 };
@@ -428,6 +476,12 @@ export type MutationUpdateDeliveryArgs = {
 };
 
 
+export type MutationUpdateHolidayArgs = {
+  data?: InputMaybe<HolidayInput>;
+  id: Scalars['Int']['input'];
+};
+
+
 export type MutationUpdateLeaveArgs = {
   data?: InputMaybe<LeaveInput>;
   id: Scalars['Int']['input'];
@@ -437,6 +491,12 @@ export type MutationUpdateLeaveArgs = {
 export type MutationUpdateLeaveStatusArgs = {
   id: Scalars['Int']['input'];
   status?: InputMaybe<LeaveStatus>;
+};
+
+
+export type MutationUpdateOrderScheduleArgs = {
+  data?: InputMaybe<OrderScheduleInput>;
+  id: Scalars['Int']['input'];
 };
 
 
@@ -556,6 +616,31 @@ export type OrderLog = {
   text?: Maybe<Scalars['String']['output']>;
 };
 
+export type OrderSchedule = {
+  __typename?: 'OrderSchedule';
+  endAt?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
+  items?: Maybe<Array<Maybe<OrderScheduleItem>>>;
+  name?: Maybe<Scalars['String']['output']>;
+  startAt?: Maybe<Scalars['String']['output']>;
+};
+
+export type OrderScheduleInput = {
+  endAt?: InputMaybe<Scalars['String']['input']>;
+  items?: InputMaybe<Array<InputMaybe<OrderScheduleItemInput>>>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  startAt?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OrderScheduleItem = {
+  __typename?: 'OrderScheduleItem';
+  sku?: Maybe<Sku>;
+};
+
+export type OrderScheduleItemInput = {
+  skuId?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export enum OrderViewBy {
   Admin = 'ADMIN',
   Kitchen = 'KITCHEN',
@@ -656,6 +741,7 @@ export type ProductStockInput = {
 
 export type Query = {
   __typename?: 'Query';
+  activityStaff?: Maybe<Scalars['JSON']['output']>;
   attendanceListAdmin?: Maybe<Array<Maybe<Attendance>>>;
   attendanceStaff?: Maybe<Array<Maybe<Attendance>>>;
   bankInfo?: Maybe<BankInfo>;
@@ -672,12 +758,17 @@ export type Query = {
   getPositionList?: Maybe<Array<Maybe<Position>>>;
   getSummaryAttendanceStaff?: Maybe<Scalars['JSON']['output']>;
   getbankList?: Maybe<Array<Maybe<BankInfo>>>;
+  holiday?: Maybe<Holiday>;
+  holidayList?: Maybe<Array<Maybe<Holiday>>>;
   leave?: Maybe<Leave>;
   leaveList?: Maybe<Array<Maybe<Leave>>>;
   me?: Maybe<User>;
   order?: Maybe<Order>;
   orderBalanceSummary?: Maybe<Scalars['JSON']['output']>;
+  orderItem?: Maybe<Scalars['JSON']['output']>;
   orderList?: Maybe<Array<Maybe<Order>>>;
+  orderSchedule?: Maybe<OrderSchedule>;
+  orderScheduleList?: Maybe<Array<Maybe<OrderSchedule>>>;
   overTime?: Maybe<OverTime>;
   overTimeList?: Maybe<Array<Maybe<OverTime>>>;
   position?: Maybe<Position>;
@@ -685,6 +776,9 @@ export type Query = {
   productList?: Maybe<Array<Maybe<Product>>>;
   productStock?: Maybe<ProductStock>;
   productStockList?: Maybe<Array<Maybe<ProductStock>>>;
+  reportSaleByDay?: Maybe<Scalars['JSON']['output']>;
+  reportSaleProduct?: Maybe<Scalars['JSON']['output']>;
+  reportStaffPayroll?: Maybe<Scalars['JSON']['output']>;
   roleList?: Maybe<Array<Maybe<Role>>>;
   settingList?: Maybe<Array<Maybe<Setting>>>;
   shiftById?: Maybe<Shift>;
@@ -694,6 +788,11 @@ export type Query = {
   topProductSell?: Maybe<Array<Maybe<ProductSell>>>;
   user?: Maybe<User>;
   userList?: Maybe<Array<Maybe<User>>>;
+};
+
+
+export type QueryActivityStaffArgs = {
+  userId: Scalars['Int']['input'];
 };
 
 
@@ -774,6 +873,11 @@ export type QueryGetbankListArgs = {
 };
 
 
+export type QueryHolidayArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
 export type QueryLeaveArgs = {
   id: Scalars['Int']['input'];
 };
@@ -801,14 +905,26 @@ export type QueryOrderBalanceSummaryArgs = {
 };
 
 
+export type QueryOrderItemArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
 export type QueryOrderListArgs = {
+  discount?: InputMaybe<Scalars['Boolean']['input']>;
   fromDate?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderId?: InputMaybe<Scalars['String']['input']>;
+  sign?: InputMaybe<Scalars['Boolean']['input']>;
   status?: InputMaybe<Array<InputMaybe<StatusOrder>>>;
   toDate?: InputMaybe<Scalars['String']['input']>;
   viewBy?: InputMaybe<OrderViewBy>;
+};
+
+
+export type QueryOrderScheduleArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -841,6 +957,7 @@ export type QueryProductListArgs = {
   filter?: InputMaybe<FilterProduct>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  schedule?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -852,6 +969,26 @@ export type QueryProductStockArgs = {
 export type QueryProductStockListArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryReportSaleByDayArgs = {
+  from?: InputMaybe<Scalars['String']['input']>;
+  to?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryReportSaleProductArgs = {
+  filters?: InputMaybe<ReportSaleFilter>;
+  from?: InputMaybe<Scalars['String']['input']>;
+  groupBy?: InputMaybe<ReportSaleGroupBy>;
+  to?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryReportStaffPayrollArgs = {
+  from?: InputMaybe<Scalars['String']['input']>;
+  to?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -883,6 +1020,7 @@ export type QueryTableSetListArgs = {
 
 
 export type QueryTopProductSellArgs = {
+  categoryIds?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   from?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   to?: InputMaybe<Scalars['String']['input']>;
@@ -902,6 +1040,15 @@ export type QueryUserListArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ReportSaleFilter = {
+  category?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+};
+
+export enum ReportSaleGroupBy {
+  Date = 'DATE',
+  Product = 'PRODUCT'
+}
+
 export type Role = {
   __typename?: 'Role';
   id?: Maybe<Scalars['Int']['output']>;
@@ -915,6 +1062,7 @@ export type Sku = {
   image?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   price?: Maybe<Scalars['Float']['output']>;
+  product?: Maybe<Product>;
   status?: Maybe<Status_Product>;
   unit?: Maybe<Scalars['String']['output']>;
 };
@@ -948,6 +1096,8 @@ export type Shift = {
   card?: Maybe<Scalars['Int']['output']>;
   close?: Maybe<Scalars['String']['output']>;
   closeCurrency?: Maybe<CurrencyShift>;
+  customer?: Maybe<Scalars['String']['output']>;
+  customerAvgCost?: Maybe<Scalars['String']['output']>;
   deposit?: Maybe<Scalars['String']['output']>;
   expectedCurrency?: Maybe<CurrencyShift>;
   id?: Maybe<Scalars['Int']['output']>;
@@ -1267,6 +1417,7 @@ export type ProductListQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   code?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<FilterProduct>;
+  schedule?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
@@ -2278,8 +2429,14 @@ export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeSuspenseQueryHookResult = ReturnType<typeof useMeSuspenseQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const ProductListDocument = gql`
-    query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProduct) {
-  productList(offset: $offset, limit: $limit, code: $code, filter: $filter) {
+    query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProduct, $schedule: Boolean) {
+  productList(
+    offset: $offset
+    limit: $limit
+    code: $code
+    filter: $filter
+    schedule: $schedule
+  ) {
     id
     title
     description
@@ -2327,6 +2484,7 @@ export const ProductListDocument = gql`
  *      limit: // value for 'limit'
  *      code: // value for 'code'
  *      filter: // value for 'filter'
+ *      schedule: // value for 'schedule'
  *   },
  * });
  */

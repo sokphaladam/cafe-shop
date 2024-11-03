@@ -23,8 +23,8 @@ query me {
   }
 }
 
-query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProduct) {
-  productList(offset: $offset, limit: $limit, code: $code, filter: $filter) {
+query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProduct, $schedule: Boolean) {
+  productList(offset: $offset, limit: $limit, code: $code, filter: $filter, schedule: $schedule) {
     id
     title
     description
