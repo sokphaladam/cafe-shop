@@ -14,7 +14,7 @@ import {
   TextField,
   Thumbnail,
 } from '@shopify/polaris';
-import { CartAbandonedFilledIcon } from '@shopify/polaris-icons';
+import { CartAbandonedFilledIcon, PackageOnHoldIcon } from '@shopify/polaris-icons';
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
 
@@ -153,7 +153,7 @@ export function ProductItem(props: Props) {
                     label={x?.name}
                     key={i}
                     helpText={(<div>${x?.price}</div>) as any}
-                    disabled={x?.status === Status_Product.OutOfStock}
+                    disabled={x?.status === Status_Product.OutOfStock || x?.status === Status_Product.TimeOut}
                   />
                 );
               })}
@@ -269,7 +269,8 @@ export function ProductItem(props: Props) {
             <b
               className={`text-lg ${
                 props.product.status === Status_Product.OutOfStock ||
-                props.defaultSku?.status === Status_Product.OutOfStock
+                props.defaultSku?.status === Status_Product.OutOfStock ||
+                props.defaultSku?.status === Status_Product.TimeOut
                   ? 'text-gray-400'
                   : ''
               }`}
@@ -284,6 +285,14 @@ export function ProductItem(props: Props) {
                   <Icon source={CartAbandonedFilledIcon} tone="critical" />
                 </div>
                 <small className="text-red-500">(Out Of Stock)</small>
+              </div>
+            )}
+            {props.defaultSku?.status === Status_Product.TimeOut && (
+              <div className="flex flex-row items-center gap-1">
+                <div>
+                  <Icon source={PackageOnHoldIcon} tone="critical" />
+                </div>
+                <small className="text-red-500">(Time Out)</small>
               </div>
             )}
             <div className="max-h-[30px] truncate">{props.product.description}</div>
@@ -316,7 +325,8 @@ export function ProductItem(props: Props) {
             <b
               className={`text-lg ${
                 props.product.status === Status_Product.OutOfStock ||
-                props.defaultSku?.status === Status_Product.OutOfStock
+                props.defaultSku?.status === Status_Product.OutOfStock ||
+                props.defaultSku?.status === Status_Product.TimeOut
                   ? 'text-gray-400'
                   : ''
               }`}
@@ -331,6 +341,14 @@ export function ProductItem(props: Props) {
                   <Icon source={CartAbandonedFilledIcon} tone="critical" />
                 </div>
                 <small className="text-red-500">(Out Of Stock)</small>
+              </div>
+            )}
+            {props.defaultSku?.status === Status_Product.TimeOut && (
+              <div className="flex flex-row items-center gap-1">
+                <div>
+                  <Icon source={PackageOnHoldIcon} tone="critical" />
+                </div>
+                <small className="text-red-500">(Time Out)</small>
               </div>
             )}
             <div className="max-h-[30px] truncate">{props.product.description}</div>

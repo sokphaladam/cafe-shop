@@ -1079,7 +1079,8 @@ export type SkuInput = {
 
 export enum Status_Product {
   Available = 'AVAILABLE',
-  OutOfStock = 'OUT_OF_STOCK'
+  OutOfStock = 'OUT_OF_STOCK',
+  TimeOut = 'TIME_OUT'
 }
 
 export type Setting = {

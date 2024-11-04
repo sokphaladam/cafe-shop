@@ -234,7 +234,8 @@ export function CustomerOrderScreen() {
                                     if (!enable) {
                                       if (
                                         sku?.status === Status_Product.OutOfStock ||
-                                        x.status === Status_Product.OutOfStock
+                                        x.status === Status_Product.OutOfStock ||
+                                        sku?.status === Status_Product.TimeOut
                                       ) {
                                         return;
                                       }
