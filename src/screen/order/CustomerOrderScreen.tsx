@@ -56,6 +56,7 @@ export function CustomerOrderScreen() {
       offset: 0,
       filter: {
         type: [Type_Product.Production],
+        status: [Status_Product.Available, Status_Product.OutOfStock, Status_Product.TimeOut]
       },
       schedule: true,
     },
