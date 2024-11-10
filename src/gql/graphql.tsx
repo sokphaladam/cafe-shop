@@ -145,6 +145,7 @@ export type DeliveryInput = {
 export type FilterProduct = {
   category?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   isLowStock?: InputMaybe<Scalars['Boolean']['input']>;
+  status?: InputMaybe<Array<InputMaybe<Status_Product>>>;
   type?: InputMaybe<Array<InputMaybe<Type_Product>>>;
 };
 
@@ -247,6 +248,7 @@ export type Mutation = {
   login?: Maybe<Scalars['String']['output']>;
   markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
   peopleInOrder?: Maybe<Scalars['Boolean']['output']>;
+  resetPassword?: Maybe<Scalars['Boolean']['output']>;
   setTypePaymentOrder?: Maybe<Scalars['Boolean']['output']>;
   signatureOrder?: Maybe<Scalars['Boolean']['output']>;
   swapOrderTable?: Maybe<Scalars['Boolean']['output']>;
@@ -414,6 +416,13 @@ export type MutationMarkOrderItemStatusArgs = {
 export type MutationPeopleInOrderArgs = {
   count: Scalars['Int']['input'];
   id: Scalars['Int']['input'];
+};
+
+
+export type MutationResetPasswordArgs = {
+  oldPassowrd: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
@@ -750,6 +759,7 @@ export type Query = {
   brandList?: Maybe<Array<Maybe<Brand>>>;
   category?: Maybe<Category>;
   categoryList?: Maybe<Scalars['JSON']['output']>;
+  checkHaveOpenShiftToday?: Maybe<Scalars['Boolean']['output']>;
   deliveryById?: Maybe<Delivery>;
   deliveryList?: Maybe<Array<Maybe<Delivery>>>;
   getAttendanceStaff?: Maybe<Array<Maybe<Attendance>>>;
@@ -1079,6 +1089,7 @@ export type SkuInput = {
 
 export enum Status_Product {
   Available = 'AVAILABLE',
+  Inactive = 'INACTIVE',
   OutOfStock = 'OUT_OF_STOCK',
   TimeOut = 'TIME_OUT'
 }
