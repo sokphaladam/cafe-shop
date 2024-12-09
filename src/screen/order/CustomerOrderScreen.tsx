@@ -56,30 +56,12 @@ export function CustomerOrderScreen() {
       offset: 0,
       filter: {
         type: [Type_Product.Production],
-        status: [Status_Product.Available, Status_Product.OutOfStock, Status_Product.TimeOut]
+        status: [Status_Product.Available, Status_Product.OutOfStock, Status_Product.TimeOut],
       },
       schedule: true,
+      enabledOn: ['ALL', 'WEB'],
     },
   });
-
-  // useEffect(() => {
-  //   if (process.browser && setting.length > 0) {
-  //     const center = setting.find((f: any) => f?.option === 'LOCATION')?.value;
-  //     navigator.geolocation.getCurrentPosition((msg) => {
-  //       const str: any = center?.split(',');
-  //       const km = haversineDistance(
-  //         Number(str[0]),
-  //         Number(str[1]),
-  //         Number(msg.coords.latitude),
-  //         Number(msg.coords.longitude),
-  //       );
-
-  //       if (Number(km) < 0.1) {
-  //         setAllow(true);
-  //       }
-  //     });
-  //   }
-  // }, [setting]);
 
   useEffect(() => {
     if (setting.length > 0) {

@@ -232,7 +232,7 @@ export type Mutation = {
   createDelivery?: Maybe<Scalars['Boolean']['output']>;
   createHoliday?: Maybe<Scalars['Boolean']['output']>;
   createLeave?: Maybe<Scalars['Boolean']['output']>;
-  createOrder?: Maybe<Scalars['Boolean']['output']>;
+  createOrder?: Maybe<Scalars['Int']['output']>;
   createOrderSchedule?: Maybe<Scalars['Boolean']['output']>;
   createOverTime?: Maybe<Scalars['Boolean']['output']>;
   createPosition?: Maybe<Scalars['Boolean']['output']>;
@@ -249,6 +249,7 @@ export type Mutation = {
   markOrderItemStatus?: Maybe<Scalars['Boolean']['output']>;
   peopleInOrder?: Maybe<Scalars['Boolean']['output']>;
   resetPassword?: Maybe<Scalars['Boolean']['output']>;
+  setItemShowOn?: Maybe<Scalars['Boolean']['output']>;
   setTypePaymentOrder?: Maybe<Scalars['Boolean']['output']>;
   signatureOrder?: Maybe<Scalars['Boolean']['output']>;
   swapOrderTable?: Maybe<Scalars['Boolean']['output']>;
@@ -426,6 +427,13 @@ export type MutationResetPasswordArgs = {
 };
 
 
+export type MutationSetItemShowOnArgs = {
+  productId: Scalars['Int']['input'];
+  skuId?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationSetTypePaymentOrderArgs = {
   bankId?: InputMaybe<Scalars['Int']['input']>;
   bankType?: InputMaybe<Scalars['String']['input']>;
@@ -597,8 +605,16 @@ export type Order = {
 
 export type OrderInput = {
   address?: InputMaybe<Scalars['String']['input']>;
+  amount?: InputMaybe<Scalars['String']['input']>;
+  bankId?: InputMaybe<Scalars['Int']['input']>;
+  bankType?: InputMaybe<Scalars['String']['input']>;
   carts?: InputMaybe<Array<InputMaybe<CartItemInput>>>;
+  currency?: InputMaybe<Scalars['String']['input']>;
+  customerPaid?: InputMaybe<Scalars['String']['input']>;
+  discount?: InputMaybe<Scalars['Float']['input']>;
+  invoice?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
   set?: InputMaybe<Scalars['String']['input']>;
   uuid?: InputMaybe<Scalars['String']['input']>;
 };
@@ -653,6 +669,7 @@ export type OrderScheduleItemInput = {
 export enum OrderViewBy {
   Admin = 'ADMIN',
   Kitchen = 'KITCHEN',
+  QuickOrder = 'QUICK_ORDER',
   User = 'USER'
 }
 
@@ -802,7 +819,10 @@ export type Query = {
 
 
 export type QueryActivityStaffArgs = {
-  userId: Scalars['Int']['input'];
+  from?: InputMaybe<Scalars['String']['input']>;
+  to?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  userId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -964,6 +984,7 @@ export type QueryProductArgs = {
 
 export type QueryProductListArgs = {
   code?: InputMaybe<Scalars['String']['input']>;
+  enabledOn?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   filter?: InputMaybe<FilterProduct>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1068,6 +1089,7 @@ export type Role = {
 export type Sku = {
   __typename?: 'SKU';
   discount?: Maybe<Scalars['Float']['output']>;
+  enabledOn?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['Int']['output']>;
   image?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
@@ -1270,7 +1292,7 @@ export type CreateOrderMutationVariables = Exact<{
 }>;
 
 
-export type CreateOrderMutation = { __typename?: 'Mutation', createOrder?: boolean | null };
+export type CreateOrderMutation = { __typename?: 'Mutation', createOrder?: number | null };
 
 export type AddOrderItemMutationVariables = Exact<{
   orderId: Scalars['Int']['input'];
@@ -1430,6 +1452,7 @@ export type ProductListQueryVariables = Exact<{
   code?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<FilterProduct>;
   schedule?: InputMaybe<Scalars['Boolean']['input']>;
+  enabledOn?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
 }>;
 
 
@@ -2441,13 +2464,14 @@ export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeSuspenseQueryHookResult = ReturnType<typeof useMeSuspenseQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const ProductListDocument = gql`
-    query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProduct, $schedule: Boolean) {
+    query ProductList($offset: Int, $limit: Int, $code: String, $filter: FilterProduct, $schedule: Boolean, $enabledOn: [String]) {
   productList(
     offset: $offset
     limit: $limit
     code: $code
     filter: $filter
     schedule: $schedule
+    enabledOn: $enabledOn
   ) {
     id
     title
@@ -2497,6 +2521,7 @@ export const ProductListDocument = gql`
  *      code: // value for 'code'
  *      filter: // value for 'filter'
  *      schedule: // value for 'schedule'
+ *      enabledOn: // value for 'enabledOn'
  *   },
  * });
  */
