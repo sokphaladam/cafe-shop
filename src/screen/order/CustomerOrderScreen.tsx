@@ -25,6 +25,7 @@ import { Button, Icon, Spinner, TextField } from '@shopify/polaris';
 import { CustomerOrderCategory } from './components/CustomerOrderCategoy';
 import { SearchIcon } from '@shopify/polaris-icons';
 import { DisplayOrder } from './components/DisplayOrder';
+import { WarningProduct } from './components/warning-product';
 
 export function CustomerOrderScreen() {
   const mooddev = process.browser ? sessionStorage.getItem('mooddev') : 'F';
@@ -118,6 +119,8 @@ export function CustomerOrderScreen() {
     return a;
   }, {});
 
+  const warningProduct = data?.productList?.find((f) => f?.category?.name === 'Beer')?.sku?.find((f) => f?.id === 226);
+
   return (
     <Suspense>
       <div>
@@ -134,6 +137,7 @@ export function CustomerOrderScreen() {
                 <DisplayOrder />
               </div>
             )}
+            <WarningProduct sku={warningProduct} />
             {!!allow && (
               <div className="bg-white sticky z-[51] top-[39px]">
                 <div>
@@ -175,28 +179,6 @@ export function CustomerOrderScreen() {
               <>
                 <div className="max-w-[1200px] mx-auto flex flex-row gap-4 max-sm:w-full max-sm:gap-0 ">
                   <div className="w-[100%] flex flex-col gap-4 max-sm:w-full p-2">
-                    {/* <div className="bg-white">
-                      <DisplayOrder />
-                      <div>
-                        <div className="p-1">
-                          <TextField
-                            autoComplete="off"
-                            value={searchInput}
-                            label
-                            labelHidden
-                            suffix={<Icon source={SearchIcon} />}
-                            size="slim"
-                            placeholder="Search keyword..."
-                            // monospaced
-                            onFocus={() => setCategory(null)}
-                            onChange={(v) => {
-                              setSearchInput(v);
-                            }}
-                          />
-                        </div>
-                        <CustomerOrderCategory productGroup={groups} onSelected={setCategory} selected={category} />
-                      </div>
-                    </div> */}
                     <div className="max-sm:px-4">
                       {groups &&
                         (category === null
@@ -233,6 +215,11 @@ export function CustomerOrderScreen() {
                                         />
                                       );
                                     }
+
+                                    if (sku?.name?.toLowerCase() === 'wine charge') {
+                                      return;
+                                    }
+
                                     return (
                                       <ProductItem
                                         key={indexSku}
@@ -245,32 +232,11 @@ export function CustomerOrderScreen() {
                                   });
                                 })}
                               </div>
-                              {/* <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-                                {(searchInput
-                                  ? groups[g].filter((f: any) =>
-                                      String(f.title).toLowerCase().match(searchInput.toLowerCase()),
-                                    )
-                                  : groups[g]
-                                ).map((x: Product, i: any) => {
-                                  return x.sku?.map((sku, indexSku) => {
-                                    return (
-                                      <ProductItem
-                                        key={indexSku}
-                                        product={x}
-                                        keyItem={info.name}
-                                        defaultSku={sku || {}}
-                                      />
-                                    );
-                                  });
-                                  // return <ProductItem key={i} product={x} keyItem={info.name} />;
-                                })}
-                              </div> */}
                             </div>
                           );
                         })}
                     </div>
                   </div>
-                  {/* <LayoutCart /> */}
                 </div>
               </>
             )}

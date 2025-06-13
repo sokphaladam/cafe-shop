@@ -158,79 +158,8 @@ export function ProductItem(props: Props) {
                 );
               })}
             </div>
-            {/* {(props.product.addons || []).length > 0 && (
-              <div>
-                {addons.map((x, i) => {
-                  return (
-                    <div key={i} className="border-solid border-[0.5px] rounded-md mb-2 p-2">
-                      <div className="flex flex-row justify-between items-center">
-                        <div>
-                          {x?.name} (${x?.value})
-                        </div>
-                        <div className="text-right flex flex-col gap-2">
-                          <div>
-                            <ButtonGroup variant="segmented">
-                              <Button
-                                onClick={() => {
-                                  const dummy = [...addons];
-                                  dummy[i].qty = dummy[i].qty > 0 ? dummy[i].qty - 1 : 0;
-                                  setAddons(dummy);
-                                }}
-                                disabled={x.qty === 0}
-                              >
-                                -
-                              </Button>
-                              <Button disabled>{String(x.qty || 0)}</Button>
-                              <Button
-                                onClick={() => {
-                                  const dummy = [...addons];
-                                  dummy[i].qty = dummy[i].qty + 1;
-                                  setAddons(dummy);
-                                }}
-                              >
-                                +
-                              </Button>
-                            </ButtonGroup>
-                          </div>
-                          {x?.isRequired ? 'Required' : 'Optional'}
-                        </div>
-                      </div>
-                      // Close before
-                      <ChoiceList
-                        key={x?.id}
-                        title={x?.name}
-                        titleHidden
-                        choices={x?.value?.split(',').map((v) => ({ label: v, value: x.name + '(' + v + ')' })) || []}
-                        selected={addons[i]}
-                        onChange={(v) => {
-                          const dummy = [...addons];
-                          dummy[i] = v[0];
-                          setAddons(dummy);
-                        }}
-                      /> 
-                      // Close before
-                    </div>
-                  );
-                })}
-              </div>
-            )} */}
-            {/* <TextField
-              value={remark}
-              onChange={(v) => setRemark(v)}
-              label="Special instructions"
-              multiline={3}
-              autoComplete="off"
-              placeholder={`Tell us here!`}
-            /> */}
           </div>
         </Modal.Section>
-        {/* <Modal.Section>
-          <div className="flex flex-row items-center">
-            <Button fullWidth tone="success" variant="primary" onClick={handleAddtoCart}>
-              Add to cart
-            </Button>
-          </div>
-        </Modal.Section> */}
       </Modal>
       {props.display === 'CARD' ? (
         <div
