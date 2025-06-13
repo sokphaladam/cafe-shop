@@ -97,7 +97,7 @@ export function CustomerOrderCategory(props: Props) {
                     props.onSelected && props.onSelected(c);
                   }}
                 >
-                  {c.name} {count > 0 ? `(${count})` : ''}
+                  {c.name} {count > 0 ? `(${c.name === 'Beer' ? count - 1 : count})` : ''}
                 </li>
               );
             })}
