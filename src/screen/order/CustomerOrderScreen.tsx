@@ -216,7 +216,11 @@ export function CustomerOrderScreen() {
                                       );
                                     }
 
-                                    if (sku?.name?.toLowerCase() === 'wine charge') {
+                                    if (
+                                      sku?.name?.toLowerCase() === 'wine charge' ||
+                                      x.status === Status_Product.OutOfStock ||
+                                      sku?.status === Status_Product.OutOfStock
+                                    ) {
                                       return;
                                     }
 

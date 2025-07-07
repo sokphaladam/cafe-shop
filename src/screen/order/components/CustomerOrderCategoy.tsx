@@ -80,9 +80,7 @@ export function CustomerOrderCategory(props: Props) {
                         (a =
                           a +
                           b.sku.filter((f: any) => {
-                            return !props.isOutStock
-                              ? [Status_Product.Available].includes(f.status)
-                              : [Status_Product.Available, Status_Product.OutOfStock].includes(f.status);
+                            return [Status_Product.Available].includes(f.status);
                           }).length),
                       0,
                     )
