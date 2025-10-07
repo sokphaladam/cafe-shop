@@ -2,7 +2,7 @@
 'use client';
 
 import { config_app } from '@/lib/config_app';
-import { ApolloLink, HttpLink, split } from '@apollo/client';
+import { ApolloLink, split } from '@apollo/client';
 import {
   NextSSRApolloClient,
   NextSSRInMemoryCache,
@@ -19,14 +19,6 @@ let previousWsClient: GraphQLWsLink | null = null;
 
 function makeClient(initialize_token?: string | null) {
   const token = initialize_token ? initialize_token : getCookie('tk_token');
-  // const httpLink = new HttpLink({
-  //   uri: config_app.public.assets.url + '?token=' + (token ? token : ''),
-  //   headers: token
-  //     ? {
-  //         Authorization: 'Bearer ' + (token ? token : ''),
-  //       }
-  //     : {},
-  // });
 
   const btachLink = new BatchHttpLink({
     uri: config_app.public.assets.url + '?token=' + (token ? token : ''),
@@ -84,7 +76,6 @@ function makeClient(initialize_token?: string | null) {
         fetchPolicy: 'network-only',
       },
     },
-    connectToDevTools: config_app.public.assets.dev !== 'production',
   });
 }
 

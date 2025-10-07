@@ -3,17 +3,7 @@ import { useCustomToast } from '@/components/custom/CustomToast';
 import { useOrderContext } from '@/context/OrderContext';
 import { CartItemInput, Product, Sku, Status_Product, StatusOrder, useAddOrderItemMutation } from '@/gql/graphql';
 import { config_app } from '@/lib/config_app';
-import {
-  Button,
-  ButtonGroup,
-  ChoiceList,
-  Divider,
-  Icon,
-  Modal,
-  RadioButton,
-  TextField,
-  Thumbnail,
-} from '@shopify/polaris';
+import { Divider, Icon, Modal, RadioButton, Thumbnail } from '@shopify/polaris';
 import { CartAbandonedFilledIcon, PackageOnHoldIcon } from '@shopify/polaris-icons';
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
@@ -49,66 +39,6 @@ export function ProductItem(props: Props) {
   const [addCart] = useAddOrderItemMutation({
     refetchQueries: ['order'],
   });
-
-  const handleAddtoCart = useCallback(() => {
-    if (sku === 0) {
-      return;
-    }
-
-    const data = [...(items || [])];
-    const addonValue = addons
-      .filter((x) => x.qty > 0)
-      .map((x) => `${x.name}(x${x.qty})`)
-      .join(',');
-    const index = data.findIndex(
-      (f) =>
-        f.id === props.product.id &&
-        f.addon_value.join(',').trim() === addonValue.trim() &&
-        f.remark.trim() === remark.trim(),
-    );
-    const skuIndex = props.product.sku?.findIndex((f: any) => Number(f?.id) === sku);
-
-    if (index >= 0) {
-      data[index].qty = data[index].qty + 1;
-    }
-
-    const skuQuery = items?.find((f) => f.sku_id === sku && !f.isPrint);
-    const addonPrice = addons
-      .filter((x) => x.qty > 0)
-      .reduce(
-        (a, b) => (a = a + Number(b.qty || '0') * (isNaN(Number(b.value || '0')) ? 0 : Number(b.value || '0'))),
-        0,
-      );
-
-    const input: CartItemInput = {
-      skuId: sku,
-      productId: props.product.id,
-      addons: addonValue,
-      discount: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.discount) : 0,
-      price: skuIndex !== undefined ? Number((props.product.sku || [])[skuIndex]?.price) + addonPrice : 0,
-      qty: 1,
-      remark: remark,
-    };
-    addCart({
-      variables: {
-        orderId: Number(orderId),
-        data: input,
-      },
-    }).then((res) => {
-      if (res.data?.addOrderItem) {
-        setToasts([
-          ...toasts,
-          {
-            content: `Add ${props.product.title} to cart`,
-            status: 'info',
-          },
-        ]);
-        refetch();
-      }
-    });
-
-    setOpen(!open);
-  }, [addCart, addons, items, open, orderId, props.product, refetch, remark, setToasts, sku, toasts]);
 
   const edited = [StatusOrder.Pending, StatusOrder.Delivery, StatusOrder.Verify].includes(status);
   const addon = addons

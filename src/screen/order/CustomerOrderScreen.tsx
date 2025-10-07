@@ -1,26 +1,18 @@
 'use client';
-import { useCustomToast } from '@/components/custom/CustomToast';
-import { PolarisLayout } from '@/components/polaris/PolarisLayout';
-import { ProductList } from '@/components/ProductList';
 import { Topbar } from '@/components/Topbar';
 import { ProviderOrderContext, useOrderContext } from '@/context/OrderContext';
 import {
   Product,
   Status_Product,
   Type_Product,
-  useCategoryListQuery,
   useGenerateTokenOrderMutation,
-  useOrderLazyQuery,
-  useOrderQuery,
   useProductListQuery,
 } from '@/gql/graphql';
 import { ProductItem } from './components/ProductItem';
-import { LayoutCart } from './components/LayoutCart';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { VerifyCustomerOrderScreen } from './VerifyCustomerOrderScreen';
 import { useSetting } from '@/service/useSettingProvider';
-import { haversineDistance } from '@/lib/loacationDistance';
 import { Button, Icon, Spinner, TextField } from '@shopify/polaris';
 import { CustomerOrderCategory } from './components/CustomerOrderCategoy';
 import { SearchIcon } from '@shopify/polaris-icons';

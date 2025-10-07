@@ -1,5 +1,3 @@
-import { DashboardScreen } from "@/screen/DashboardScreen";
-
 export default function Home() {
-  return <DashboardScreen />
+  return <div></div>;
 }

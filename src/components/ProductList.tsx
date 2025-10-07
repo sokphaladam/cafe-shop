@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useOrderContext } from '@/context/OrderContext';
 import React, { useCallback, useState } from 'react';
 import { useCustomToast } from './custom/CustomToast';
