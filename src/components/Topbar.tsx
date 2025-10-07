@@ -4,7 +4,6 @@ import { CartPop } from './CartPop';
 import useLongPress from '@/hook/useLongPress';
 import { useRouter } from 'next/navigation';
 import { config_app } from '@/lib/config_app';
-import { GeneratePrint } from './GeneratePrint';
 
 export function Topbar({ isCart }: { isCart: boolean }) {
   const { push } = useRouter();
