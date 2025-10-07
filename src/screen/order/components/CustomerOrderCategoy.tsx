@@ -5,6 +5,7 @@ import { Status_Product, useCategoryListQuery } from '@/gql/graphql';
 import { isMobile } from '@/hook/isMobile';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+//@ts-ignore
 import './style.css';
 
 interface Props {
