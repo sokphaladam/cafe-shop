@@ -19,6 +19,29 @@ import { SearchIcon } from '@shopify/polaris-icons';
 import { DisplayOrder } from './components/DisplayOrder';
 import { WarningProduct } from './components/warning-product';
 
+function searchProducts(list: any, searchInput: string) {
+  const q = searchInput.toLowerCase();
+
+  return list
+    .map((product: any) => {
+      // filter only matching SKUs
+      const matchedSku = product.sku.filter((s: any) => s.name.toLowerCase().includes(q));
+
+      // If title matches OR any SKU matches
+      const matchTitle = product.title.toLowerCase().includes(q);
+
+      if (matchTitle || matchedSku.length > 0) {
+        return {
+          ...product,
+          sku: matchedSku.length > 0 ? matchedSku : product.sku,
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+}
+
 export function CustomerOrderScreen() {
   const mooddev = process.browser ? sessionStorage.getItem('mooddev') : 'F';
   const params = useSearchParams();
@@ -181,18 +204,33 @@ export function CustomerOrderScreen() {
                             <div key={g}>
                               {!searchInput && <div className="text-xl my-2 font-semibold">{g}</div>}
                               <div className="grid grid-cols-3 gap-4 max-sm:grid-cols-2">
-                                {(searchInput
-                                  ? groups[g].filter((f: any) =>
-                                      String(f.title).toLowerCase().match(searchInput.toLowerCase()),
-                                    )
-                                  : groups[g]
-                                ).map((x: Product, i: any) => {
-                                  return x.sku?.map((sku, indexSku) => {
-                                    if (!enable) {
+                                {(searchInput ? searchProducts(groups[g], searchInput) : groups[g]).map(
+                                  (x: Product, i: any) => {
+                                    return x.sku?.map((sku, indexSku) => {
+                                      if (!enable) {
+                                        if (
+                                          sku?.status === Status_Product.OutOfStock ||
+                                          x.status === Status_Product.OutOfStock ||
+                                          sku?.status === Status_Product.TimeOut
+                                        ) {
+                                          return;
+                                        }
+
+                                        return (
+                                          <ProductItem
+                                            key={indexSku}
+                                            product={x}
+                                            keyItem={info.name}
+                                            defaultSku={sku || {}}
+                                            display="CARD"
+                                          />
+                                        );
+                                      }
+
                                       if (
-                                        sku?.status === Status_Product.OutOfStock ||
+                                        sku?.name?.toLowerCase() === 'wine charge' ||
                                         x.status === Status_Product.OutOfStock ||
-                                        sku?.status === Status_Product.TimeOut
+                                        sku?.status === Status_Product.OutOfStock
                                       ) {
                                         return;
                                       }
@@ -206,27 +244,9 @@ export function CustomerOrderScreen() {
                                           display="CARD"
                                         />
                                       );
-                                    }
-
-                                    if (
-                                      sku?.name?.toLowerCase() === 'wine charge' ||
-                                      x.status === Status_Product.OutOfStock ||
-                                      sku?.status === Status_Product.OutOfStock
-                                    ) {
-                                      return;
-                                    }
-
-                                    return (
-                                      <ProductItem
-                                        key={indexSku}
-                                        product={x}
-                                        keyItem={info.name}
-                                        defaultSku={sku || {}}
-                                        display="CARD"
-                                      />
-                                    );
-                                  });
-                                })}
+                                    });
+                                  },
+                                )}
                               </div>
                             </div>
                           );
