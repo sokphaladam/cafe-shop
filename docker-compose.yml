@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_ENDPOINT: $NEXT_PUBLIC_ENDPOINT
+        PORT: $PORT
+    container_name: app-docker
+    ports:
+      - '$PORT:$PORT' # host:container
+    environment:
+      PORT: $PORT # Should match build args
+      NEXT_PUBLIC_ENDPOINT: $NEXT_PUBLIC_ENDPOINT
+    restart: always
+    command: ['sh', '-c', 'npm start -- -p $PORT']
