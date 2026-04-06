@@ -123,18 +123,27 @@ export function CustomerOrderScreen() {
     );
   }
 
-  const groups = data?.productList?.reduce((a: any, b: any) => {
+  const products = data
+    ? [...(data?.productList || [])].sort((a, b) => {
+        return (Number(b?.id) || 0) - (Number(a?.id) || 0);
+      }) || []
+    : [];
+
+  const groups = products?.reduce((a: any, b: any) => {
     const key = b?.category?.name;
 
     if (!a[key]) {
       a[key] = [];
     }
 
-    a[key].push(b);
+    a[key].push({
+      ...b,
+      sku: [...(b?.sku || [])].sort((a: any, b: any) => (Number(b?.id) || 0) - (Number(a?.id) || 0)) || [],
+    });
     return a;
   }, {});
 
-  const warningProduct = data?.productList?.find((f) => f?.category?.name === 'Beer')?.sku?.find((f) => f?.id === 226);
+  const warningProduct = products?.find((f) => f?.category?.name === 'Beer')?.sku?.find((f) => f?.id === 226);
 
   return (
     <Suspense>
@@ -204,7 +213,7 @@ export function CustomerOrderScreen() {
                             <div key={g}>
                               {!searchInput && <div className="text-xl my-2 font-semibold">{g}</div>}
                               <div className="grid grid-cols-3 gap-4 max-sm:grid-cols-2">
-                                {(searchInput ? searchProducts(groups[g], searchInput) : groups[g]).map(
+                                {((searchInput ? searchProducts(groups[g], searchInput) : groups[g]) as any[]).map(
                                   (x: Product, i: any) => {
                                     return x.sku?.map((sku, indexSku) => {
                                       if (!enable) {
